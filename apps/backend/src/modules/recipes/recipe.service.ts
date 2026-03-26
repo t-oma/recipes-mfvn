@@ -12,6 +12,8 @@ interface PaginatedResult {
     limit: number;
     total: number;
     totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
   };
 }
 
@@ -39,13 +41,16 @@ export class RecipeService {
       Recipe.countDocuments(filter),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
     return {
       items: items,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
       },
     };
   }
