@@ -1,3 +1,4 @@
+import { cleanupDoc, cleanupDocs } from "@/common/utils/transform.js";
 import { Recipe } from "@/modules/recipes/recipe.model.js";
 import type {
   CreateRecipeBody,
@@ -6,7 +7,7 @@ import type {
 } from "@/modules/recipes/recipe.schema.js";
 
 interface PaginatedResult {
-  items: Awaited<ReturnType<ReturnType<typeof Recipe.find>["lean"]>>;
+  items: ReturnType<typeof cleanupDocs<Record<string, unknown>>>;
   pagination: {
     page: number;
     limit: number;
@@ -43,7 +44,7 @@ export class RecipeService {
 
     const totalPages = Math.ceil(total / limit);
     return {
-      items: items,
+      items: cleanupDocs(items),
       pagination: {
         page,
         limit,
@@ -66,7 +67,7 @@ export class RecipeService {
         statusCode: 404,
       });
     }
-    return recipe;
+    return cleanupDoc(recipe);
   }
 
   async create(data: CreateRecipeBody, authorId: string) {

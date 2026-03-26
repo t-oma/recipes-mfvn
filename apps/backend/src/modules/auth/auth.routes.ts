@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { authGuard } from "@/common/middleware/auth.guard.js";
+import { cleanupDoc } from "@/common/utils/transform.js";
 import { loginSchema, registerSchema } from "@/modules/auth/auth.schema.js";
 import { AuthService } from "@/modules/auth/auth.service.js";
 
@@ -56,8 +57,13 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       if (!user) {
         return reply.status(404).send({ error: "User not found" });
       }
+      const transformed = cleanupDoc(user);
       return reply.send({
-        user: { id: user._id, email: user.email, name: user.name },
+        user: {
+          id: transformed.id,
+          email: transformed.email,
+          name: transformed.name,
+        },
       });
     },
   );

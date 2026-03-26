@@ -1,9 +1,11 @@
+import { cleanupDocs } from "@/common/utils/transform.js";
 import { Category } from "@/modules/categories/category.model.js";
 import type { CreateCategoryBody } from "@/modules/categories/category.schema.js";
 
 export class CategoryService {
   async findAll() {
-    return Category.find().sort({ name: 1 }).lean();
+    const categories = await Category.find().sort({ name: 1 }).lean();
+    return cleanupDocs(categories);
   }
 
   async create(data: CreateCategoryBody) {

@@ -47,7 +47,18 @@ const recipeSchema = new Schema<IRecipe>(
     cookingTime: { type: Number, required: true, min: 1 },
     servings: { type: Number, required: true, min: 1 },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      versionKey: false,
+      transform: (_doc, ret) => {
+        const { _id, ...rest } = ret;
+        return rest;
+      },
+    },
+    toObject: { virtuals: true },
+  },
 );
 
 recipeSchema.index({ title: "text", description: "text" });

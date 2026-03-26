@@ -14,7 +14,18 @@ const categorySchema = new Schema<ICategory>(
     slug: { type: String, required: true, unique: true, lowercase: true },
     description: { type: String, trim: true },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      versionKey: false,
+      transform: (_doc, ret) => {
+        const { _id, ...rest } = ret;
+        return rest;
+      },
+    },
+    toObject: { virtuals: true },
+  },
 );
 
 categorySchema.pre("validate", function (next) {

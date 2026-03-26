@@ -22,7 +22,18 @@ const userSchema = new Schema<IUser>(
     password: { type: String, required: true, minlength: 6, select: false },
     name: { type: String, required: true, trim: true },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      versionKey: false,
+      transform: (_doc, ret) => {
+        const { _id, ...rest } = ret;
+        return rest;
+      },
+    },
+    toObject: { virtuals: true },
+  },
 );
 
 userSchema.pre("save", async function (next) {
