@@ -1,9 +1,9 @@
-import { Recipe } from "@recipes/recipe.model.js";
+import { Recipe } from "@/modules/recipes/recipe.model.js";
 import type {
   CreateRecipeBody,
   SearchRecipeQuery,
   UpdateRecipeBody,
-} from "@recipes/recipe.schema.js";
+} from "@/modules/recipes/recipe.schema.js";
 
 interface PaginatedResult {
   items: Awaited<ReturnType<ReturnType<typeof Recipe.find>["lean"]>>;

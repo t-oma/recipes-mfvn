@@ -2,4 +2,5 @@
 
 ### 🚜 Refactor
 
-- *(monorepo)* Migrate to pnpm workspaces
+- _(monorepo)_ Migrate to pnpm workspaces
+- Created base tsconfig

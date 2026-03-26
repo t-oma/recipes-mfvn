@@ -1,6 +1,6 @@
-import type { LoginBody, RegisterBody } from "@auth/auth.schema.js";
-import { User } from "@auth/user.model.js";
-import { type JwtPayload, signToken } from "@common/utils/jwt.js";
+import { type JwtPayload, signToken } from "@/common/utils/jwt.js";
+import type { LoginBody, RegisterBody } from "@/modules/auth/auth.schema.js";
+import { User } from "@/modules/auth/user.model.js";
 
 interface AuthResponse {
   user: { id: string; email: string; name: string };

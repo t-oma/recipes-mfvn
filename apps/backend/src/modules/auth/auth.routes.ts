@@ -1,8 +1,8 @@
-import { loginSchema, registerSchema } from "@auth/auth.schema.js";
-import { AuthService } from "@auth/auth.service.js";
-import { authGuard } from "@common/middleware/auth.guard.js";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import { authGuard } from "@/common/middleware/auth.guard.js";
+import { loginSchema, registerSchema } from "@/modules/auth/auth.schema.js";
+import { AuthService } from "@/modules/auth/auth.service.js";
 
 const authService = new AuthService();
 

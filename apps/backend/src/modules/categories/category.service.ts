@@ -1,5 +1,5 @@
-import { Category } from "./category.model.js";
-import type { CreateCategoryBody } from "./category.schema.js";
+import { Category } from "@/modules/categories/category.model.js";
+import type { CreateCategoryBody } from "@/modules/categories/category.schema.js";
 
 export class CategoryService {
   async findAll() {

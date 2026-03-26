@@ -1,13 +1,13 @@
-import { authGuard } from "@common/middleware/auth.guard.js";
+import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import { authGuard } from "@/common/middleware/auth.guard.js";
 import {
   createRecipeSchema,
   recipeParamsSchema,
   recipeQuerySchema,
   updateRecipeSchema,
-} from "@recipes/recipe.schema.js";
-import { RecipeService } from "@recipes/recipe.service.js";
-import type { FastifyInstance } from "fastify";
-import type { ZodTypeProvider } from "fastify-type-provider-zod";
+} from "@/modules/recipes/recipe.schema.js";
+import { RecipeService } from "@/modules/recipes/recipe.service.js";
 
 const recipeService = new RecipeService();
 
