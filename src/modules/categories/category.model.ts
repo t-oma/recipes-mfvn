@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { type Document, Schema } from "mongoose";
 
 export interface ICategory extends Document {
   name: string;
@@ -14,7 +14,7 @@ const categorySchema = new Schema<ICategory>(
     slug: { type: String, required: true, unique: true, lowercase: true },
     description: { type: String, trim: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 categorySchema.pre("validate", function (next) {

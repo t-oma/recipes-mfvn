@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import mongoose, { type Document, Schema } from "mongoose";
 
 export interface IUser extends Document {
   email: string;
@@ -31,9 +31,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.comparePassword = async function (
-  candidate: string,
-): Promise<boolean> {
+userSchema.methods.comparePassword = async function (candidate: string): Promise<boolean> {
   return bcrypt.compare(candidate, this.password);
 };
 

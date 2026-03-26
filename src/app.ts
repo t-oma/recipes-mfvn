@@ -1,18 +1,15 @@
 import "dotenv/config";
-import Fastify from "fastify";
-import {
-  serializerCompiler,
-  validatorCompiler,
-} from "fastify-type-provider-zod";
+import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
-import fastifyCors from "@fastify/cors";
-import { swaggerOptions, swaggerUiOptions } from "./config/swagger.js";
+import Fastify from "fastify";
+import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { errorHandler } from "./common/middleware/errorHandler.js";
-import { authRoutes } from "./modules/auth/auth.routes.js";
-import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
-import { categoryRoutes } from "./modules/categories/category.routes.js";
 import { env } from "./config/env.js";
+import { swaggerOptions, swaggerUiOptions } from "./config/swagger.js";
+import { authRoutes } from "./modules/auth/auth.routes.js";
+import { categoryRoutes } from "./modules/categories/category.routes.js";
+import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
 
 export function buildApp() {
   const app = Fastify({

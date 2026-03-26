@@ -1,8 +1,8 @@
 import { Recipe } from "@recipes/recipe.model.js";
-import {
+import type {
   CreateRecipeBody,
-  UpdateRecipeBody,
   SearchRecipeQuery,
+  UpdateRecipeBody,
 } from "@recipes/recipe.schema.js";
 
 interface PaginatedResult {

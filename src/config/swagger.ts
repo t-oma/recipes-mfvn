@@ -1,5 +1,5 @@
-import { FastifySwaggerUiOptions } from "@fastify/swagger-ui";
-import { FastifyDynamicSwaggerOptions } from "@fastify/swagger";
+import type { FastifyDynamicSwaggerOptions } from "@fastify/swagger";
+import type { FastifySwaggerUiOptions } from "@fastify/swagger-ui";
 
 export const swaggerOptions: FastifyDynamicSwaggerOptions = {
   openapi: {
@@ -8,9 +8,7 @@ export const swaggerOptions: FastifyDynamicSwaggerOptions = {
       description: "API для сайту рецептів",
       version: "1.0.0",
     },
-    servers: [
-      { url: "http://localhost:3000", description: "Development" },
-    ],
+    servers: [{ url: "http://localhost:3000", description: "Development" }],
   },
 };
 

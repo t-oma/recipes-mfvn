@@ -1,11 +1,8 @@
-import { FastifyInstance } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  createCategorySchema,
-  categoryParamsSchema,
-} from "@categories/category.schema.js";
+import { categoryParamsSchema, createCategorySchema } from "@categories/category.schema.js";
 import { CategoryService } from "@categories/category.service.js";
 import { authGuard } from "@common/middleware/auth.guard.js";
+import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 const categoryService = new CategoryService();
 

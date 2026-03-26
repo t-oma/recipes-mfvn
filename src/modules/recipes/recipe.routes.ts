@@ -1,13 +1,13 @@
-import { FastifyInstance } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { authGuard } from "@common/middleware/auth.guard.js";
 import {
   createRecipeSchema,
-  updateRecipeSchema,
   recipeParamsSchema,
   recipeQuerySchema,
+  updateRecipeSchema,
 } from "@recipes/recipe.schema.js";
 import { RecipeService } from "@recipes/recipe.service.js";
-import { authGuard } from "@common/middleware/auth.guard.js";
+import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 const recipeService = new RecipeService();
 
@@ -55,10 +55,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      const recipe = await recipeService.create(
-        request.body,
-        request.user.userId,
-      );
+      const recipe = await recipeService.create(request.body, request.user.userId);
       return reply.status(201).send(recipe);
     },
   );
