@@ -1,4 +1,8 @@
+import type { FilterQuery } from "mongoose";
 import { cleanupDoc, cleanupDocs } from "@/common/utils/transform.js";
+import { User } from "@/modules/auth/user.model.js";
+import { Category } from "@/modules/categories/category.model.js";
+import type { IRecipe } from "@/modules/recipes/recipe.model.js";
 import { Recipe } from "@/modules/recipes/recipe.model.js";
 import type {
   CreateRecipeBody,
@@ -21,7 +25,7 @@ interface PaginatedResult {
 export class RecipeService {
   async findAll(query: SearchRecipeQuery): Promise<PaginatedResult> {
     const { page, limit, sort, category, search } = query;
-    const filter: Record<string, unknown> = {};
+    const filter: FilterQuery<IRecipe> = {};
 
     if (category) {
       filter.category = category;
@@ -71,6 +75,20 @@ export class RecipeService {
   }
 
   async create(data: CreateRecipeBody, authorId: string) {
+    const category = await Category.findById(data.category);
+    if (!category) {
+      throw Object.assign(new Error("Category not found"), {
+        statusCode: 400,
+      });
+    }
+
+    const author = await User.findById(authorId);
+    if (!author) {
+      throw Object.assign(new Error("Author not found"), {
+        statusCode: 400,
+      });
+    }
+
     const recipe = await Recipe.create({ ...data, author: authorId });
     return recipe.populate([
       { path: "author", select: "name email" },

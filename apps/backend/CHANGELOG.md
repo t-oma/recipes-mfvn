@@ -3,6 +3,7 @@
 ### 🐛 Bug Fixes
 
 - *(backend)* Remove MongoDB-specific fields from response
+- *(backend)* Added category and author validation before recipe creation
 
 ### 🚜 Refactor
 
