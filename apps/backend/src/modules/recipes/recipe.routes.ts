@@ -56,7 +56,10 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      const recipe = await recipeService.create(request.body, request.user.userId);
+      const recipe = await recipeService.create(
+        request.body,
+        request.user.userId,
+      );
       return reply.status(201).send(recipe);
     },
   );

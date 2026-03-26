@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { type JwtPayload, verifyToken } from "../utils/jwt.js";
+import type { JwtPayload } from "../utils/jwt.js";
+import { verifyToken } from "../utils/jwt.js";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -7,7 +8,10 @@ declare module "fastify" {
   }
 }
 
-export async function authGuard(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export async function authGuard(
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
   const authHeader = request.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {

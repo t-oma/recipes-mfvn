@@ -1,4 +1,5 @@
-import mongoose, { type Document, Schema, type Types } from "mongoose";
+import type { Document, Types } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export interface IIngredient {
   name: string;
@@ -35,12 +36,18 @@ const recipeSchema = new Schema<IRecipe>(
     ingredients: {
       type: [ingredientSchema],
       required: true,
-      validate: [(v: IIngredient[]) => v.length > 0, "At least one ingredient required"],
+      validate: [
+        (v: IIngredient[]) => v.length > 0,
+        "At least one ingredient required",
+      ],
     },
     instructions: {
       type: [String],
       required: true,
-      validate: [(v: string[]) => v.length > 0, "At least one instruction required"],
+      validate: [
+        (v: string[]) => v.length > 0,
+        "At least one instruction required",
+      ],
     },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },

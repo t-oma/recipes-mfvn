@@ -14,7 +14,8 @@ export function errorHandler(
     return;
   }
 
-  const statusCode = ("statusCode" in error ? error.statusCode : undefined) ?? 500;
+  const statusCode =
+    ("statusCode" in error ? error.statusCode : undefined) ?? 500;
   const message = statusCode === 500 ? "Internal server error" : error.message;
 
   reply.status(statusCode).send({ error: message });

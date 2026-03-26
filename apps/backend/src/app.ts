@@ -3,7 +3,10 @@ import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import Fastify from "fastify";
-import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
+import {
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
 import { errorHandler } from "./common/middleware/errorHandler.js";
 import { env } from "./config/env.js";
 import { swaggerOptions, swaggerUiOptions } from "./config/swagger.js";

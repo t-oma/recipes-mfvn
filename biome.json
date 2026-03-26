@@ -12,7 +12,7 @@
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100,
+    "lineWidth": 80,
     "lineEnding": "lf"
   },
   "linter": {
@@ -41,7 +41,13 @@
         "noNonNullAssertion": "warn",
         "useEnumInitializers": "error",
         "useForOf": "error",
-        "useNumberNamespace": "error"
+        "useNumberNamespace": "error",
+        "useImportType": {
+          "level": "on",
+          "options": {
+            "style": "separatedType"
+          }
+        }
       },
       "complexity": {
         "noExtraBooleanCast": "error",
@@ -62,7 +68,12 @@
     "enabled": true,
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": []
+          }
+        }
       }
     }
   }

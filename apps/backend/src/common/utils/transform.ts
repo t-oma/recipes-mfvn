@@ -19,7 +19,9 @@ function transformValue(value: unknown): unknown {
  * @param doc - MongoDB document
  * @returns Clean object
  */
-export function cleanupDoc<T extends Record<string, unknown>>(doc: T): CleanDoc<T> {
+export function cleanupDoc<T extends Record<string, unknown>>(
+  doc: T,
+): CleanDoc<T> {
   const { _id, __v, ...rest } = doc;
   const transformed: Record<string, unknown> = { id: String(_id) };
   for (const [key, value] of Object.entries(rest)) {
@@ -38,6 +40,8 @@ export function cleanupDoc<T extends Record<string, unknown>>(doc: T): CleanDoc<
  * @param docs - Array of MongoDB documents
  * @returns Array of clean objects
  */
-export function cleanupDocs<T extends Record<string, unknown>>(docs: T[]): CleanDoc<T>[] {
+export function cleanupDocs<T extends Record<string, unknown>>(
+  docs: T[],
+): CleanDoc<T>[] {
   return docs.map(cleanupDoc);
 }
