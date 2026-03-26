@@ -2,8 +2,8 @@ import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IIngredient {
   name: string;
-  quantity: string;
-  unit?: string;
+  quantity: number;
+  unit: string;
 }
 
 export interface IRecipe extends Document {
@@ -22,10 +22,10 @@ export interface IRecipe extends Document {
 const ingredientSchema = new Schema<IIngredient>(
   {
     name: { type: String, required: true, trim: true },
-    quantity: { type: String, required: true, trim: true },
-    unit: { type: String, trim: true },
+    quantity: { type: Number, required: true },
+    unit: { type: String, required: true, trim: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const recipeSchema = new Schema<IRecipe>(
@@ -43,14 +43,17 @@ const recipeSchema = new Schema<IRecipe>(
     instructions: {
       type: [String],
       required: true,
-      validate: [(v: string[]) => v.length > 0, "At least one instruction required"],
+      validate: [
+        (v: string[]) => v.length > 0,
+        "At least one instruction required",
+      ],
     },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
     cookingTime: { type: Number, required: true, min: 1 },
     servings: { type: Number, required: true, min: 1 },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 recipeSchema.index({ title: "text", description: "text" });

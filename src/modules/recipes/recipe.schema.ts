@@ -2,8 +2,8 @@ import { z } from "zod";
 
 const ingredientSchema = z.object({
   name: z.string().min(1),
-  quantity: z.string().min(1),
-  unit: z.string().optional(),
+  quantity: z.number().int().positive(),
+  unit: z.string().min(1),
 });
 
 export const createRecipeSchema = z.object({
@@ -32,4 +32,4 @@ export const recipeQuerySchema = z.object({
 
 export type CreateRecipeBody = z.infer<typeof createRecipeSchema>;
 export type UpdateRecipeBody = z.infer<typeof updateRecipeSchema>;
-export type RecipeQuery = z.infer<typeof recipeQuerySchema>;
+export type SearchRecipeQuery = z.infer<typeof recipeQuerySchema>;
