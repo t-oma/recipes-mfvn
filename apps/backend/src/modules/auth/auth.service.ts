@@ -1,4 +1,4 @@
-import type { User } from "@recipes/shared";
+import type { AuthResponse, User } from "@recipes/shared";
 import type { JwtPayload } from "@/common/utils/jwt.js";
 import { signToken } from "@/common/utils/jwt.js";
 import type { LoginBody, RegisterBody } from "@/modules/auth/auth.schema.js";
@@ -13,11 +13,6 @@ function toUser(doc: unknown): User {
     createdAt: (d.createdAt as Date).toISOString(),
     updatedAt: (d.updatedAt as Date).toISOString(),
   };
-}
-
-interface AuthResponse {
-  user: User;
-  token: string;
 }
 
 export class AuthService {

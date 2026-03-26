@@ -47,6 +47,11 @@ export interface User {
   updatedAt: string;
 }
 
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
+
 export interface PaginatedResult<T> {
   items: T[];
   pagination: {

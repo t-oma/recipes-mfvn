@@ -14,3 +14,4 @@
 - *(backend)* Updated biome configuration
 - *(backend)* Created shared types
 - *(backend)* Moved auth/me logic to service
+- *(backend)* Moved AuthResponse to packages/shared
