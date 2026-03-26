@@ -1,6 +1,6 @@
 {
   "name": "recipes-api",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Recipes API - Node.js + Fastify + MongoDB",
   "type": "module",
   "scripts": {
@@ -14,7 +14,7 @@
     "lint": "pnpm typecheck && pnpm check"
   },
   "keywords": [],
-  "author": "",
+  "author": "Artem Levchenko",
   "license": "ISC",
   "packageManager": "pnpm@10.24.0",
   "dependencies": {

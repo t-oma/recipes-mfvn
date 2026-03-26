@@ -45,6 +45,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       schema: {
         tags: ["Auth"],
         summary: "Get current user",
+        security: [{ bearerAuth: [] }],
       },
       preHandler: authGuard,
     },
