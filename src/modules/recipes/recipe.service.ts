@@ -2,11 +2,11 @@ import { Recipe } from "@recipes/recipe.model.js";
 import {
   CreateRecipeBody,
   UpdateRecipeBody,
-  RecipeQuery,
+  SearchRecipeQuery,
 } from "@recipes/recipe.schema.js";
 
 interface PaginatedResult {
-  data: Awaited<ReturnType<ReturnType<typeof Recipe.find>["lean"]>>;
+  items: Awaited<ReturnType<ReturnType<typeof Recipe.find>["lean"]>>;
   pagination: {
     page: number;
     limit: number;
@@ -16,7 +16,7 @@ interface PaginatedResult {
 }
 
 export class RecipeService {
-  async findAll(query: RecipeQuery): Promise<PaginatedResult> {
+  async findAll(query: SearchRecipeQuery): Promise<PaginatedResult> {
     const { page, limit, sort, category, search } = query;
     const filter: Record<string, unknown> = {};
 
@@ -28,7 +28,7 @@ export class RecipeService {
       filter.$text = { $search: search };
     }
 
-    const [data, total] = await Promise.all([
+    const [items, total] = await Promise.all([
       Recipe.find(filter)
         .populate("author", "name email")
         .populate("category", "name slug")
@@ -40,7 +40,7 @@ export class RecipeService {
     ]);
 
     return {
-      data,
+      items: items,
       pagination: {
         page,
         limit,
