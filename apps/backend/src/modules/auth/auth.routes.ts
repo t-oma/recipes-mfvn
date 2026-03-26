@@ -1,7 +1,7 @@
+import type { User } from "@recipes/shared";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { authGuard } from "@/common/middleware/auth.guard.js";
-import { cleanupDoc } from "@/common/utils/transform.js";
 import { loginSchema, registerSchema } from "@/modules/auth/auth.schema.js";
 import { AuthService } from "@/modules/auth/auth.service.js";
 
@@ -51,20 +51,20 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      const user = await import("./user.model.js").then((m) =>
+      const userDoc = await import("./user.model.js").then((m) =>
         m.User.findById(request.user.userId).lean(),
       );
-      if (!user) {
+      if (!userDoc) {
         return reply.status(404).send({ error: "User not found" });
       }
-      const transformed = cleanupDoc(user);
-      return reply.send({
-        user: {
-          id: transformed.id,
-          email: transformed.email,
-          name: transformed.name,
-        },
-      });
+      const user: User = {
+        id: String(userDoc._id),
+        email: userDoc.email,
+        name: userDoc.name,
+        createdAt: userDoc.createdAt.toISOString(),
+        updatedAt: userDoc.updatedAt.toISOString(),
+      };
+      return reply.send({ user });
     },
   );
 }

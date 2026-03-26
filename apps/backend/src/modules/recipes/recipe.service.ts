@@ -1,29 +1,49 @@
+import type {
+  CategorySummary,
+  PaginatedResult,
+  Recipe,
+  UserSummary,
+} from "@recipes/shared";
 import type { FilterQuery } from "mongoose";
-import { cleanupDoc, cleanupDocs } from "@/common/utils/transform.js";
-import { User } from "@/modules/auth/user.model.js";
-import { Category } from "@/modules/categories/category.model.js";
+import { User as UserModel } from "@/modules/auth/user.model.js";
+import { Category as CategoryModel } from "@/modules/categories/category.model.js";
 import type { IRecipe } from "@/modules/recipes/recipe.model.js";
-import { Recipe } from "@/modules/recipes/recipe.model.js";
+import { Recipe as RecipeModel } from "@/modules/recipes/recipe.model.js";
 import type {
   CreateRecipeBody,
   SearchRecipeQuery,
   UpdateRecipeBody,
 } from "@/modules/recipes/recipe.schema.js";
 
-interface PaginatedResult {
-  items: ReturnType<typeof cleanupDocs<Record<string, unknown>>>;
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
+function toRecipe(doc: unknown): Recipe {
+  const d = doc as Record<string, unknown>;
+  const category = d.category as Record<string, unknown>;
+  const author = d.author as Record<string, unknown>;
+  return {
+    id: String(d._id),
+    title: d.title as string,
+    description: d.description as string,
+    ingredients: d.ingredients as Recipe["ingredients"],
+    instructions: d.instructions as string[],
+    category: {
+      id: String(category._id),
+      name: category.name as string,
+      slug: category.slug as string,
+    } satisfies CategorySummary,
+    author: {
+      id: String(author._id),
+      email: author.email as string,
+      name: author.name as string,
+    } satisfies UserSummary,
+    cookingTime: d.cookingTime as number,
+    servings: d.servings as number,
+    createdAt: (d.createdAt as Date).toISOString(),
+    updatedAt: (d.updatedAt as Date).toISOString(),
   };
 }
 
 export class RecipeService {
-  async findAll(query: SearchRecipeQuery): Promise<PaginatedResult> {
+  async findAll(query: SearchRecipeQuery): Promise<PaginatedResult<Recipe>> {
     const { page, limit, sort, category, search } = query;
     const filter: FilterQuery<IRecipe> = {};
 
@@ -36,32 +56,32 @@ export class RecipeService {
     }
 
     const [items, total] = await Promise.all([
-      Recipe.find(filter)
+      RecipeModel.find(filter)
         .populate("author", "name email")
         .populate("category", "name slug")
         .sort(sort)
         .skip((page - 1) * limit)
         .limit(limit)
         .lean(),
-      Recipe.countDocuments(filter),
+      RecipeModel.countDocuments(filter),
     ]);
 
     const totalPages = Math.ceil(total / limit);
     return {
-      items: cleanupDocs(items),
+      items: items.map(toRecipe),
       pagination: {
         page,
         limit,
         total,
-        totalPages: totalPages,
+        totalPages,
         hasNext: page < totalPages,
         hasPrev: page > 1,
       },
     };
   }
 
-  async findById(id: string) {
-    const recipe = await Recipe.findById(id)
+  async findById(id: string): Promise<Recipe> {
+    const recipe = await RecipeModel.findById(id)
       .populate("author", "name email")
       .populate("category", "name slug")
       .lean();
@@ -71,33 +91,38 @@ export class RecipeService {
         statusCode: 404,
       });
     }
-    return cleanupDoc(recipe);
+    return toRecipe(recipe);
   }
 
-  async create(data: CreateRecipeBody, authorId: string) {
-    const category = await Category.findById(data.category);
+  async create(data: CreateRecipeBody, authorId: string): Promise<Recipe> {
+    const category = await CategoryModel.findById(data.category);
     if (!category) {
-      throw Object.assign(new Error("Category not found"), {
+      throw Object.assign(new Error("Category does not exist"), {
         statusCode: 400,
       });
     }
 
-    const author = await User.findById(authorId);
+    const author = await UserModel.findById(authorId);
     if (!author) {
       throw Object.assign(new Error("Author not found"), {
         statusCode: 400,
       });
     }
 
-    const recipe = await Recipe.create({ ...data, author: authorId });
-    return recipe.populate([
+    const recipe = await RecipeModel.create({ ...data, author: authorId });
+    const populated = await recipe.populate([
       { path: "author", select: "name email" },
       { path: "category", select: "name slug" },
     ]);
+    return toRecipe(populated.toObject());
   }
 
-  async update(id: string, data: UpdateRecipeBody, userId: string) {
-    const recipe = await Recipe.findById(id);
+  async update(
+    id: string,
+    data: UpdateRecipeBody,
+    userId: string,
+  ): Promise<Recipe> {
+    const recipe = await RecipeModel.findById(id);
     if (!recipe) {
       throw Object.assign(new Error("Recipe not found"), {
         statusCode: 404,
@@ -112,14 +137,15 @@ export class RecipeService {
 
     Object.assign(recipe, data);
     await recipe.save();
-    return recipe.populate([
+    const populated = await recipe.populate([
       { path: "author", select: "name email" },
       { path: "category", select: "name slug" },
     ]);
+    return toRecipe(populated.toObject());
   }
 
   async delete(id: string, userId: string): Promise<void> {
-    const recipe = await Recipe.findById(id);
+    const recipe = await RecipeModel.findById(id);
     if (!recipe) {
       throw Object.assign(new Error("Recipe not found"), {
         statusCode: 404,

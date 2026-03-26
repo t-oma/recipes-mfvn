@@ -12,3 +12,4 @@
 - *(backend)* HasNext & hasPrev pagination helpers
 - Moved form schemas from backend to shared package
 - *(backend)* Updated biome configuration
+- *(backend)* Created shared types
