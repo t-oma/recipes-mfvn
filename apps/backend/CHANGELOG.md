@@ -1,4 +1,4 @@
-## [unreleased]
+## [0.1.0] - 2026-03-27
 
 ### 🐛 Bug Fixes
 
@@ -16,6 +16,10 @@
 - *(backend)* Moved auth/me logic to service
 - *(backend)* Moved AuthResponse to packages/shared
 - *(backend)* Branded Minutes type for recipe cookingTime
+
+### 📚 Documentation
+
+- Update changelog for v0.1.0 release
 
 ### 🧪 Testing
 
