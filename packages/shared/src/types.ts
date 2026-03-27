@@ -1,3 +1,17 @@
+import type { z } from "zod";
+import type {
+  createRecipeSchema,
+  minutesSchema,
+  secondsSchema,
+  updateRecipeSchema,
+} from "./recipe.schema.js";
+
+export type Minutes = z.infer<typeof minutesSchema>;
+export type Seconds = z.infer<typeof secondsSchema>;
+
+export type CreateRecipeBody = z.infer<typeof createRecipeSchema>;
+export type UpdateRecipeBody = z.infer<typeof updateRecipeSchema>;
+
 export interface Ingredient {
   name: string;
   quantity: number;
@@ -24,7 +38,7 @@ export interface Recipe {
   instructions: string[];
   category: CategorySummary;
   author: UserSummary;
-  cookingTime: number;
+  cookingTime: Minutes;
   servings: number;
   createdAt: string;
   updatedAt: string;

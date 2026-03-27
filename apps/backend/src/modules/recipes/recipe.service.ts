@@ -1,5 +1,6 @@
 import type {
   CategorySummary,
+  Minutes,
   PaginatedResult,
   Recipe,
   UserSummary,
@@ -35,7 +36,7 @@ function toRecipe(doc: unknown): Recipe {
       email: author.email as string,
       name: author.name as string,
     } satisfies UserSummary,
-    cookingTime: d.cookingTime as number,
+    cookingTime: d.cookingTime as Minutes,
     servings: d.servings as number,
     createdAt: (d.createdAt as Date).toISOString(),
     updatedAt: (d.updatedAt as Date).toISOString(),

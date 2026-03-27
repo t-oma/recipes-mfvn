@@ -1,3 +1,4 @@
+import type { Minutes } from "@recipes/shared";
 import type { Document, Types } from "mongoose";
 import mongoose, { Schema } from "mongoose";
 
@@ -14,7 +15,7 @@ export interface IRecipe extends Document {
   instructions: string[];
   category: Types.ObjectId;
   author: Types.ObjectId;
-  cookingTime: number;
+  cookingTime: Minutes;
   servings: number;
   createdAt: Date;
   updatedAt: Date;

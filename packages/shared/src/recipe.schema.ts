@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const minutesSchema = z.number().int().min(1).brand<"Minutes">();
+export const secondsSchema = z.number().int().min(1).brand<"Seconds">();
+
 export const ingredientSchema = z.object({
   name: z.string().min(1),
   quantity: z.number().int().positive(),
@@ -12,11 +15,8 @@ export const createRecipeSchema = z.object({
   ingredients: z.array(ingredientSchema).min(1),
   instructions: z.array(z.string().min(5)).min(1),
   category: z.string().length(24),
-  cookingTime: z.number().int().min(1),
+  cookingTime: minutesSchema,
   servings: z.number().int().min(1),
 });
 
 export const updateRecipeSchema = createRecipeSchema.partial();
-
-export type CreateRecipeBody = z.infer<typeof createRecipeSchema>;
-export type UpdateRecipeBody = z.infer<typeof updateRecipeSchema>;

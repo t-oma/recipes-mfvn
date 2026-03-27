@@ -15,3 +15,4 @@
 - *(backend)* Created shared types
 - *(backend)* Moved auth/me logic to service
 - *(backend)* Moved AuthResponse to packages/shared
+- *(backend)* Branded Minutes type for recipe cookingTime
