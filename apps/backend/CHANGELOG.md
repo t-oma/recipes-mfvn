@@ -17,6 +17,10 @@
 - *(backend)* Moved AuthResponse to packages/shared
 - *(backend)* Branded Minutes type for recipe cookingTime
 
+### 🧪 Testing
+
+- *(categories)* Added unit tests for category service
+
 ### ⚙️ Miscellaneous Tasks
 
 - Configure vitest
