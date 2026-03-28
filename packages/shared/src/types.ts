@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import type { createCommentSchema } from "./comment.schema.js";
 import type {
   createRecipeSchema,
   minutesSchema,
@@ -11,6 +12,8 @@ export type Seconds = z.infer<typeof secondsSchema>;
 
 export type CreateRecipeBody = z.infer<typeof createRecipeSchema>;
 export type UpdateRecipeBody = z.infer<typeof updateRecipeSchema>;
+
+export type CreateCommentBody = z.infer<typeof createCommentSchema>;
 
 export interface Ingredient {
   name: string;
@@ -64,6 +67,15 @@ export interface User {
 export interface AuthResponse {
   user: User;
   token: string;
+}
+
+export interface Comment {
+  id: string;
+  text: string;
+  recipeId: string;
+  author: UserSummary;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaginatedResult<T> {
