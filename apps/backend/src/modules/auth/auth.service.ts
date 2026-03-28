@@ -1,4 +1,5 @@
 import type { AuthResponse, User } from "@recipes/shared";
+import { AppError } from "@/common/errors.js";
 import type { JwtPayload } from "@/common/utils/jwt.js";
 import { signToken } from "@/common/utils/jwt.js";
 import type { LoginBody, RegisterBody } from "@/modules/auth/auth.schema.js";
@@ -19,9 +20,7 @@ export class AuthService {
   async register(data: RegisterBody): Promise<AuthResponse> {
     const exists = await UserModel.findOne({ email: data.email });
     if (exists) {
-      throw Object.assign(new Error("Email already in use"), {
-        statusCode: 409,
-      });
+      throw new AppError("Email already in use", 409);
     }
 
     const user = await UserModel.create(data);
@@ -38,9 +37,7 @@ export class AuthService {
       .select("+password")
       .lean();
     if (!user || !(await user.comparePassword(data.password))) {
-      throw Object.assign(new Error("Invalid email or password"), {
-        statusCode: 401,
-      });
+      throw new AppError("Invalid email or password", 401);
     }
 
     const token = this.generateToken(user.id, user.email);
@@ -54,9 +51,7 @@ export class AuthService {
   async me(userId: string): Promise<User> {
     const user = await UserModel.findById(userId).lean();
     if (!user) {
-      throw Object.assign(new Error("User not found"), {
-        statusCode: 404,
-      });
+      throw new AppError("User not found", 404);
     }
 
     return toUser(user);

@@ -10,7 +10,8 @@
     "check:fix": "biome check --write apps/ packages/",
     "format": "biome format --write apps/ packages/",
     "test": "pnpm -r test",
-    "test:run": "pnpm -r test:run"
+    "test:watch": "pnpm -r test:watch",
+    "coverage": "pnpm -r coverage"
   },
   "dependencies": {
     "zod": "^4.3.6"

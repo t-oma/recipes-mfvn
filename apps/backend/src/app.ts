@@ -12,6 +12,7 @@ import { env } from "./config/env.js";
 import { swaggerOptions, swaggerUiOptions } from "./config/swagger.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
 import { categoryRoutes } from "./modules/categories/category.routes.js";
+import { commentRoutes } from "./modules/comments/comment.routes.js";
 import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
 
 export function buildApp() {
@@ -45,6 +46,7 @@ export function buildApp() {
   // Routes
   app.register(authRoutes, { prefix: "/api/auth" });
   app.register(recipeRoutes, { prefix: "/api/recipes" });
+  app.register(commentRoutes, { prefix: "/api/recipes" });
   app.register(categoryRoutes, { prefix: "/api/categories" });
 
   return app;
