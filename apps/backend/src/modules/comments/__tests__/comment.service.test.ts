@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CommentService } from "../comment.service.js";
 
-vi.mock("../comment.model.js", () => ({
+vi.mock("@/modules/comments/comment.model.js", () => ({
   Comment: {
     find: vi.fn(),
     findById: vi.fn(),
@@ -16,8 +16,16 @@ vi.mock("@/modules/recipes/recipe.model.js", () => ({
   },
 }));
 
-const { Comment } = await import("../comment.model.js");
+vi.mock("@/modules/auth/user.model.js", () => ({
+  User: {
+    findById: vi.fn(),
+  },
+}));
+
+const { Comment } = await import("@/modules/comments/comment.model.js");
 const { Recipe } = await import("@/modules/recipes/recipe.model.js");
+const { User } = await import("@/modules/auth/user.model.js");
+
 describe("CommentService", () => {
   let service: CommentService;
 
@@ -151,6 +159,8 @@ describe("CommentService", () => {
       vi.mocked(Comment.create).mockResolvedValue({
         populate: mockPopulate,
       } as never);
+
+      vi.mocked(User.findById).mockResolvedValue({ _id: authorId } as never);
 
       const result = await service.create(recipeId, authorId, {
         text: "Great recipe!",
