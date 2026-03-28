@@ -4,6 +4,7 @@ import type {
   UserSummary,
 } from "@recipes/shared";
 import type { FilterQuery } from "mongoose";
+import { AppError } from "@/common/errors.js";
 import type { IComment } from "@/modules/comments/comment.model.js";
 import { Comment as CommentModel } from "@/modules/comments/comment.model.js";
 import type {
@@ -41,13 +42,10 @@ export class CommentService {
 
     const recipe = await RecipeModel.findById(recipeId);
     if (!recipe) {
-      throw Object.assign(new Error("Recipe not found"), { statusCode: 404 });
+      throw new AppError("Recipe not found", 404);
     }
-    const filter: FilterQuery<IComment> = {};
 
-    if (recipe) {
-      filter.recipe = recipeId;
-    }
+    const filter: FilterQuery<IComment> = { recipe: recipeId };
 
     const [items, total] = await Promise.all([
       CommentModel.find(filter)
@@ -80,12 +78,12 @@ export class CommentService {
   ): Promise<CommentType> {
     const recipe = await RecipeModel.findById(recipeId);
     if (!recipe) {
-      throw Object.assign(new Error("Recipe not found"), { statusCode: 404 });
+      throw new AppError("Recipe not found", 404);
     }
 
     const author = await UserModel.findById(authorId);
     if (!author) {
-      throw Object.assign(new Error("Author not found"), { statusCode: 404 });
+      throw new AppError("Author not found", 404);
     }
 
     const comment = await CommentModel.create({
@@ -101,13 +99,11 @@ export class CommentService {
   async delete(id: string, userId: string): Promise<void> {
     const comment = await CommentModel.findById(id);
     if (!comment) {
-      throw Object.assign(new Error("Comment not found"), { statusCode: 404 });
+      throw new AppError("Comment not found", 404);
     }
 
     if (comment.author.toString() !== userId) {
-      throw Object.assign(new Error("Not authorized to delete this comment"), {
-        statusCode: 403,
-      });
+      throw new AppError("Not authorized to delete this comment", 403);
     }
 
     await comment.deleteOne();
