@@ -1,4 +1,5 @@
 import type { Category } from "@recipes/shared";
+import { AppError } from "@/common/errors.js";
 import { Category as CategoryModel } from "@/modules/categories/category.model.js";
 import type { CreateCategoryBody } from "@/modules/categories/category.schema.js";
 
@@ -28,9 +29,7 @@ export class CategoryService {
   async deleteById(id: string): Promise<void> {
     const result = await CategoryModel.findByIdAndDelete(id);
     if (!result) {
-      throw Object.assign(new Error("Category not found"), {
-        statusCode: 404,
-      });
+      throw new AppError("Category not found", 404);
     }
   }
 }

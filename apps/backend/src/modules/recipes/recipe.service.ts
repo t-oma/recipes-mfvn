@@ -6,6 +6,7 @@ import type {
   UserSummary,
 } from "@recipes/shared";
 import type { FilterQuery } from "mongoose";
+import { AppError } from "@/common/errors.js";
 import { User as UserModel } from "@/modules/auth/user.model.js";
 import { Category as CategoryModel } from "@/modules/categories/category.model.js";
 import type { IRecipe } from "@/modules/recipes/recipe.model.js";
@@ -88,9 +89,7 @@ export class RecipeService {
       .lean();
 
     if (!recipe) {
-      throw Object.assign(new Error("Recipe not found"), {
-        statusCode: 404,
-      });
+      throw new AppError("Recipe not found", 404);
     }
     return toRecipe(recipe);
   }
@@ -98,16 +97,12 @@ export class RecipeService {
   async create(data: CreateRecipeBody, authorId: string): Promise<Recipe> {
     const category = await CategoryModel.findById(data.category);
     if (!category) {
-      throw Object.assign(new Error("Category does not exist"), {
-        statusCode: 400,
-      });
+      throw new AppError("Category does not exist", 400);
     }
 
     const author = await UserModel.findById(authorId);
     if (!author) {
-      throw Object.assign(new Error("Author not found"), {
-        statusCode: 400,
-      });
+      throw new AppError("Author not found", 400);
     }
 
     const recipe = await RecipeModel.create({ ...data, author: authorId });
@@ -125,15 +120,11 @@ export class RecipeService {
   ): Promise<Recipe> {
     const recipe = await RecipeModel.findById(id);
     if (!recipe) {
-      throw Object.assign(new Error("Recipe not found"), {
-        statusCode: 404,
-      });
+      throw new AppError("Recipe not found", 404);
     }
 
     if (recipe.author.toString() !== userId) {
-      throw Object.assign(new Error("Not authorized to update this recipe"), {
-        statusCode: 403,
-      });
+      throw new AppError("Not authorized to update this recipe", 403);
     }
 
     Object.assign(recipe, data);
@@ -148,15 +139,11 @@ export class RecipeService {
   async delete(id: string, userId: string): Promise<void> {
     const recipe = await RecipeModel.findById(id);
     if (!recipe) {
-      throw Object.assign(new Error("Recipe not found"), {
-        statusCode: 404,
-      });
+      throw new AppError("Recipe not found", 404);
     }
 
     if (recipe.author.toString() !== userId) {
-      throw Object.assign(new Error("Not authorized to delete this recipe"), {
-        statusCode: 403,
-      });
+      throw new AppError("Not authorized to delete this recipe", 403);
     }
 
     await recipe.deleteOne();

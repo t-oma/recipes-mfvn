@@ -1,4 +1,3 @@
-import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -6,10 +5,11 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["src/**/*.test.ts"],
-  },
-  resolve: {
+    coverage: {
+      provider: "v8",
+    },
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@/": new URL("./src/", import.meta.url).pathname,
     },
   },
 });
