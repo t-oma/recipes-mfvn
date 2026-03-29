@@ -1,3 +1,4 @@
+import { difficultySchema } from "@recipes/shared";
 import { z } from "zod";
 
 export {
@@ -16,6 +17,7 @@ export const recipeQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
   sort: z.string().default("-createdAt"),
   category: z.string().length(24).optional(),
+  difficulty: difficultySchema.optional(),
   search: z.string().optional(),
 });
 

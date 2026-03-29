@@ -2,6 +2,7 @@ import type { z } from "zod";
 import type { createCommentSchema } from "./comment.schema.js";
 import type {
   createRecipeSchema,
+  difficultySchema,
   minutesSchema,
   secondsSchema,
   updateRecipeSchema,
@@ -14,6 +15,8 @@ export type CreateRecipeBody = z.infer<typeof createRecipeSchema>;
 export type UpdateRecipeBody = z.infer<typeof updateRecipeSchema>;
 
 export type CreateCommentBody = z.infer<typeof createCommentSchema>;
+
+export type Difficulty = z.infer<typeof difficultySchema>;
 
 export interface Ingredient {
   name: string;
@@ -41,6 +44,7 @@ export interface Recipe {
   instructions: string[];
   category: CategorySummary;
   author: UserSummary;
+  difficulty: Difficulty;
   cookingTime: Minutes;
   servings: number;
   createdAt: string;

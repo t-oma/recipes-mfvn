@@ -1,4 +1,4 @@
-import type { Minutes } from "@recipes/shared";
+import type { Difficulty, Minutes } from "@recipes/shared";
 import type { Document, Types } from "mongoose";
 import mongoose, { Schema } from "mongoose";
 
@@ -15,6 +15,7 @@ export interface IRecipeDocument extends Document {
   instructions: string[];
   category: Types.ObjectId;
   author: Types.ObjectId;
+  difficulty: Difficulty;
   cookingTime: Minutes;
   servings: number;
   createdAt: Date;
@@ -52,6 +53,11 @@ const recipeSchema = new Schema<IRecipeDocument>(
     },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    difficulty: {
+      type: String,
+      required: true,
+      enum: ["easy", "medium", "hard"],
+    },
     cookingTime: { type: Number, required: true, min: 1 },
     servings: { type: Number, required: true, min: 1 },
   },

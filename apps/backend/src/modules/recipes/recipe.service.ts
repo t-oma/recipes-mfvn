@@ -1,5 +1,6 @@
 import type {
   CategorySummary,
+  Difficulty,
   Minutes,
   PaginatedResult,
   Recipe,
@@ -37,6 +38,7 @@ function toRecipe(doc: unknown): Recipe {
       email: author.email as string,
       name: author.name as string,
     } satisfies UserSummary,
+    difficulty: d.difficulty as Difficulty,
     cookingTime: d.cookingTime as Minutes,
     servings: d.servings as number,
     createdAt: (d.createdAt as Date).toISOString(),
@@ -46,11 +48,14 @@ function toRecipe(doc: unknown): Recipe {
 
 export class RecipeService {
   async findAll(query: SearchRecipeQuery): Promise<PaginatedResult<Recipe>> {
-    const { page, limit, sort, category, search } = query;
+    const { page, limit, sort, category, difficulty, search } = query;
     const filter: QueryFilter<IRecipeDocument> = {};
 
     if (category) {
       filter.category = category;
+    }
+    if (difficulty) {
+      filter.difficulty = difficulty;
     }
 
     if (search) {
