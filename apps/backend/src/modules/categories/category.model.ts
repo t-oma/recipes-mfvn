@@ -29,7 +29,7 @@ const categorySchema = new Schema<ICategory>(
   },
 );
 
-categorySchema.pre("validate", function (next) {
+categorySchema.pre("validate", async function () {
   if (this.isModified("name") && !this.slug) {
     this.slug = this.name
       .toLowerCase()
@@ -37,7 +37,6 @@ categorySchema.pre("validate", function (next) {
       .replace(/\s+/g, "-")
       .trim();
   }
-  next();
 });
 
 export const Category = mongoose.model<ICategory>("Category", categorySchema);
