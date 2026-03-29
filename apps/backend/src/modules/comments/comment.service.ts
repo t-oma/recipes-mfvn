@@ -3,7 +3,7 @@ import type {
   PaginatedResult,
   UserSummary,
 } from "@recipes/shared";
-import type { FilterQuery } from "mongoose";
+import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import type { IComment } from "@/modules/comments/comment.model.js";
 import { Comment as CommentModel } from "@/modules/comments/comment.model.js";
@@ -45,7 +45,7 @@ export class CommentService {
       throw new AppError("Recipe not found", 404);
     }
 
-    const filter: FilterQuery<IComment> = { recipe: recipeId };
+    const filter: QueryFilter<IComment> = { recipe: recipeId };
 
     const [items, total] = await Promise.all([
       CommentModel.find(filter)

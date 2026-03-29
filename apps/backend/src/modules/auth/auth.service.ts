@@ -33,9 +33,9 @@ export class AuthService {
   }
 
   async login(data: LoginBody): Promise<AuthResponse> {
-    const user = await UserModel.findOne({ email: data.email })
-      .select("+password")
-      .lean();
+    const user = await UserModel.findOne({ email: data.email }).select(
+      "+password",
+    );
     if (!user || !(await user.comparePassword(data.password))) {
       throw new AppError("Invalid email or password", 401);
     }
@@ -43,7 +43,7 @@ export class AuthService {
     const token = this.generateToken(user.id, user.email);
 
     return {
-      user: toUser(user),
+      user: toUser(user.toObject()),
       token,
     };
   }

@@ -5,7 +5,7 @@ import type {
   Recipe,
   UserSummary,
 } from "@recipes/shared";
-import type { FilterQuery } from "mongoose";
+import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { User as UserModel } from "@/modules/auth/user.model.js";
 import { Category as CategoryModel } from "@/modules/categories/category.model.js";
@@ -47,7 +47,7 @@ function toRecipe(doc: unknown): Recipe {
 export class RecipeService {
   async findAll(query: SearchRecipeQuery): Promise<PaginatedResult<Recipe>> {
     const { page, limit, sort, category, search } = query;
-    const filter: FilterQuery<IRecipe> = {};
+    const filter: QueryFilter<IRecipe> = {};
 
     if (category) {
       filter.category = category;
