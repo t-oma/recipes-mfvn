@@ -1,7 +1,7 @@
 import type { Document, Types } from "mongoose";
 import mongoose, { Schema } from "mongoose";
 
-export interface IComment extends Document {
+export interface ICommentDocument extends Document {
   text: string;
   recipe: Types.ObjectId;
   author: Types.ObjectId;
@@ -9,7 +9,7 @@ export interface IComment extends Document {
   updatedAt: Date;
 }
 
-const commentSchema = new Schema<IComment>(
+const commentSchema = new Schema<ICommentDocument>(
   {
     text: {
       type: String,
@@ -37,4 +37,7 @@ const commentSchema = new Schema<IComment>(
 
 commentSchema.index({ recipe: 1, createdAt: -1 });
 
-export const Comment = mongoose.model<IComment>("Comment", commentSchema);
+export const CommentModel = mongoose.model<ICommentDocument>(
+  "Comment",
+  commentSchema,
+);
