@@ -41,13 +41,17 @@ function toRecipe(doc: unknown): Recipe {
     difficulty: d.difficulty as Difficulty,
     cookingTime: d.cookingTime as Minutes,
     servings: d.servings as number,
+    isPublic: d.isPublic as boolean,
     createdAt: (d.createdAt as Date).toISOString(),
     updatedAt: (d.updatedAt as Date).toISOString(),
   };
 }
 
 export class RecipeService {
-  async findAll(query: SearchRecipeQuery): Promise<PaginatedResult<Recipe>> {
+  async findAll(
+    query: SearchRecipeQuery,
+    userId?: string,
+  ): Promise<PaginatedResult<Recipe>> {
     const { page, limit, sort, category, difficulty, search } = query;
     const filter: QueryFilter<IRecipeDocument> = {};
 
@@ -60,6 +64,13 @@ export class RecipeService {
 
     if (search) {
       filter.$text = { $search: search };
+    }
+
+    // Filter by visibility: show public + own private recipes
+    if (!userId) {
+      filter.isPublic = true;
+    } else {
+      filter.$or = [{ isPublic: true }, { author: userId }];
     }
 
     const [items, total] = await Promise.all([
@@ -87,7 +98,7 @@ export class RecipeService {
     };
   }
 
-  async findById(id: string): Promise<Recipe> {
+  async findById(id: string, userId?: string): Promise<Recipe> {
     const recipe = await RecipeModel.findById(id)
       .populate("author", "name email")
       .populate("category", "name slug")
@@ -96,6 +107,12 @@ export class RecipeService {
     if (!recipe) {
       throw new AppError("Recipe not found", 404);
     }
+
+    // Check access to private recipes
+    if (!recipe.isPublic && recipe.author._id.toString() !== userId) {
+      throw new AppError("Recipe not found", 404);
+    }
+
     return toRecipe(recipe);
   }
 

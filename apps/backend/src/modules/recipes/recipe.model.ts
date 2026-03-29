@@ -18,6 +18,7 @@ export interface IRecipeDocument extends Document {
   difficulty: Difficulty;
   cookingTime: Minutes;
   servings: number;
+  isPublic: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,6 +61,7 @@ const recipeSchema = new Schema<IRecipeDocument>(
     },
     cookingTime: { type: Number, required: true, min: 1 },
     servings: { type: Number, required: true, min: 1 },
+    isPublic: { type: Boolean, default: true },
   },
   {
     timestamps: true,

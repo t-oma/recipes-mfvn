@@ -48,7 +48,7 @@ export async function commentRoutes(app: FastifyInstance): Promise<void> {
     async (request, reply) => {
       const comment = await commentService.create(
         request.params.recipeId,
-        request.user.userId,
+        request.user!.userId,
         request.body,
       );
       return reply.status(201).send(comment);
@@ -69,7 +69,7 @@ export async function commentRoutes(app: FastifyInstance): Promise<void> {
     async (request, reply) => {
       await commentService.delete(
         request.params.commentId,
-        request.user.userId,
+        request.user!.userId,
       );
       return reply.status(204).send();
     },
