@@ -7,10 +7,10 @@ import type {
 } from "@recipes/shared";
 import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
-import { User as UserModel } from "@/modules/auth/user.model.js";
-import { Category as CategoryModel } from "@/modules/categories/category.model.js";
-import type { IRecipe } from "@/modules/recipes/recipe.model.js";
-import { Recipe as RecipeModel } from "@/modules/recipes/recipe.model.js";
+import { UserModel } from "@/modules/auth/user.model.js";
+import { CategoryModel } from "@/modules/categories/category.model.js";
+import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
+import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import type {
   CreateRecipeBody,
   SearchRecipeQuery,
@@ -47,7 +47,7 @@ function toRecipe(doc: unknown): Recipe {
 export class RecipeService {
   async findAll(query: SearchRecipeQuery): Promise<PaginatedResult<Recipe>> {
     const { page, limit, sort, category, search } = query;
-    const filter: QueryFilter<IRecipe> = {};
+    const filter: QueryFilter<IRecipeDocument> = {};
 
     if (category) {
       filter.category = category;

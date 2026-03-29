@@ -3,7 +3,7 @@ import { AppError } from "@/common/errors.js";
 import type { JwtPayload } from "@/common/utils/jwt.js";
 import { signToken } from "@/common/utils/jwt.js";
 import type { LoginBody, RegisterBody } from "@/modules/auth/auth.schema.js";
-import { User as UserModel } from "@/modules/auth/user.model.js";
+import { UserModel } from "@/modules/auth/user.model.js";
 
 function toUser(doc: unknown): User {
   const d = doc as Record<string, unknown>;

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CommentService } from "../comment.service.js";
 
 vi.mock("@/modules/comments/comment.model.js", () => ({
-  Comment: {
+  CommentModel: {
     find: vi.fn(),
     findById: vi.fn(),
     countDocuments: vi.fn(),
@@ -11,20 +11,20 @@ vi.mock("@/modules/comments/comment.model.js", () => ({
 }));
 
 vi.mock("@/modules/recipes/recipe.model.js", () => ({
-  Recipe: {
+  RecipeModel: {
     findById: vi.fn(),
   },
 }));
 
 vi.mock("@/modules/auth/user.model.js", () => ({
-  User: {
+  UserModel: {
     findById: vi.fn(),
   },
 }));
 
-const { Comment } = await import("@/modules/comments/comment.model.js");
-const { Recipe } = await import("@/modules/recipes/recipe.model.js");
-const { User } = await import("@/modules/auth/user.model.js");
+const { CommentModel } = await import("@/modules/comments/comment.model.js");
+const { RecipeModel } = await import("@/modules/recipes/recipe.model.js");
+const { UserModel } = await import("@/modules/auth/user.model.js");
 
 describe("CommentService", () => {
   let service: CommentService;
@@ -56,7 +56,9 @@ describe("CommentService", () => {
 
   describe("findByRecipe", () => {
     it("should return paginated comments for a recipe", async () => {
-      vi.mocked(Recipe.findById).mockResolvedValue({ _id: recipeId } as never);
+      vi.mocked(RecipeModel.findById).mockResolvedValue({
+        _id: recipeId,
+      } as never);
 
       const mockLean = vi.fn().mockResolvedValue([mockLeanComment]);
       const mockLimit = vi.fn().mockReturnValue({ lean: mockLean });
@@ -64,10 +66,10 @@ describe("CommentService", () => {
       const mockSort = vi.fn().mockReturnValue({ skip: mockSkip });
       const mockPopulate = vi.fn().mockReturnValue({ sort: mockSort });
 
-      vi.mocked(Comment.find).mockReturnValue({
+      vi.mocked(CommentModel.find).mockReturnValue({
         populate: mockPopulate,
       } as never);
-      vi.mocked(Comment.countDocuments).mockResolvedValue(1);
+      vi.mocked(CommentModel.countDocuments).mockResolvedValue(1);
 
       const result = await service.findByRecipe(
         { recipeId },
@@ -98,11 +100,13 @@ describe("CommentService", () => {
         hasNext: false,
         hasPrev: false,
       });
-      expect(Comment.find).toHaveBeenCalledWith({ recipe: recipeId });
+      expect(CommentModel.find).toHaveBeenCalledWith({ recipe: recipeId });
     });
 
     it("should return correct pagination for multiple pages", async () => {
-      vi.mocked(Recipe.findById).mockResolvedValue({ _id: recipeId } as never);
+      vi.mocked(RecipeModel.findById).mockResolvedValue({
+        _id: recipeId,
+      } as never);
 
       const mockLean = vi.fn().mockResolvedValue([]);
       const mockLimit = vi.fn().mockReturnValue({ lean: mockLean });
@@ -110,10 +114,10 @@ describe("CommentService", () => {
       const mockSort = vi.fn().mockReturnValue({ skip: mockSkip });
       const mockPopulate = vi.fn().mockReturnValue({ sort: mockSort });
 
-      vi.mocked(Comment.find).mockReturnValue({
+      vi.mocked(CommentModel.find).mockReturnValue({
         populate: mockPopulate,
       } as never);
-      vi.mocked(Comment.countDocuments).mockResolvedValue(45);
+      vi.mocked(CommentModel.countDocuments).mockResolvedValue(45);
 
       const result = await service.findByRecipe(
         { recipeId },
@@ -134,7 +138,7 @@ describe("CommentService", () => {
     });
 
     it("should throw 404 when recipe not found", async () => {
-      vi.mocked(Recipe.findById).mockResolvedValue(null);
+      vi.mocked(RecipeModel.findById).mockResolvedValue(null);
 
       await expect(
         service.findByRecipe(
@@ -150,17 +154,21 @@ describe("CommentService", () => {
 
   describe("create", () => {
     it("should create and return a comment", async () => {
-      vi.mocked(Recipe.findById).mockResolvedValue({ _id: recipeId } as never);
+      vi.mocked(RecipeModel.findById).mockResolvedValue({
+        _id: recipeId,
+      } as never);
 
       const mockPopulate = vi.fn().mockResolvedValue({
         toObject: () => mockLeanComment,
       });
 
-      vi.mocked(Comment.create).mockResolvedValue({
+      vi.mocked(CommentModel.create).mockResolvedValue({
         populate: mockPopulate,
       } as never);
 
-      vi.mocked(User.findById).mockResolvedValue({ _id: authorId } as never);
+      vi.mocked(UserModel.findById).mockResolvedValue({
+        _id: authorId,
+      } as never);
 
       const result = await service.create(recipeId, authorId, {
         text: "Great recipe!",
@@ -178,7 +186,7 @@ describe("CommentService", () => {
         createdAt: mockDate.toISOString(),
         updatedAt: mockDate.toISOString(),
       });
-      expect(Comment.create).toHaveBeenCalledWith({
+      expect(CommentModel.create).toHaveBeenCalledWith({
         text: "Great recipe!",
         recipe: recipeId,
         author: authorId,
@@ -186,7 +194,7 @@ describe("CommentService", () => {
     });
 
     it("should throw 404 when recipe not found", async () => {
-      vi.mocked(Recipe.findById).mockResolvedValue(null);
+      vi.mocked(RecipeModel.findById).mockResolvedValue(null);
 
       await expect(
         service.create("nonexistent", authorId, { text: "Hello" }),
@@ -201,7 +209,7 @@ describe("CommentService", () => {
     it("should delete comment when user is the author", async () => {
       const mockDeleteOne = vi.fn().mockResolvedValue(undefined);
 
-      vi.mocked(Comment.findById).mockResolvedValue({
+      vi.mocked(CommentModel.findById).mockResolvedValue({
         _id: commentId,
         author: { toString: () => authorId },
         deleteOne: mockDeleteOne,
@@ -209,12 +217,12 @@ describe("CommentService", () => {
 
       await service.delete(commentId, authorId);
 
-      expect(Comment.findById).toHaveBeenCalledWith(commentId);
+      expect(CommentModel.findById).toHaveBeenCalledWith(commentId);
       expect(mockDeleteOne).toHaveBeenCalled();
     });
 
     it("should throw 404 when comment not found", async () => {
-      vi.mocked(Comment.findById).mockResolvedValue(null);
+      vi.mocked(CommentModel.findById).mockResolvedValue(null);
 
       await expect(
         service.delete("nonexistent", authorId),
@@ -225,7 +233,7 @@ describe("CommentService", () => {
     });
 
     it("should throw 403 when user is not the author", async () => {
-      vi.mocked(Comment.findById).mockResolvedValue({
+      vi.mocked(CommentModel.findById).mockResolvedValue({
         _id: commentId,
         author: { toString: () => authorId },
         deleteOne: vi.fn(),

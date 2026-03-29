@@ -3,14 +3,14 @@ import { mockCreate, mockFind } from "@/common/utils/test-helpers.js";
 import { CategoryService } from "../category.service.js";
 
 vi.mock("../category.model.js", () => ({
-  Category: {
+  CategoryModel: {
     find: vi.fn(),
     create: vi.fn(),
     findByIdAndDelete: vi.fn(),
   },
 }));
 
-const { Category } = await import("../category.model.js");
+const { CategoryModel } = await import("../category.model.js");
 
 describe("CategoryService", () => {
   let service: CategoryService;
@@ -40,7 +40,7 @@ describe("CategoryService", () => {
         },
       ];
 
-      vi.mocked(Category.find).mockReturnValue(
+      vi.mocked(CategoryModel.find).mockReturnValue(
         mockFind(mockCategories) as never,
       );
 
@@ -55,11 +55,11 @@ describe("CategoryService", () => {
         createdAt: mockDate.toISOString(),
         updatedAt: mockDate.toISOString(),
       });
-      expect(Category.find).toHaveBeenCalled();
+      expect(CategoryModel.find).toHaveBeenCalled();
     });
 
     it("should return empty array when no categories exist", async () => {
-      vi.mocked(Category.find).mockReturnValue(mockFind([]) as never);
+      vi.mocked(CategoryModel.find).mockReturnValue(mockFind([]) as never);
 
       const result = await service.findAll();
 
@@ -79,7 +79,7 @@ describe("CategoryService", () => {
         updatedAt: mockDate,
       };
 
-      vi.mocked(Category.create).mockResolvedValue(
+      vi.mocked(CategoryModel.create).mockResolvedValue(
         mockCreate(mockDoc) as never,
       );
 
@@ -93,22 +93,22 @@ describe("CategoryService", () => {
         createdAt: mockDate.toISOString(),
         updatedAt: mockDate.toISOString(),
       });
-      expect(Category.create).toHaveBeenCalledWith(input);
+      expect(CategoryModel.create).toHaveBeenCalledWith(input);
     });
   });
 
   describe("deleteById", () => {
     it("should delete category by id", async () => {
-      vi.mocked(Category.findByIdAndDelete).mockResolvedValue({
+      vi.mocked(CategoryModel.findByIdAndDelete).mockResolvedValue({
         _id: "1",
       } as never);
 
       await expect(service.deleteById("1")).resolves.toBeUndefined();
-      expect(Category.findByIdAndDelete).toHaveBeenCalledWith("1");
+      expect(CategoryModel.findByIdAndDelete).toHaveBeenCalledWith("1");
     });
 
     it("should throw 404 error when category not found", async () => {
-      vi.mocked(Category.findByIdAndDelete).mockResolvedValue(null);
+      vi.mocked(CategoryModel.findByIdAndDelete).mockResolvedValue(null);
 
       await expect(service.deleteById("999")).rejects.toMatchObject({
         message: "Category not found",
