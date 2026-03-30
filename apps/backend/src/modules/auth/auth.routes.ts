@@ -50,7 +50,12 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      const user = await authService.me(request.user!.userId);
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
+      const user = await authService.me(userId);
       return reply.send(user);
     },
   );

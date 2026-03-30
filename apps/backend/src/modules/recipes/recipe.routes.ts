@@ -60,10 +60,12 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      const recipe = await recipeService.create(
-        request.body,
-        request.user!.userId,
-      );
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
+      const recipe = await recipeService.create(request.body, userId);
       return reply.status(201).send(recipe);
     },
   );
@@ -81,10 +83,15 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
       const recipe = await recipeService.update(
         request.params.id,
         request.body,
-        request.user!.userId,
+        userId,
       );
       return reply.send(recipe);
     },
@@ -102,7 +109,12 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      await recipeService.delete(request.params.id, request.user!.userId);
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
+      await recipeService.delete(request.params.id, userId);
       return reply.status(204).send();
     },
   );

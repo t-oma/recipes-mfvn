@@ -46,9 +46,14 @@ export async function commentRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
       const comment = await commentService.create(
         request.params.recipeId,
-        request.user!.userId,
+        userId,
         request.body,
       );
       return reply.status(201).send(comment);
@@ -67,10 +72,12 @@ export async function commentRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      await commentService.delete(
-        request.params.commentId,
-        request.user!.userId,
-      );
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
+      await commentService.delete(request.params.commentId, userId);
       return reply.status(204).send();
     },
   );
