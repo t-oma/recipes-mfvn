@@ -1,4 +1,4 @@
-import type { Minutes } from "@recipes/shared";
+import type { Difficulty, Minutes } from "@recipes/shared";
 import type { Document, Types } from "mongoose";
 import mongoose, { Schema } from "mongoose";
 
@@ -8,15 +8,17 @@ export interface IIngredient {
   unit: string;
 }
 
-export interface IRecipe extends Document {
+export interface IRecipeDocument extends Document {
   title: string;
   description: string;
   ingredients: IIngredient[];
   instructions: string[];
   category: Types.ObjectId;
   author: Types.ObjectId;
+  difficulty: Difficulty;
   cookingTime: Minutes;
   servings: number;
+  isPublic: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,7 +32,7 @@ const ingredientSchema = new Schema<IIngredient>(
   { _id: false },
 );
 
-const recipeSchema = new Schema<IRecipe>(
+const recipeSchema = new Schema<IRecipeDocument>(
   {
     title: { type: String, required: true, trim: true, index: "text" },
     description: { type: String, required: true, trim: true },
@@ -52,8 +54,14 @@ const recipeSchema = new Schema<IRecipe>(
     },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    difficulty: {
+      type: String,
+      required: true,
+      enum: ["easy", "medium", "hard"],
+    },
     cookingTime: { type: Number, required: true, min: 1 },
     servings: { type: Number, required: true, min: 1 },
+    isPublic: { type: Boolean, default: true },
   },
   {
     timestamps: true,
@@ -72,4 +80,7 @@ const recipeSchema = new Schema<IRecipe>(
 recipeSchema.index({ title: "text", description: "text" });
 recipeSchema.index({ category: 1, createdAt: -1 });
 
-export const Recipe = mongoose.model<IRecipe>("Recipe", recipeSchema);
+export const RecipeModel = mongoose.model<IRecipeDocument>(
+  "Recipe",
+  recipeSchema,
+);

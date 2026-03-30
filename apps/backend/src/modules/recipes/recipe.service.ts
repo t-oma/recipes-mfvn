@@ -1,16 +1,17 @@
 import type {
   CategorySummary,
+  Difficulty,
   Minutes,
   PaginatedResult,
   Recipe,
   UserSummary,
 } from "@recipes/shared";
-import type { FilterQuery } from "mongoose";
+import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
-import { User as UserModel } from "@/modules/auth/user.model.js";
-import { Category as CategoryModel } from "@/modules/categories/category.model.js";
-import type { IRecipe } from "@/modules/recipes/recipe.model.js";
-import { Recipe as RecipeModel } from "@/modules/recipes/recipe.model.js";
+import { UserModel } from "@/modules/auth/user.model.js";
+import { CategoryModel } from "@/modules/categories/category.model.js";
+import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
+import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import type {
   CreateRecipeBody,
   SearchRecipeQuery,
@@ -37,24 +38,39 @@ function toRecipe(doc: unknown): Recipe {
       email: author.email as string,
       name: author.name as string,
     } satisfies UserSummary,
+    difficulty: d.difficulty as Difficulty,
     cookingTime: d.cookingTime as Minutes,
     servings: d.servings as number,
+    isPublic: d.isPublic as boolean,
     createdAt: (d.createdAt as Date).toISOString(),
     updatedAt: (d.updatedAt as Date).toISOString(),
   };
 }
 
 export class RecipeService {
-  async findAll(query: SearchRecipeQuery): Promise<PaginatedResult<Recipe>> {
-    const { page, limit, sort, category, search } = query;
-    const filter: FilterQuery<IRecipe> = {};
+  async findAll(
+    query: SearchRecipeQuery,
+    userId?: string,
+  ): Promise<PaginatedResult<Recipe>> {
+    const { page, limit, sort, category, difficulty, search } = query;
+    const filter: QueryFilter<IRecipeDocument> = {};
 
     if (category) {
       filter.category = category;
     }
+    if (difficulty) {
+      filter.difficulty = difficulty;
+    }
 
     if (search) {
       filter.$text = { $search: search };
+    }
+
+    // Filter by visibility: show public + own private recipes
+    if (!userId) {
+      filter.isPublic = true;
+    } else {
+      filter.$or = [{ isPublic: true }, { author: userId }];
     }
 
     const [items, total] = await Promise.all([
@@ -82,7 +98,7 @@ export class RecipeService {
     };
   }
 
-  async findById(id: string): Promise<Recipe> {
+  async findById(id: string, userId?: string): Promise<Recipe> {
     const recipe = await RecipeModel.findById(id)
       .populate("author", "name email")
       .populate("category", "name slug")
@@ -91,6 +107,12 @@ export class RecipeService {
     if (!recipe) {
       throw new AppError("Recipe not found", 404);
     }
+
+    // Check access to private recipes
+    if (!recipe.isPublic && recipe.author._id.toString() !== userId) {
+      throw new AppError("Recipe not found", 404);
+    }
+
     return toRecipe(recipe);
   }
 

@@ -29,7 +29,7 @@
     "fastify": "^5.8.4",
     "fastify-type-provider-zod": "^6.1.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^8.23.0"
+    "mongoose": "^9.3.3"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",

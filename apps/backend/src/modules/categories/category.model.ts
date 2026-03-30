@@ -1,7 +1,7 @@
 import type { Document } from "mongoose";
 import mongoose, { Schema } from "mongoose";
 
-export interface ICategory extends Document {
+export interface ICategoryDocument extends Document {
   name: string;
   slug: string;
   description?: string;
@@ -9,7 +9,7 @@ export interface ICategory extends Document {
   updatedAt: Date;
 }
 
-const categorySchema = new Schema<ICategory>(
+const categorySchema = new Schema<ICategoryDocument>(
   {
     name: { type: String, required: true, unique: true, trim: true },
     slug: { type: String, required: true, unique: true, lowercase: true },
@@ -29,7 +29,7 @@ const categorySchema = new Schema<ICategory>(
   },
 );
 
-categorySchema.pre("validate", function (next) {
+categorySchema.pre("validate", async function () {
   if (this.isModified("name") && !this.slug) {
     this.slug = this.name
       .toLowerCase()
@@ -37,7 +37,9 @@ categorySchema.pre("validate", function (next) {
       .replace(/\s+/g, "-")
       .trim();
   }
-  next();
 });
 
-export const Category = mongoose.model<ICategory>("Category", categorySchema);
+export const CategoryModel = mongoose.model<ICategoryDocument>(
+  "Category",
+  categorySchema,
+);

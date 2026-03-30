@@ -1,6 +1,6 @@
 import type { Category } from "@recipes/shared";
 import { AppError } from "@/common/errors.js";
-import { Category as CategoryModel } from "@/modules/categories/category.model.js";
+import { CategoryModel } from "@/modules/categories/category.model.js";
 import type { CreateCategoryBody } from "@/modules/categories/category.schema.js";
 
 function toCategory(doc: unknown): Category {

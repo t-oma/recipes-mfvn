@@ -3,7 +3,7 @@ import { AppError } from "@/common/errors.js";
 import type { JwtPayload } from "@/common/utils/jwt.js";
 import { signToken } from "@/common/utils/jwt.js";
 import type { LoginBody, RegisterBody } from "@/modules/auth/auth.schema.js";
-import { User as UserModel } from "@/modules/auth/user.model.js";
+import { UserModel } from "@/modules/auth/user.model.js";
 
 function toUser(doc: unknown): User {
   const d = doc as Record<string, unknown>;
@@ -33,9 +33,9 @@ export class AuthService {
   }
 
   async login(data: LoginBody): Promise<AuthResponse> {
-    const user = await UserModel.findOne({ email: data.email })
-      .select("+password")
-      .lean();
+    const user = await UserModel.findOne({ email: data.email }).select(
+      "+password",
+    );
     if (!user || !(await user.comparePassword(data.password))) {
       throw new AppError("Invalid email or password", 401);
     }
@@ -43,7 +43,7 @@ export class AuthService {
     const token = this.generateToken(user.id, user.email);
 
     return {
-      user: toUser(user),
+      user: toUser(user.toObject()),
       token,
     };
   }

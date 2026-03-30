@@ -1,21 +1,17 @@
-import type {
-  Comment as CommentType,
-  PaginatedResult,
-  UserSummary,
-} from "@recipes/shared";
-import type { FilterQuery } from "mongoose";
+import type { Comment, PaginatedResult, UserSummary } from "@recipes/shared";
+import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
-import type { IComment } from "@/modules/comments/comment.model.js";
-import { Comment as CommentModel } from "@/modules/comments/comment.model.js";
+import type { ICommentDocument } from "@/modules/comments/comment.model.js";
+import { CommentModel } from "@/modules/comments/comment.model.js";
 import type {
   CommentQuery,
   CreateCommentBody,
   RecipeCommentsParams,
 } from "@/modules/comments/comment.schema.js";
-import { Recipe as RecipeModel } from "@/modules/recipes/recipe.model.js";
-import { User as UserModel } from "../auth/user.model.js";
+import { RecipeModel } from "@/modules/recipes/recipe.model.js";
+import { UserModel } from "../auth/user.model.js";
 
-function toComment(doc: unknown): CommentType {
+function toComment(doc: unknown): Comment {
   const d = doc as Record<string, unknown>;
   const author = d.author as Record<string, unknown>;
   return {
@@ -36,7 +32,7 @@ export class CommentService {
   async findByRecipe(
     params: RecipeCommentsParams,
     query: CommentQuery,
-  ): Promise<PaginatedResult<CommentType>> {
+  ): Promise<PaginatedResult<Comment>> {
     const { page, limit } = query;
     const { recipeId } = params;
 
@@ -45,7 +41,7 @@ export class CommentService {
       throw new AppError("Recipe not found", 404);
     }
 
-    const filter: FilterQuery<IComment> = { recipe: recipeId };
+    const filter: QueryFilter<ICommentDocument> = { recipe: recipeId };
 
     const [items, total] = await Promise.all([
       CommentModel.find(filter)
@@ -75,7 +71,7 @@ export class CommentService {
     recipeId: string,
     authorId: string,
     data: CreateCommentBody,
-  ): Promise<CommentType> {
+  ): Promise<Comment> {
     const recipe = await RecipeModel.findById(recipeId);
     if (!recipe) {
       throw new AppError("Recipe not found", 404);
