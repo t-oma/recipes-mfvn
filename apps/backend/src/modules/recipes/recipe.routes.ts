@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { authGuard } from "@/common/middleware/auth.guard.js";
+import { authGuard, optionalAuth } from "@/common/middleware/auth.guard.js";
 import {
   createRecipeSchema,
   recipeParamsSchema,
@@ -22,9 +22,11 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
         tags: ["Recipes"],
         summary: "Get all recipes with pagination",
       },
+      preHandler: optionalAuth,
     },
     async (request, reply) => {
-      const result = await recipeService.findAll(request.query);
+      const userId = request.user?.userId;
+      const result = await recipeService.findAll(request.query, userId);
       return reply.send(result);
     },
   );
@@ -37,9 +39,11 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
         tags: ["Recipes"],
         summary: "Get recipe by ID",
       },
+      preHandler: optionalAuth,
     },
     async (request, reply) => {
-      const recipe = await recipeService.findById(request.params.id);
+      const userId = request.user?.userId;
+      const recipe = await recipeService.findById(request.params.id, userId);
       return reply.send(recipe);
     },
   );
@@ -56,10 +60,12 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      const recipe = await recipeService.create(
-        request.body,
-        request.user.userId,
-      );
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
+      const recipe = await recipeService.create(request.body, userId);
       return reply.status(201).send(recipe);
     },
   );
@@ -77,10 +83,15 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
       const recipe = await recipeService.update(
         request.params.id,
         request.body,
-        request.user.userId,
+        userId,
       );
       return reply.send(recipe);
     },
@@ -98,7 +109,12 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       preHandler: authGuard,
     },
     async (request, reply) => {
-      await recipeService.delete(request.params.id, request.user.userId);
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
+      await recipeService.delete(request.params.id, userId);
       return reply.status(204).send();
     },
   );

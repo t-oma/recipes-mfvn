@@ -47,6 +47,7 @@ export interface Recipe {
   difficulty: Difficulty;
   cookingTime: Minutes;
   servings: number;
+  isPublic: boolean;
   createdAt: string;
   updatedAt: string;
 }

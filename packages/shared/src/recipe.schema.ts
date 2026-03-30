@@ -20,6 +20,7 @@ export const createRecipeSchema = z.object({
   difficulty: difficultySchema,
   cookingTime: minutesSchema,
   servings: z.number().int().min(1),
+  isPublic: z.boolean().default(true),
 });
 
 export const updateRecipeSchema = createRecipeSchema.partial();
