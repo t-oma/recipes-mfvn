@@ -3,7 +3,7 @@ import { AppError } from "@/common/errors.js";
 import type { JwtPayload } from "@/common/utils/jwt.js";
 import { signToken } from "@/common/utils/jwt.js";
 import type { LoginBody, RegisterBody } from "@/modules/auth/auth.schema.js";
-import { UserModel } from "@/modules/auth/user.model.js";
+import { UserModel } from "@/modules/users/user.model.js";
 
 function toUser(doc: unknown): User {
   const d = doc as Record<string, unknown>;
@@ -46,15 +46,6 @@ export class AuthService {
       user: toUser(user.toObject()),
       token,
     };
-  }
-
-  async me(userId: string): Promise<User> {
-    const user = await UserModel.findById(userId).lean();
-    if (!user) {
-      throw new AppError("User not found", 404);
-    }
-
-    return toUser(user);
   }
 
   private generateToken(userId: string, email: string): string {

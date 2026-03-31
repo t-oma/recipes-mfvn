@@ -36,6 +36,11 @@ export interface UserSummary {
   name: string;
 }
 
+export interface RecipeSummary {
+  id: string;
+  title: string;
+}
+
 export interface Recipe {
   id: string;
   title: string;
@@ -78,7 +83,7 @@ export interface AuthResponse {
 export interface Comment {
   id: string;
   text: string;
-  recipeId: string;
+  recipe: RecipeSummary;
   author: UserSummary;
   createdAt: string;
   updatedAt: string;

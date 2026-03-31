@@ -16,7 +16,7 @@ vi.mock("@/modules/recipes/recipe.model.js", () => ({
   },
 }));
 
-vi.mock("@/modules/auth/user.model.js", () => ({
+vi.mock("@/modules/users/user.model.js", () => ({
   UserModel: {
     findById: vi.fn(),
   },
@@ -24,7 +24,7 @@ vi.mock("@/modules/auth/user.model.js", () => ({
 
 const { CommentModel } = await import("@/modules/comments/comment.model.js");
 const { RecipeModel } = await import("@/modules/recipes/recipe.model.js");
-const { UserModel } = await import("@/modules/auth/user.model.js");
+const { UserModel } = await import("@/modules/users/user.model.js");
 
 describe("CommentService", () => {
   let service: CommentService;
@@ -43,7 +43,7 @@ describe("CommentService", () => {
   const mockLeanComment = {
     _id: commentId,
     text: "Great recipe!",
-    recipe: recipeId,
+    recipe: { _id: recipeId, title: "Test Recipe" },
     author: mockAuthor,
     createdAt: mockDate,
     updatedAt: mockDate,
@@ -83,7 +83,10 @@ describe("CommentService", () => {
       expect(result.items[0]).toEqual({
         id: commentId,
         text: "Great recipe!",
-        recipeId,
+        recipe: {
+          id: recipeId,
+          title: "Test Recipe",
+        },
         author: {
           id: authorId,
           name: "Test User",
@@ -177,7 +180,10 @@ describe("CommentService", () => {
       expect(result).toEqual({
         id: commentId,
         text: "Great recipe!",
-        recipeId,
+        recipe: {
+          id: recipeId,
+          title: "Test Recipe",
+        },
         author: {
           id: authorId,
           name: "Test User",

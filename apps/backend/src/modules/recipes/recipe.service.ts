@@ -8,7 +8,6 @@ import type {
 } from "@recipes/shared";
 import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
-import { UserModel } from "@/modules/auth/user.model.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
@@ -18,6 +17,7 @@ import type {
   SearchRecipeQuery,
   UpdateRecipeBody,
 } from "@/modules/recipes/recipe.schema.js";
+import { UserModel } from "@/modules/users/user.model.js";
 
 function toRecipe(doc: unknown, isFavorited: boolean): Recipe {
   const d = doc as Record<string, unknown>;

@@ -15,6 +15,7 @@ import { categoryRoutes } from "./modules/categories/category.routes.js";
 import { commentRoutes } from "./modules/comments/comment.routes.js";
 import { favoriteRoutes } from "./modules/favorites/favorite.routes.js";
 import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
+import { userRoutes } from "./modules/users/user.routes.js";
 
 export function buildApp() {
   const app = Fastify({
@@ -46,6 +47,7 @@ export function buildApp() {
 
   // Routes
   app.register(authRoutes, { prefix: "/api/auth" });
+  app.register(userRoutes, { prefix: "/api/users" });
   app.register(recipeRoutes, { prefix: "/api/recipes" });
   app.register(commentRoutes, { prefix: "/api/recipes" });
   app.register(categoryRoutes, { prefix: "/api/categories" });

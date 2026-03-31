@@ -1,10 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { authGuard, optionalAuth } from "@/common/middleware/auth.guard.js";
-import {
-  favoriteParamsSchema,
-  favoriteQuerySchema,
-} from "@/modules/favorites/favorite.schema.js";
+import { favoriteParamsSchema } from "@/modules/favorites/favorite.schema.js";
 import { FavoriteService } from "@/modules/favorites/favorite.service.js";
 
 const favoriteService = new FavoriteService();
@@ -57,29 +54,6 @@ export async function favoriteRoutes(app: FastifyInstance): Promise<void> {
         request.params.id,
       );
       return reply.send({ favorited });
-    },
-  );
-
-  // GET /api/users/me/favorites — get user's favorites
-  fastify.get(
-    "/users/me/favorites",
-    {
-      schema: {
-        querystring: favoriteQuerySchema,
-        tags: ["Favorites"],
-        summary: "Get current user's favorite recipes",
-        security: [{ bearerAuth: [] }],
-      },
-      preHandler: authGuard,
-    },
-    async (request, reply) => {
-      const userId = request.user?.userId;
-      if (!userId) {
-        return reply.status(401).send({ error: "Not authorized" });
-      }
-
-      const result = await favoriteService.findByUser(userId, request.query);
-      return reply.send(result);
     },
   );
 }
