@@ -10,6 +10,7 @@ import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { UserModel } from "@/modules/auth/user.model.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
+import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import type {
@@ -18,7 +19,7 @@ import type {
   UpdateRecipeBody,
 } from "@/modules/recipes/recipe.schema.js";
 
-function toRecipe(doc: unknown): Recipe {
+function toRecipe(doc: unknown, isFavorited: boolean): Recipe {
   const d = doc as Record<string, unknown>;
   const category = d.category as Record<string, unknown>;
   const author = d.author as Record<string, unknown>;
@@ -42,6 +43,7 @@ function toRecipe(doc: unknown): Recipe {
     cookingTime: d.cookingTime as Minutes,
     servings: d.servings as number,
     isPublic: d.isPublic as boolean,
+    isFavorited,
     createdAt: (d.createdAt as Date).toISOString(),
     updatedAt: (d.updatedAt as Date).toISOString(),
   };
@@ -84,9 +86,22 @@ export class RecipeService {
       RecipeModel.countDocuments(filter),
     ]);
 
+    // Get favorited recipe IDs for current user
+    let favoritedIds = new Set<string>();
+    if (userId && items.length > 0) {
+      const recipeIds = items.map((item) => String(item._id));
+      const favorites = await FavoriteModel.find({
+        user: userId,
+        recipe: { $in: recipeIds },
+      }).lean();
+      favoritedIds = new Set(favorites.map((f) => String(f.recipe)));
+    }
+
     const totalPages = Math.ceil(total / limit);
     return {
-      items: items.map(toRecipe),
+      items: items.map((item) =>
+        toRecipe(item, favoritedIds.has(String(item._id))),
+      ),
       pagination: {
         page,
         limit,
@@ -103,7 +118,6 @@ export class RecipeService {
       .populate("author", "name email")
       .populate("category", "name slug")
       .lean();
-
     if (!recipe) {
       throw new AppError("Recipe not found", 404);
     }
@@ -113,7 +127,16 @@ export class RecipeService {
       throw new AppError("Recipe not found", 404);
     }
 
-    return toRecipe(recipe);
+    let isFavorited = false;
+    if (userId) {
+      const favorite = await FavoriteModel.findOne({
+        user: userId,
+        recipe: id,
+      }).lean();
+      isFavorited = !!favorite;
+    }
+
+    return toRecipe(recipe, isFavorited);
   }
 
   async create(data: CreateRecipeBody, authorId: string): Promise<Recipe> {
@@ -132,7 +155,7 @@ export class RecipeService {
       { path: "author", select: "name email" },
       { path: "category", select: "name slug" },
     ]);
-    return toRecipe(populated.toObject());
+    return toRecipe(populated.toObject(), false);
   }
 
   async update(
@@ -155,7 +178,17 @@ export class RecipeService {
       { path: "author", select: "name email" },
       { path: "category", select: "name slug" },
     ]);
-    return toRecipe(populated.toObject());
+
+    let isFavorited = false;
+    if (userId) {
+      const favorite = await FavoriteModel.findOne({
+        user: userId,
+        recipe: id,
+      }).lean();
+      isFavorited = !!favorite;
+    }
+
+    return toRecipe(populated.toObject(), isFavorited);
   }
 
   async delete(id: string, userId: string): Promise<void> {
