@@ -18,6 +18,7 @@ export const recipeQuerySchema = z.object({
   sort: z.string().default("-createdAt"),
   category: z.string().length(24).optional(),
   difficulty: difficultySchema.optional(),
+  isFavorited: z.coerce.boolean().optional(),
   search: z.string().optional(),
 });
 
