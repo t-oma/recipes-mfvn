@@ -54,8 +54,46 @@ export class RecipeService {
     query: SearchRecipeQuery,
     userId?: string,
   ): Promise<PaginatedResult<Recipe>> {
-    const { page, limit, sort, category, difficulty, search } = query;
+    const { page, limit, sort, category, difficulty, isFavorited, search } =
+      query;
     const filter: QueryFilter<IRecipeDocument> = {};
+
+    // Filter by favorites
+    if (isFavorited === true) {
+      if (!userId) {
+        // Can't filter favorites without auth
+        return {
+          items: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false,
+          },
+        };
+      }
+
+      const favorites = await FavoriteModel.find({ user: userId }).lean();
+      const favoritedRecipeIds = favorites.map((f) => f.recipe);
+
+      if (favoritedRecipeIds.length === 0) {
+        return {
+          items: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false,
+          },
+        };
+      }
+
+      filter._id = { $in: favoritedRecipeIds };
+    }
 
     if (category) {
       filter.category = category;
@@ -71,7 +109,8 @@ export class RecipeService {
     // Filter by visibility: show public + own private recipes
     if (!userId) {
       filter.isPublic = true;
-    } else {
+    } else if (!isFavorited) {
+      // Only apply visibility filter when not filtering by favorites
       filter.$or = [{ isPublic: true }, { author: userId }];
     }
 
