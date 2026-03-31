@@ -1,5 +1,7 @@
-import type { PaginatedResult, Recipe, User } from "@recipes/shared";
+import type { Comment, PaginatedResult, Recipe, User } from "@recipes/shared";
 import { AppError } from "@/common/errors.js";
+import type { CommentQuery } from "@/modules/comments/comment.schema.js";
+import { CommentService } from "@/modules/comments/comment.service.js";
 import type { FavoriteQuery } from "@/modules/favorites/favorite.schema.js";
 import { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import { UserModel } from "@/modules/users/user.model.js";
@@ -17,9 +19,14 @@ function toUser(doc: unknown): User {
 
 export class UserService {
   private readonly favoriteService: FavoriteService;
+  private readonly commentService: CommentService;
 
-  constructor(favoriteService: FavoriteService = new FavoriteService()) {
+  constructor(
+    favoriteService: FavoriteService = new FavoriteService(),
+    commentService: CommentService = new CommentService(),
+  ) {
     this.favoriteService = favoriteService;
+    this.commentService = commentService;
   }
 
   async getCurrentUser(userId: string): Promise<User> {
@@ -36,5 +43,12 @@ export class UserService {
     query: FavoriteQuery,
   ): Promise<PaginatedResult<Recipe>> {
     return this.favoriteService.findByUser(userId, query);
+  }
+
+  async getComments(
+    userId: string,
+    query: CommentQuery,
+  ): Promise<PaginatedResult<Comment>> {
+    return this.commentService.findByUser(userId, query);
   }
 }

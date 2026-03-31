@@ -43,7 +43,7 @@ describe("CommentService", () => {
   const mockLeanComment = {
     _id: commentId,
     text: "Great recipe!",
-    recipe: recipeId,
+    recipe: { _id: recipeId, title: "Test Recipe" },
     author: mockAuthor,
     createdAt: mockDate,
     updatedAt: mockDate,
@@ -83,7 +83,10 @@ describe("CommentService", () => {
       expect(result.items[0]).toEqual({
         id: commentId,
         text: "Great recipe!",
-        recipeId,
+        recipe: {
+          id: recipeId,
+          title: "Test Recipe",
+        },
         author: {
           id: authorId,
           name: "Test User",
@@ -177,7 +180,10 @@ describe("CommentService", () => {
       expect(result).toEqual({
         id: commentId,
         text: "Great recipe!",
-        recipeId,
+        recipe: {
+          id: recipeId,
+          title: "Test Recipe",
+        },
         author: {
           id: authorId,
           name: "Test User",

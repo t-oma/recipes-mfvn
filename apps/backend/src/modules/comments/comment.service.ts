@@ -1,4 +1,9 @@
-import type { Comment, PaginatedResult, UserSummary } from "@recipes/shared";
+import type {
+  Comment,
+  PaginatedResult,
+  RecipeSummary,
+  UserSummary,
+} from "@recipes/shared";
 import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import type { ICommentDocument } from "@/modules/comments/comment.model.js";
@@ -9,15 +14,19 @@ import type {
   RecipeCommentsParams,
 } from "@/modules/comments/comment.schema.js";
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
-import { UserModel } from "../auth/user.model.js";
+import { UserModel } from "@/modules/users/user.model.js";
 
 function toComment(doc: unknown): Comment {
   const d = doc as Record<string, unknown>;
   const author = d.author as Record<string, unknown>;
+  const recipe = d.recipe as Record<string, unknown>;
   return {
     id: String(d._id),
     text: d.text as string,
-    recipeId: String(d.recipe),
+    recipe: {
+      id: String(recipe._id),
+      title: recipe.title as string,
+    } satisfies RecipeSummary,
     author: {
       id: String(author._id),
       email: author.email as string,
@@ -90,6 +99,39 @@ export class CommentService {
 
     const populated = await comment.populate("author", "name email");
     return toComment(populated.toObject());
+  }
+
+  async findByUser(
+    userId: string,
+    query: CommentQuery,
+  ): Promise<PaginatedResult<Comment>> {
+    const { page, limit } = query;
+
+    const filter: QueryFilter<ICommentDocument> = { author: userId };
+
+    const [items, total] = await Promise.all([
+      CommentModel.find(filter)
+        .populate("author", "name email")
+        .populate("recipe", "title")
+        .sort("-createdAt")
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      CommentModel.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    return {
+      items: items.map(toComment),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
   }
 
   async delete(id: string, userId: string): Promise<void> {
