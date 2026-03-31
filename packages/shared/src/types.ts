@@ -48,6 +48,7 @@ export interface Recipe {
   cookingTime: Minutes;
   servings: number;
   isPublic: boolean;
+  isFavorited: boolean;
   createdAt: string;
   updatedAt: string;
 }
