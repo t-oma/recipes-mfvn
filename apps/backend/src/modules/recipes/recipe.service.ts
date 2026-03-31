@@ -54,7 +54,7 @@ export class RecipeService {
     query: SearchRecipeQuery,
     userId?: string,
   ): Promise<PaginatedResult<Recipe>> {
-    const { page, limit, sort, category, difficulty, isFavorited, search } =
+    const { page, limit, sort, categoryId, difficulty, isFavorited, search } =
       query;
     const filter: QueryFilter<IRecipeDocument> = {};
 
@@ -95,8 +95,8 @@ export class RecipeService {
       filter._id = { $in: favoritedRecipeIds };
     }
 
-    if (category) {
-      filter.category = category;
+    if (categoryId) {
+      filter.category = categoryId;
     }
     if (difficulty) {
       filter.difficulty = difficulty;

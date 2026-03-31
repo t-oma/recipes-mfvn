@@ -11,7 +11,7 @@ export async function favoriteRoutes(app: FastifyInstance): Promise<void> {
 
   // POST /api/recipes/:id/favorite — toggle favorite
   fastify.post(
-    "/recipes/:id/favorite",
+    "/recipes/:recipeId/favorite",
     {
       schema: {
         params: favoriteParamsSchema,
@@ -27,14 +27,17 @@ export async function favoriteRoutes(app: FastifyInstance): Promise<void> {
         return reply.status(401).send({ error: "Not authorized" });
       }
 
-      const result = await favoriteService.toggle(userId, request.params.id);
+      const result = await favoriteService.toggle(
+        userId,
+        request.params.recipeId,
+      );
       return reply.send(result);
     },
   );
 
   // GET /api/recipes/:id/favorite — check if favorited
   fastify.get(
-    "/recipes/:id/favorite",
+    "/recipes/:recipeId/favorite",
     {
       schema: {
         params: favoriteParamsSchema,
@@ -51,7 +54,7 @@ export async function favoriteRoutes(app: FastifyInstance): Promise<void> {
 
       const favorited = await favoriteService.isFavorited(
         userId,
-        request.params.id,
+        request.params.recipeId,
       );
       return reply.send({ favorited });
     },

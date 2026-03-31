@@ -32,7 +32,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
   );
 
   fastify.get(
-    "/:id",
+    "/:recipeId",
     {
       schema: {
         params: recipeParamsSchema,
@@ -43,7 +43,10 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
     },
     async (request, reply) => {
       const userId = request.user?.userId;
-      const recipe = await recipeService.findById(request.params.id, userId);
+      const recipe = await recipeService.findById(
+        request.params.recipeId,
+        userId,
+      );
       return reply.send(recipe);
     },
   );
@@ -71,7 +74,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
   );
 
   fastify.patch(
-    "/:id",
+    "/:recipeId",
     {
       schema: {
         params: recipeParamsSchema,
@@ -89,7 +92,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
       }
 
       const recipe = await recipeService.update(
-        request.params.id,
+        request.params.recipeId,
         request.body,
         userId,
       );
@@ -98,7 +101,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
   );
 
   fastify.delete(
-    "/:id",
+    "/:recipeId",
     {
       schema: {
         params: recipeParamsSchema,
@@ -114,7 +117,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
         return reply.status(401).send({ error: "Not authorized" });
       }
 
-      await recipeService.delete(request.params.id, userId);
+      await recipeService.delete(request.params.recipeId, userId);
       return reply.status(204).send();
     },
   );
