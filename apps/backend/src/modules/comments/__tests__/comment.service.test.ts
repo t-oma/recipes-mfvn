@@ -16,7 +16,7 @@ vi.mock("@/modules/recipes/recipe.model.js", () => ({
   },
 }));
 
-vi.mock("@/modules/auth/user.model.js", () => ({
+vi.mock("@/modules/users/user.model.js", () => ({
   UserModel: {
     findById: vi.fn(),
   },
@@ -24,7 +24,7 @@ vi.mock("@/modules/auth/user.model.js", () => ({
 
 const { CommentModel } = await import("@/modules/comments/comment.model.js");
 const { RecipeModel } = await import("@/modules/recipes/recipe.model.js");
-const { UserModel } = await import("@/modules/auth/user.model.js");
+const { UserModel } = await import("@/modules/users/user.model.js");
 
 describe("CommentService", () => {
   let service: CommentService;
