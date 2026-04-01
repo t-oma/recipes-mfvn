@@ -1,14 +1,8 @@
-import type {
-  CategorySummary,
-  Difficulty,
-  Minutes,
-  Paginated,
-  Recipe,
-  UserSummary,
-} from "@recipes/shared";
+import type { Paginated, Recipe } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
+import { toRecipe } from "@/common/utils/mongo.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
@@ -19,36 +13,6 @@ import type {
   UpdateRecipeBody,
 } from "@/modules/recipes/recipe.schema.js";
 import { UserModel } from "@/modules/users/user.model.js";
-
-function toRecipe(doc: unknown, isFavorited: boolean): Recipe {
-  const d = doc as Record<string, unknown>;
-  const category = d.category as Record<string, unknown>;
-  const author = d.author as Record<string, unknown>;
-  return {
-    id: String(d._id),
-    title: d.title as string,
-    description: d.description as string,
-    ingredients: d.ingredients as Recipe["ingredients"],
-    instructions: d.instructions as string[],
-    category: {
-      id: String(category._id),
-      name: category.name as string,
-      slug: category.slug as string,
-    } satisfies CategorySummary,
-    author: {
-      id: String(author._id),
-      email: author.email as string,
-      name: author.name as string,
-    } satisfies UserSummary,
-    difficulty: d.difficulty as Difficulty,
-    cookingTime: d.cookingTime as Minutes,
-    servings: d.servings as number,
-    isPublic: d.isPublic as boolean,
-    isFavorited,
-    createdAt: (d.createdAt as Date).toISOString(),
-    updatedAt: (d.updatedAt as Date).toISOString(),
-  };
-}
 
 export class RecipeService {
   async findAll(

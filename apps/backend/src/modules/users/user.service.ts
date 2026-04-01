@@ -1,21 +1,11 @@
 import type { Comment, Paginated, Recipe, User } from "@recipes/shared";
 import { AppError } from "@/common/errors.js";
+import { toUser } from "@/common/utils/mongo.js";
 import type { CommentQuery } from "@/modules/comments/comment.schema.js";
 import { CommentService } from "@/modules/comments/comment.service.js";
 import type { FavoriteQuery } from "@/modules/favorites/favorite.schema.js";
 import { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import { UserModel } from "@/modules/users/user.model.js";
-
-function toUser(doc: unknown): User {
-  const d = doc as Record<string, unknown>;
-  return {
-    id: String(d._id),
-    email: d.email as string,
-    name: d.name as string,
-    createdAt: (d.createdAt as Date).toISOString(),
-    updatedAt: (d.updatedAt as Date).toISOString(),
-  };
-}
 
 export class UserService {
   private readonly favoriteService: FavoriteService;

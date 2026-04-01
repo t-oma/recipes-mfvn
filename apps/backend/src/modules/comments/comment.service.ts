@@ -1,12 +1,8 @@
-import type {
-  Comment,
-  Paginated,
-  RecipeSummary,
-  UserSummary,
-} from "@recipes/shared";
+import type { Comment, CommentForRecipe, Paginated } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
+import { toComment, toCommentForRecipe } from "@/common/utils/mongo.js";
 import type { ICommentDocument } from "@/modules/comments/comment.model.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
 import type {
@@ -17,32 +13,11 @@ import type {
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import { UserModel } from "@/modules/users/user.model.js";
 
-function toComment(doc: unknown): Comment {
-  const d = doc as Record<string, unknown>;
-  const author = d.author as Record<string, unknown>;
-  const recipe = d.recipe as Record<string, unknown>;
-  return {
-    id: String(d._id),
-    text: d.text as string,
-    recipe: {
-      id: String(recipe._id),
-      title: recipe.title as string,
-    } satisfies RecipeSummary,
-    author: {
-      id: String(author._id),
-      email: author.email as string,
-      name: author.name as string,
-    } satisfies UserSummary,
-    createdAt: (d.createdAt as Date).toISOString(),
-    updatedAt: (d.updatedAt as Date).toISOString(),
-  };
-}
-
 export class CommentService {
   async findByRecipe(
     params: RecipeCommentsParams,
     query: CommentQuery,
-  ): Promise<Paginated<Comment>> {
+  ): Promise<Paginated<CommentForRecipe>> {
     const { page, limit } = query;
     const { recipeId } = params;
 
@@ -63,14 +38,14 @@ export class CommentService {
       CommentModel.countDocuments(filter),
     ]);
 
-    return withPagination(items.map(toComment), total, page, limit);
+    return withPagination(items.map(toCommentForRecipe), total, page, limit);
   }
 
   async create(
     recipeId: string,
     authorId: string,
     data: CreateCommentBody,
-  ): Promise<Comment> {
+  ): Promise<CommentForRecipe> {
     const recipe = await RecipeModel.findById(recipeId);
     if (!recipe) {
       throw new AppError("Recipe not found", 404);
@@ -88,7 +63,7 @@ export class CommentService {
     });
 
     const populated = await comment.populate("author", "name email");
-    return toComment(populated.toObject());
+    return toCommentForRecipe(populated.toObject());
   }
 
   async findByUser(

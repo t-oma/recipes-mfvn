@@ -58,7 +58,7 @@ describe("CommentService", () => {
     it("should return paginated comments for a recipe", async () => {
       vi.mocked(RecipeModel.findById).mockResolvedValue({
         _id: recipeId,
-      } as never);
+      });
 
       const mockLean = vi.fn().mockResolvedValue([mockLeanComment]);
       const mockLimit = vi.fn().mockReturnValue({ lean: mockLean });
@@ -83,10 +83,6 @@ describe("CommentService", () => {
       expect(result.items[0]).toEqual({
         id: commentId,
         text: "Great recipe!",
-        recipe: {
-          id: recipeId,
-          title: "Test Recipe",
-        },
         author: {
           id: authorId,
           name: "Test User",
@@ -109,7 +105,7 @@ describe("CommentService", () => {
     it("should return correct pagination for multiple pages", async () => {
       vi.mocked(RecipeModel.findById).mockResolvedValue({
         _id: recipeId,
-      } as never);
+      });
 
       const mockLean = vi.fn().mockResolvedValue([]);
       const mockLimit = vi.fn().mockReturnValue({ lean: mockLean });
@@ -159,7 +155,7 @@ describe("CommentService", () => {
     it("should create and return a comment", async () => {
       vi.mocked(RecipeModel.findById).mockResolvedValue({
         _id: recipeId,
-      } as never);
+      });
 
       const mockPopulate = vi.fn().mockResolvedValue({
         toObject: () => mockLeanComment,
@@ -180,10 +176,6 @@ describe("CommentService", () => {
       expect(result).toEqual({
         id: commentId,
         text: "Great recipe!",
-        recipe: {
-          id: recipeId,
-          title: "Test Recipe",
-        },
         author: {
           id: authorId,
           name: "Test User",

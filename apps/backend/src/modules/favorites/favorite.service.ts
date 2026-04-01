@@ -1,39 +1,11 @@
 import type { Paginated, Recipe } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import { AppError } from "@/common/errors.js";
+import { toRecipe } from "@/common/utils/mongo.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
+import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import type { FavoriteQuery } from "./favorite.schema.js";
-
-function toRecipe(doc: unknown): Recipe {
-  const d = doc as Record<string, unknown>;
-  const category = d.category as Record<string, unknown>;
-  const author = d.author as Record<string, unknown>;
-  return {
-    id: String(d._id),
-    title: d.title as string,
-    description: d.description as string,
-    ingredients: d.ingredients as Recipe["ingredients"],
-    instructions: d.instructions as string[],
-    category: {
-      id: String(category._id),
-      name: category.name as string,
-      slug: category.slug as string,
-    },
-    author: {
-      id: String(author._id),
-      email: author.email as string,
-      name: author.name as string,
-    },
-    difficulty: d.difficulty as Recipe["difficulty"],
-    cookingTime: d.cookingTime as Recipe["cookingTime"],
-    servings: d.servings as number,
-    isPublic: d.isPublic as boolean,
-    isFavorited: true,
-    createdAt: (d.createdAt as Date).toISOString(),
-    updatedAt: (d.updatedAt as Date).toISOString(),
-  };
-}
 
 export class FavoriteService {
   async toggle(
@@ -92,7 +64,7 @@ export class FavoriteService {
     const items = favorites
       .map((fav) => fav.recipe)
       .filter((recipe) => recipe != null)
-      .map((recipe) => toRecipe(recipe));
+      .map((recipe) => toRecipe(recipe as unknown as IRecipeDocument, true));
 
     return withPagination(items, total, page, limit);
   }
