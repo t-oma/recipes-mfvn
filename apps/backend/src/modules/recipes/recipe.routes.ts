@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { authGuard, optionalAuth } from "@/common/middleware/auth.guard.js";
+import { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import {
   createRecipeSchema,
   recipeParamsSchema,
@@ -10,10 +11,12 @@ import {
 import { RecipeService } from "@/modules/recipes/recipe.service.js";
 
 const recipeService = new RecipeService();
+const favoriteService = new FavoriteService();
 
 export async function recipeRoutes(app: FastifyInstance): Promise<void> {
   const fastify = app.withTypeProvider<ZodTypeProvider>();
 
+  // GET — get all recipes with pagination, filtering and sorting
   fastify.get(
     "/",
     {
@@ -31,6 +34,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
+  // GET — get recipe by ID
   fastify.get(
     "/:recipeId",
     {
@@ -51,6 +55,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
+  // POST — create recipe
   fastify.post(
     "/",
     {
@@ -73,6 +78,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
+  // PATCH — update recipe
   fastify.patch(
     "/:recipeId",
     {
@@ -100,6 +106,7 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
+  // DELETE — delete recipe
   fastify.delete(
     "/:recipeId",
     {
@@ -119,6 +126,57 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
 
       await recipeService.delete(request.params.recipeId, userId);
       return reply.status(204).send();
+    },
+  );
+
+  // POST — toggle favorite
+  fastify.post(
+    "/:recipeId/favorite",
+    {
+      schema: {
+        params: recipeParamsSchema,
+        tags: ["Recipes"],
+        summary: "Toggle favorite for a recipe",
+        security: [{ bearerAuth: [] }],
+      },
+      preHandler: authGuard,
+    },
+    async (request, reply) => {
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
+      const result = await favoriteService.toggle(
+        userId,
+        request.params.recipeId,
+      );
+      return reply.send(result);
+    },
+  );
+
+  // GET — check if favorited
+  fastify.get(
+    "/:recipeId/favorite",
+    {
+      schema: {
+        params: recipeParamsSchema,
+        tags: ["Recipes"],
+        summary: "Check if recipe is favorited",
+      },
+      preHandler: optionalAuth,
+    },
+    async (request, reply) => {
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.send({ favorited: false });
+      }
+
+      const favorited = await favoriteService.isFavorited(
+        userId,
+        request.params.recipeId,
+      );
+      return reply.send({ favorited });
     },
   );
 }
