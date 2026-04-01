@@ -1,9 +1,10 @@
 import type {
   Comment,
-  PaginatedResult,
+  Paginated,
   RecipeSummary,
   UserSummary,
 } from "@recipes/shared";
+import { withPagination } from "@recipes/shared";
 import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import type { ICommentDocument } from "@/modules/comments/comment.model.js";
@@ -41,7 +42,7 @@ export class CommentService {
   async findByRecipe(
     params: RecipeCommentsParams,
     query: CommentQuery,
-  ): Promise<PaginatedResult<Comment>> {
+  ): Promise<Paginated<Comment>> {
     const { page, limit } = query;
     const { recipeId } = params;
 
@@ -62,18 +63,7 @@ export class CommentService {
       CommentModel.countDocuments(filter),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
-    return {
-      items: items.map(toComment),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
-    };
+    return withPagination(items.map(toComment), total, page, limit);
   }
 
   async create(
@@ -104,7 +94,7 @@ export class CommentService {
   async findByUser(
     userId: string,
     query: CommentQuery,
-  ): Promise<PaginatedResult<Comment>> {
+  ): Promise<Paginated<Comment>> {
     const { page, limit } = query;
 
     const filter: QueryFilter<ICommentDocument> = { author: userId };
@@ -120,18 +110,7 @@ export class CommentService {
       CommentModel.countDocuments(filter),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
-    return {
-      items: items.map(toComment),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
-    };
+    return withPagination(items.map(toComment), total, page, limit);
   }
 
   async delete(id: string, userId: string): Promise<void> {

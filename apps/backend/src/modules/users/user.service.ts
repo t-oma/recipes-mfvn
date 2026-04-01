@@ -1,4 +1,4 @@
-import type { Comment, PaginatedResult, Recipe, User } from "@recipes/shared";
+import type { Comment, Paginated, Recipe, User } from "@recipes/shared";
 import { AppError } from "@/common/errors.js";
 import type { CommentQuery } from "@/modules/comments/comment.schema.js";
 import { CommentService } from "@/modules/comments/comment.service.js";
@@ -41,14 +41,14 @@ export class UserService {
   async getFavorites(
     userId: string,
     query: FavoriteQuery,
-  ): Promise<PaginatedResult<Recipe>> {
+  ): Promise<Paginated<Recipe>> {
     return this.favoriteService.findByUser(userId, query);
   }
 
   async getComments(
     userId: string,
     query: CommentQuery,
-  ): Promise<PaginatedResult<Comment>> {
+  ): Promise<Paginated<Comment>> {
     return this.commentService.findByUser(userId, query);
   }
 }

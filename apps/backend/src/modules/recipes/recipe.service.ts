@@ -2,10 +2,11 @@ import type {
   CategorySummary,
   Difficulty,
   Minutes,
-  PaginatedResult,
+  Paginated,
   Recipe,
   UserSummary,
 } from "@recipes/shared";
+import { withPagination } from "@recipes/shared";
 import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
@@ -53,7 +54,7 @@ export class RecipeService {
   async findAll(
     query: SearchRecipeQuery,
     userId?: string,
-  ): Promise<PaginatedResult<Recipe>> {
+  ): Promise<Paginated<Recipe>> {
     const { page, limit, sort, categoryId, difficulty, isFavorited, search } =
       query;
     const filter: QueryFilter<IRecipeDocument> = {};
@@ -62,34 +63,14 @@ export class RecipeService {
     if (isFavorited === true) {
       if (!userId) {
         // Can't filter favorites without auth
-        return {
-          items: [],
-          pagination: {
-            page,
-            limit,
-            total: 0,
-            totalPages: 0,
-            hasNext: false,
-            hasPrev: false,
-          },
-        };
+        return withPagination([], 0, page, limit);
       }
 
       const favorites = await FavoriteModel.find({ user: userId }).lean();
       const favoritedRecipeIds = favorites.map((f) => f.recipe);
 
       if (favoritedRecipeIds.length === 0) {
-        return {
-          items: [],
-          pagination: {
-            page,
-            limit,
-            total: 0,
-            totalPages: 0,
-            hasNext: false,
-            hasPrev: false,
-          },
-        };
+        return withPagination([], 0, page, limit);
       }
 
       filter._id = { $in: favoritedRecipeIds };
@@ -136,20 +117,12 @@ export class RecipeService {
       favoritedIds = new Set(favorites.map((f) => String(f.recipe)));
     }
 
-    const totalPages = Math.ceil(total / limit);
-    return {
-      items: items.map((item) =>
-        toRecipe(item, favoritedIds.has(String(item._id))),
-      ),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
-    };
+    return withPagination(
+      items.map((item) => toRecipe(item, favoritedIds.has(String(item._id)))),
+      total,
+      page,
+      limit,
+    );
   }
 
   async findById(id: string, userId?: string): Promise<Recipe> {

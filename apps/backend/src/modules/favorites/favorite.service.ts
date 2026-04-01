@@ -1,4 +1,5 @@
-import type { PaginatedResult, Recipe } from "@recipes/shared";
+import type { Paginated, Recipe } from "@recipes/shared";
+import { withPagination } from "@recipes/shared";
 import { AppError } from "@/common/errors.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
@@ -69,7 +70,7 @@ export class FavoriteService {
   async findByUser(
     userId: string,
     query: FavoriteQuery,
-  ): Promise<PaginatedResult<Recipe>> {
+  ): Promise<Paginated<Recipe>> {
     const { page, limit } = query;
 
     const [favorites, total] = await Promise.all([
@@ -93,17 +94,6 @@ export class FavoriteService {
       .filter((recipe) => recipe != null)
       .map((recipe) => toRecipe(recipe));
 
-    const totalPages = Math.ceil(total / limit);
-    return {
-      items,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
-    };
+    return withPagination(items, total, page, limit);
   }
 }
