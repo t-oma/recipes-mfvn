@@ -136,14 +136,14 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  // POST — toggle favorite
+  // POST — add to favorite
   fastify.post(
     "/:recipeId/favorite",
     {
       schema: {
         params: recipeParamsSchema,
         tags: ["Recipes"],
-        summary: "Toggle favorite for a recipe",
+        summary: "Add recipe to favorites",
         security: [{ bearerAuth: [] }],
       },
       preHandler: authGuard,
@@ -154,7 +154,30 @@ export async function recipeRoutes(app: FastifyInstance): Promise<void> {
         return reply.status(401).send({ error: "Not authorized" });
       }
 
-      const result = await favoriteService.toggle(
+      const result = await favoriteService.add(userId, request.params.recipeId);
+      return reply.send(result);
+    },
+  );
+
+  // DELETE — remove from favorites
+  fastify.delete(
+    "/:recipeId/favorite",
+    {
+      schema: {
+        params: recipeParamsSchema,
+        tags: ["Recipes"],
+        summary: "Remove recipe from favorites",
+        security: [{ bearerAuth: [] }],
+      },
+      preHandler: authGuard,
+    },
+    async (request, reply) => {
+      const userId = request.user?.userId;
+      if (!userId) {
+        return reply.status(401).send({ error: "Not authorized" });
+      }
+
+      const result = await favoriteService.remove(
         userId,
         request.params.recipeId,
       );
