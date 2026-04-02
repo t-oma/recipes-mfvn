@@ -8,7 +8,7 @@ import {
   createCommentSchema,
   createCommentService,
 } from "@/modules/comments/index.js";
-import { FavoriteService } from "@/modules/favorites/favorite.service.js";
+import { createFavoriteService } from "@/modules/favorites/index.js";
 import {
   createRecipeSchema,
   recipeParamsSchema,
@@ -16,11 +16,11 @@ import {
   updateRecipeSchema,
 } from "@/modules/recipes/recipe.schema.js";
 import { RecipeService } from "@/modules/recipes/recipe.service.js";
-import { UserModel } from "../users/user.model.js";
+import { UserModel } from "@/modules/users/index.js";
 import { RecipeModel } from "./recipe.model.js";
 
 const recipeService = new RecipeService();
-const favoriteService = new FavoriteService();
+const favoriteService = createFavoriteService(RecipeModel, UserModel);
 const commentService = createCommentService(
   CommentModel,
   RecipeModel,

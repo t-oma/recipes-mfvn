@@ -20,12 +20,12 @@ import {
   CommentModel,
   createCommentService,
 } from "@/modules/comments/index.js";
+import { createFavoriteService } from "@/modules/favorites/index.js";
 import {
   createUserService,
   UserModel,
   userRoutes,
 } from "@/modules/users/index.js";
-import { FavoriteService } from "./modules/favorites/favorite.service.js";
 import { RecipeModel } from "./modules/recipes/recipe.model.js";
 import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
 
@@ -65,7 +65,7 @@ export function buildApp() {
   app.register(userRoutes, {
     service: createUserService(
       createCommentService(CommentModel, RecipeModel, UserModel),
-      new FavoriteService(),
+      createFavoriteService(RecipeModel, UserModel),
       UserModel,
     ),
     prefix: "/api/users",
