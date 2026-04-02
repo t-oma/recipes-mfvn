@@ -1,3 +1,10 @@
+## [0.4.0] - 2026-04-02
+
+### 🚀 Features
+
+- Add favorites feature with backend architecture refactoring (#12)
+
+
 ## [0.3.0] - 2026-03-30
 
 ### 🚀 Features
