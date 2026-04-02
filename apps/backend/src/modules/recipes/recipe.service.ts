@@ -1,11 +1,9 @@
 import type { Paginated, Recipe } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
-import type { QueryFilter } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toRecipe } from "@/common/utils/mongo.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
-import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import type {
   CreateRecipeBody,
@@ -13,15 +11,18 @@ import type {
   UpdateRecipeBody,
 } from "@/modules/recipes/recipe.schema.js";
 import { UserModel } from "@/modules/users/user.model.js";
+import {
+  buildRecipeFilter,
+  withVisibilityFilter,
+} from "./recipe-filter.builder.js";
 
 export class RecipeService {
   async findAll(
     query: SearchRecipeQuery,
     userId?: string,
   ): Promise<Paginated<Recipe>> {
-    const { page, limit, sort, categoryId, difficulty, isFavorited, search } =
-      query;
-    const filter: QueryFilter<IRecipeDocument> = {};
+    const { page, limit, sort, isFavorited } = query;
+    const filter = withVisibilityFilter(buildRecipeFilter(query), userId);
 
     // Filter by favorites
     if (isFavorited === true) {
@@ -38,25 +39,6 @@ export class RecipeService {
       }
 
       filter._id = { $in: favoritedRecipeIds };
-    }
-
-    if (categoryId) {
-      filter.category = categoryId;
-    }
-    if (difficulty) {
-      filter.difficulty = difficulty;
-    }
-
-    if (search) {
-      filter.$text = { $search: search };
-    }
-
-    // Filter by visibility: show public + own private recipes
-    if (!userId) {
-      filter.isPublic = true;
-    } else if (!isFavorited) {
-      // Only apply visibility filter when not filtering by favorites
-      filter.$or = [{ isPublic: true }, { author: userId }];
     }
 
     const [items, total] = await Promise.all([
