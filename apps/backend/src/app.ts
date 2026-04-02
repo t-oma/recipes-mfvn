@@ -8,10 +8,14 @@ import {
   validatorCompiler,
 } from "fastify-type-provider-zod";
 import { authRoutes, createAuthService } from "@/modules/auth/index.js";
+import {
+  CategoryModel,
+  categoryRoutes,
+  createCategoryService,
+} from "@/modules/categories/index.js";
 import { errorHandler } from "./common/middleware/errorHandler.js";
 import { env } from "./config/env.js";
 import { swaggerOptions, swaggerUiOptions } from "./config/swagger.js";
-import { categoryRoutes } from "./modules/categories/category.routes.js";
 import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
 import { UserModel } from "./modules/users/user.model.js";
 import { userRoutes } from "./modules/users/user.routes.js";
@@ -51,7 +55,10 @@ export function buildApp() {
   });
   app.register(userRoutes, { prefix: "/api/users" });
   app.register(recipeRoutes, { prefix: "/api/recipes" });
-  app.register(categoryRoutes, { prefix: "/api/categories" });
+  app.register(categoryRoutes, {
+    service: createCategoryService(CategoryModel),
+    prefix: "/api/categories",
+  });
 
   return app;
 }
