@@ -7,12 +7,13 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
+import { authRoutes, createAuthService } from "@/modules/auth/index.js";
 import { errorHandler } from "./common/middleware/errorHandler.js";
 import { env } from "./config/env.js";
 import { swaggerOptions, swaggerUiOptions } from "./config/swagger.js";
-import { authRoutes } from "./modules/auth/auth.routes.js";
 import { categoryRoutes } from "./modules/categories/category.routes.js";
 import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
+import { UserModel } from "./modules/users/user.model.js";
 import { userRoutes } from "./modules/users/user.routes.js";
 
 export function buildApp() {
@@ -44,7 +45,10 @@ export function buildApp() {
   app.get("/health", async () => ({ status: "ok" }));
 
   // Routes
-  app.register(authRoutes, { prefix: "/api/auth" });
+  app.register(authRoutes, {
+    service: createAuthService(UserModel),
+    prefix: "/api/auth",
+  });
   app.register(userRoutes, { prefix: "/api/users" });
   app.register(recipeRoutes, { prefix: "/api/recipes" });
   app.register(categoryRoutes, { prefix: "/api/categories" });
