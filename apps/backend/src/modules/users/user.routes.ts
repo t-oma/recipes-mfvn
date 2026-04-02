@@ -1,11 +1,19 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { authGuard } from "@/common/middleware/auth.guard.js";
-import { commentQuerySchema } from "@/modules/comments/comment.schema.js";
+import {
+  CommentModel,
+  commentQuerySchema,
+  createCommentService,
+} from "@/modules/comments/index.js";
 import { favoriteQuerySchema } from "@/modules/favorites/favorite.schema.js";
+import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import { UserService } from "@/modules/users/user.service.js";
+import { UserModel } from "./user.model.js";
 
-const userService = new UserService();
+const userService = new UserService(
+  createCommentService(CommentModel, RecipeModel, UserModel),
+);
 
 export async function userRoutes(app: FastifyInstance): Promise<void> {
   const fastify = app.withTypeProvider<ZodTypeProvider>();

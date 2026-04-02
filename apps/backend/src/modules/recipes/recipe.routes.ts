@@ -2,11 +2,12 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { authGuard, optionalAuth } from "@/common/middleware/auth.guard.js";
 import {
+  CommentModel,
   commentParamsSchema,
   commentQuerySchema,
   createCommentSchema,
-} from "@/modules/comments/comment.schema.js";
-import { CommentService } from "@/modules/comments/comment.service.js";
+  createCommentService,
+} from "@/modules/comments/index.js";
 import { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import {
   createRecipeSchema,
@@ -15,10 +16,16 @@ import {
   updateRecipeSchema,
 } from "@/modules/recipes/recipe.schema.js";
 import { RecipeService } from "@/modules/recipes/recipe.service.js";
+import { UserModel } from "../users/user.model.js";
+import { RecipeModel } from "./recipe.model.js";
 
 const recipeService = new RecipeService();
 const favoriteService = new FavoriteService();
-const commentService = new CommentService();
+const commentService = createCommentService(
+  CommentModel,
+  RecipeModel,
+  UserModel,
+);
 
 export async function recipeRoutes(app: FastifyInstance): Promise<void> {
   const fastify = app.withTypeProvider<ZodTypeProvider>();

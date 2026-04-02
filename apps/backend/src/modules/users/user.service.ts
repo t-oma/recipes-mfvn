@@ -1,8 +1,7 @@
 import type { Comment, Paginated, Recipe, User } from "@recipes/shared";
 import { AppError } from "@/common/errors.js";
 import { toUser } from "@/common/utils/mongo.js";
-import type { CommentQuery } from "@/modules/comments/comment.schema.js";
-import { CommentService } from "@/modules/comments/comment.service.js";
+import type { CommentQuery, CommentService } from "@/modules/comments/index.js";
 import type { FavoriteQuery } from "@/modules/favorites/favorite.schema.js";
 import { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import { UserModel } from "@/modules/users/user.model.js";
@@ -12,8 +11,8 @@ export class UserService {
   private readonly commentService: CommentService;
 
   constructor(
+    commentService: CommentService,
     favoriteService: FavoriteService = new FavoriteService(),
-    commentService: CommentService = new CommentService(),
   ) {
     this.favoriteService = favoriteService;
     this.commentService = commentService;
