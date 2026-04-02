@@ -7,18 +7,27 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
+import { errorHandler } from "@/common/middleware/errorHandler.js";
+import { env } from "@/config/env.js";
+import { swaggerOptions, swaggerUiOptions } from "@/config/swagger.js";
 import { authRoutes, createAuthService } from "@/modules/auth/index.js";
 import {
   CategoryModel,
   categoryRoutes,
   createCategoryService,
 } from "@/modules/categories/index.js";
-import { errorHandler } from "./common/middleware/errorHandler.js";
-import { env } from "./config/env.js";
-import { swaggerOptions, swaggerUiOptions } from "./config/swagger.js";
+import {
+  CommentModel,
+  createCommentService,
+} from "@/modules/comments/index.js";
+import {
+  createUserService,
+  UserModel,
+  userRoutes,
+} from "@/modules/users/index.js";
+import { FavoriteService } from "./modules/favorites/favorite.service.js";
+import { RecipeModel } from "./modules/recipes/recipe.model.js";
 import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
-import { UserModel } from "./modules/users/user.model.js";
-import { userRoutes } from "./modules/users/user.routes.js";
 
 export function buildApp() {
   const app = Fastify({
@@ -53,7 +62,14 @@ export function buildApp() {
     service: createAuthService(UserModel),
     prefix: "/api/auth",
   });
-  app.register(userRoutes, { prefix: "/api/users" });
+  app.register(userRoutes, {
+    service: createUserService(
+      createCommentService(CommentModel, RecipeModel, UserModel),
+      new FavoriteService(),
+      UserModel,
+    ),
+    prefix: "/api/users",
+  });
   app.register(recipeRoutes, { prefix: "/api/recipes" });
   app.register(categoryRoutes, {
     service: createCategoryService(CategoryModel),
