@@ -1,164 +1,184 @@
 import type { Paginated, Recipe } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
+import type { Model } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toRecipe } from "@/common/utils/mongo.js";
-import { CategoryModel } from "@/modules/categories/category.model.js";
-import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
-import { RecipeModel } from "@/modules/recipes/recipe.model.js";
+import type { ICategoryDocument } from "@/modules/categories/index.js";
+import type { IFavoriteDocument } from "@/modules/favorites/index.js";
 import type {
   CreateRecipeBody,
+  IRecipeDocument,
   SearchRecipeQuery,
   UpdateRecipeBody,
-} from "@/modules/recipes/recipe.schema.js";
-import { UserModel } from "@/modules/users/user.model.js";
+} from "@/modules/recipes/index.js";
 import {
   buildRecipeFilter,
   withVisibilityFilter,
-} from "./recipe-filter.builder.js";
+} from "@/modules/recipes/index.js";
+import type { IUserDocument } from "@/modules/users/index.js";
 
-export class RecipeService {
-  async findAll(
+export interface RecipeService {
+  findAll(
     query: SearchRecipeQuery,
     userId?: string,
-  ): Promise<Paginated<Recipe>> {
-    const { page, limit, sort, isFavorited } = query;
-    const filter = withVisibilityFilter(buildRecipeFilter(query), userId);
+  ): Promise<Paginated<Recipe>>;
+  findById(id: string, userId?: string): Promise<Recipe>;
+  create(data: CreateRecipeBody, authorId: string): Promise<Recipe>;
+  update(id: string, data: UpdateRecipeBody, userId: string): Promise<Recipe>;
+  delete(id: string, userId: string): Promise<void>;
+}
 
-    // Filter by favorites
-    if (isFavorited === true) {
-      if (!userId) {
-        // Can't filter favorites without auth
-        return withPagination([], 0, page, limit);
+export function createRecipeService(
+  recipeModel: Model<IRecipeDocument>,
+  userModel: Model<IUserDocument>,
+  favoriteModel: Model<IFavoriteDocument>,
+  categoryModel: Model<ICategoryDocument>,
+): RecipeService {
+  return {
+    findAll: async (query, userId) => {
+      const { page, limit, sort, isFavorited } = query;
+      const filter = withVisibilityFilter(buildRecipeFilter(query), userId);
+
+      // Filter by favorites
+      if (isFavorited === true) {
+        if (!userId) {
+          // Can't filter favorites without auth
+          return withPagination([], 0, page, limit);
+        }
+
+        const favorites = await favoriteModel.find({ user: userId }).lean();
+        const favoritedRecipeIds = favorites.map((f) => f.recipe);
+
+        if (favoritedRecipeIds.length === 0) {
+          return withPagination([], 0, page, limit);
+        }
+
+        filter._id = { $in: favoritedRecipeIds };
       }
 
-      const favorites = await FavoriteModel.find({ user: userId }).lean();
-      const favoritedRecipeIds = favorites.map((f) => f.recipe);
+      const [items, total] = await Promise.all([
+        recipeModel
+          .find(filter)
+          .populate("author", "name email")
+          .populate("category", "name slug")
+          .sort(sort)
+          .skip((page - 1) * limit)
+          .limit(limit)
+          .lean(),
+        recipeModel.countDocuments(filter),
+      ]);
 
-      if (favoritedRecipeIds.length === 0) {
-        return withPagination([], 0, page, limit);
+      // Get favorited recipe IDs for current user
+      let favoritedIds = new Set<string>();
+      if (userId && items.length > 0) {
+        const recipeIds = items.map((item) => String(item._id));
+        const favorites = await favoriteModel
+          .find({
+            user: userId,
+            recipe: { $in: recipeIds },
+          })
+          .lean();
+        favoritedIds = new Set(favorites.map((f) => String(f.recipe)));
       }
 
-      filter._id = { $in: favoritedRecipeIds };
-    }
+      return withPagination(
+        items.map((item) => toRecipe(item, favoritedIds.has(String(item._id)))),
+        total,
+        page,
+        limit,
+      );
+    },
 
-    const [items, total] = await Promise.all([
-      RecipeModel.find(filter)
+    findById: async (id, userId) => {
+      const recipe = await recipeModel
+        .findById(id)
         .populate("author", "name email")
         .populate("category", "name slug")
-        .sort(sort)
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean(),
-      RecipeModel.countDocuments(filter),
-    ]);
+        .lean();
+      if (!recipe) {
+        throw new AppError("Recipe not found", 404);
+      }
 
-    // Get favorited recipe IDs for current user
-    let favoritedIds = new Set<string>();
-    if (userId && items.length > 0) {
-      const recipeIds = items.map((item) => String(item._id));
-      const favorites = await FavoriteModel.find({
-        user: userId,
-        recipe: { $in: recipeIds },
-      }).lean();
-      favoritedIds = new Set(favorites.map((f) => String(f.recipe)));
-    }
+      // Check access to private recipes
+      if (!recipe.isPublic && recipe.author._id.toString() !== userId) {
+        throw new AppError("Recipe not found", 404);
+      }
 
-    return withPagination(
-      items.map((item) => toRecipe(item, favoritedIds.has(String(item._id)))),
-      total,
-      page,
-      limit,
-    );
-  }
+      let isFavorited = false;
+      if (userId) {
+        const favorite = await favoriteModel
+          .findOne({
+            user: userId,
+            recipe: id,
+          })
+          .lean();
+        isFavorited = !!favorite;
+      }
 
-  async findById(id: string, userId?: string): Promise<Recipe> {
-    const recipe = await RecipeModel.findById(id)
-      .populate("author", "name email")
-      .populate("category", "name slug")
-      .lean();
-    if (!recipe) {
-      throw new AppError("Recipe not found", 404);
-    }
+      return toRecipe(recipe, isFavorited);
+    },
 
-    // Check access to private recipes
-    if (!recipe.isPublic && recipe.author._id.toString() !== userId) {
-      throw new AppError("Recipe not found", 404);
-    }
+    create: async (data, authorId) => {
+      const category = await categoryModel.findById(data.category);
+      if (!category) {
+        throw new AppError("Category does not exist", 400);
+      }
 
-    let isFavorited = false;
-    if (userId) {
-      const favorite = await FavoriteModel.findOne({
-        user: userId,
-        recipe: id,
-      }).lean();
-      isFavorited = !!favorite;
-    }
+      const author = await userModel.findById(authorId);
+      if (!author) {
+        throw new AppError("Author not found", 400);
+      }
 
-    return toRecipe(recipe, isFavorited);
-  }
+      const recipe = await recipeModel.create({ ...data, author: authorId });
+      const populated = await recipe.populate([
+        { path: "author", select: "name email" },
+        { path: "category", select: "name slug" },
+      ]);
+      return toRecipe(populated.toObject(), false);
+    },
 
-  async create(data: CreateRecipeBody, authorId: string): Promise<Recipe> {
-    const category = await CategoryModel.findById(data.category);
-    if (!category) {
-      throw new AppError("Category does not exist", 400);
-    }
+    update: async (id, data, userId) => {
+      const recipe = await recipeModel.findById(id);
+      if (!recipe) {
+        throw new AppError("Recipe not found", 404);
+      }
 
-    const author = await UserModel.findById(authorId);
-    if (!author) {
-      throw new AppError("Author not found", 400);
-    }
+      if (recipe.author.toString() !== userId) {
+        throw new AppError("Not authorized to update this recipe", 403);
+      }
 
-    const recipe = await RecipeModel.create({ ...data, author: authorId });
-    const populated = await recipe.populate([
-      { path: "author", select: "name email" },
-      { path: "category", select: "name slug" },
-    ]);
-    return toRecipe(populated.toObject(), false);
-  }
+      Object.assign(recipe, data);
+      await recipe.save();
+      const populated = await recipe.populate([
+        { path: "author", select: "name email" },
+        { path: "category", select: "name slug" },
+      ]);
 
-  async update(
-    id: string,
-    data: UpdateRecipeBody,
-    userId: string,
-  ): Promise<Recipe> {
-    const recipe = await RecipeModel.findById(id);
-    if (!recipe) {
-      throw new AppError("Recipe not found", 404);
-    }
+      let isFavorited = false;
+      if (userId) {
+        const favorite = await favoriteModel
+          .findOne({
+            user: userId,
+            recipe: id,
+          })
+          .lean();
+        isFavorited = !!favorite;
+      }
 
-    if (recipe.author.toString() !== userId) {
-      throw new AppError("Not authorized to update this recipe", 403);
-    }
+      return toRecipe(populated.toObject(), isFavorited);
+    },
 
-    Object.assign(recipe, data);
-    await recipe.save();
-    const populated = await recipe.populate([
-      { path: "author", select: "name email" },
-      { path: "category", select: "name slug" },
-    ]);
+    delete: async (id, userId) => {
+      const recipe = await recipeModel.findById(id);
+      if (!recipe) {
+        throw new AppError("Recipe not found", 404);
+      }
 
-    let isFavorited = false;
-    if (userId) {
-      const favorite = await FavoriteModel.findOne({
-        user: userId,
-        recipe: id,
-      }).lean();
-      isFavorited = !!favorite;
-    }
+      if (recipe.author.toString() !== userId) {
+        throw new AppError("Not authorized to delete this recipe", 403);
+      }
 
-    return toRecipe(populated.toObject(), isFavorited);
-  }
-
-  async delete(id: string, userId: string): Promise<void> {
-    const recipe = await RecipeModel.findById(id);
-    if (!recipe) {
-      throw new AppError("Recipe not found", 404);
-    }
-
-    if (recipe.author.toString() !== userId) {
-      throw new AppError("Not authorized to delete this recipe", 403);
-    }
-
-    await recipe.deleteOne();
-  }
+      await recipe.deleteOne();
+    },
+  };
 }

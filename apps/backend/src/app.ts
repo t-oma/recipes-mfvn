@@ -20,14 +20,20 @@ import {
   CommentModel,
   createCommentService,
 } from "@/modules/comments/index.js";
-import { createFavoriteService } from "@/modules/favorites/index.js";
+import {
+  createFavoriteService,
+  FavoriteModel,
+} from "@/modules/favorites/index.js";
+import {
+  createRecipeService,
+  RecipeModel,
+  recipeRoutes,
+} from "@/modules/recipes/index.js";
 import {
   createUserService,
   UserModel,
   userRoutes,
 } from "@/modules/users/index.js";
-import { RecipeModel } from "./modules/recipes/recipe.model.js";
-import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
 
 export function buildApp() {
   const app = Fastify({
@@ -70,7 +76,17 @@ export function buildApp() {
     ),
     prefix: "/api/users",
   });
-  app.register(recipeRoutes, { prefix: "/api/recipes" });
+  app.register(recipeRoutes, {
+    service: createRecipeService(
+      RecipeModel,
+      UserModel,
+      FavoriteModel,
+      CategoryModel,
+    ),
+    favoriteService: createFavoriteService(RecipeModel, UserModel),
+    commentService: createCommentService(CommentModel, RecipeModel, UserModel),
+    prefix: "/api/recipes",
+  });
   app.register(categoryRoutes, {
     service: createCategoryService(CategoryModel),
     prefix: "/api/categories",
