@@ -1,7 +1,7 @@
 import { loginSchema, registerSchema } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import type { AuthService } from "./auth.service.js";
+import type { AuthService } from "@/modules/auth/index.js";
 
 export interface AuthModuleOptions {
   service: AuthService;
