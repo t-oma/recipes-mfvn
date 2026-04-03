@@ -5,6 +5,7 @@ import type {
   CommentForRecipe,
   Recipe,
   RecipeSummary,
+  Replace,
   User,
   UserSummary,
 } from "@recipes/shared";
@@ -14,12 +15,15 @@ import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
 import type { IUserDocument } from "@/modules/users/user.model.js";
 
 export function toRecipe<T extends IRecipeDocument>(
-  doc: T,
+  doc: Replace<
+    T,
+    {
+      category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+      author: Pick<IUserDocument, "_id" | "name" | "email">;
+    }
+  >,
   isFavorited: boolean,
 ): Recipe {
-  const category = doc.category as unknown as ICategoryDocument;
-  const author = doc.author as unknown as IUserDocument;
-
   return {
     id: doc._id.toString(),
     title: doc.title,
@@ -27,14 +31,14 @@ export function toRecipe<T extends IRecipeDocument>(
     ingredients: doc.ingredients as Recipe["ingredients"],
     instructions: doc.instructions,
     category: {
-      id: category._id.toString(),
-      name: category.name,
-      slug: category.slug,
+      id: doc.category._id.toString(),
+      name: doc.category.name,
+      slug: doc.category.slug,
     } satisfies CategorySummary,
     author: {
-      id: author._id.toString(),
-      email: author.email,
-      name: author.name,
+      id: doc.author._id.toString(),
+      email: doc.author.email,
+      name: doc.author.name,
     } satisfies UserSummary,
     difficulty: doc.difficulty,
     cookingTime: doc.cookingTime,
@@ -57,37 +61,47 @@ export function toCategory(doc: ICategoryDocument): Category {
   };
 }
 
-export function toComment(doc: ICommentDocument): Comment {
-  const author = doc.author as unknown as IUserDocument;
-  const recipe = doc.recipe as unknown as IRecipeDocument;
-
+export function toComment<T extends ICommentDocument>(
+  doc: Replace<
+    T,
+    {
+      author: Pick<IUserDocument, "_id" | "name" | "email">;
+      recipe: Pick<IRecipeDocument, "_id" | "title">;
+    }
+  >,
+): Comment {
   return {
     id: doc._id.toString(),
     text: doc.text,
     recipe: {
-      id: recipe._id.toString(),
-      title: recipe.title,
+      id: doc.recipe._id.toString(),
+      title: doc.recipe.title,
     } satisfies RecipeSummary,
     author: {
-      id: author._id.toString(),
-      email: author.email,
-      name: author.name,
+      id: doc.author._id.toString(),
+      email: doc.author.email,
+      name: doc.author.name,
     } satisfies UserSummary,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };
 }
 
-export function toCommentForRecipe(doc: ICommentDocument): CommentForRecipe {
-  const author = doc.author as unknown as IUserDocument;
-
+export function toCommentForRecipe<T extends ICommentDocument>(
+  doc: Replace<
+    T,
+    {
+      author: Pick<IUserDocument, "_id" | "name" | "email">;
+    }
+  >,
+): CommentForRecipe {
   return {
     id: doc._id.toString(),
     text: doc.text,
     author: {
-      id: author._id.toString(),
-      email: author.email,
-      name: author.name,
+      id: doc.author._id.toString(),
+      email: doc.author.email,
+      name: doc.author.name,
     } satisfies UserSummary,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
