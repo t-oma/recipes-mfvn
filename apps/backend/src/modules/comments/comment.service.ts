@@ -9,8 +9,8 @@ import type {
   ICommentDocument,
   RecipeCommentsParams,
 } from "@/modules/comments/index.js";
-import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
-import type { IUserDocument } from "@/modules/users/user.model.js";
+import type { IRecipeDocument } from "@/modules/recipes/index.js";
+import type { IUserDocument } from "@/modules/users/index.js";
 
 export interface CommentService {
   findByRecipe(
@@ -46,7 +46,10 @@ export function createCommentService(
       const [items, total] = await Promise.all([
         commentModel
           .find(filter)
-          .populate("author", "name email")
+          .populate<{ author: Pick<IUserDocument, "_id" | "name" | "email"> }>(
+            "author",
+            "name email",
+          )
           .sort("-createdAt")
           .skip((page - 1) * limit)
           .limit(limit)
@@ -54,7 +57,12 @@ export function createCommentService(
         commentModel.countDocuments(filter),
       ]);
 
-      return withPagination(items.map(toCommentForRecipe), total, page, limit);
+      return withPagination(
+        items.map((item) => toCommentForRecipe(item)),
+        total,
+        page,
+        limit,
+      );
     },
     create: async (recipeId, authorId, data) => {
       const recipe = await recipeModel.findById(recipeId);
@@ -72,9 +80,11 @@ export function createCommentService(
         recipe: recipeId,
         author: authorId,
       });
+      const populated = await comment.populate<{
+        author: Pick<IUserDocument, "_id" | "name" | "email">;
+      }>("author", "name email");
 
-      const populated = await comment.populate("author", "name email");
-      return toCommentForRecipe(populated.toObject());
+      return toCommentForRecipe(populated.toObject<typeof populated>());
     },
     findByUser: async (userId, query) => {
       const { page, limit } = query;
@@ -84,8 +94,14 @@ export function createCommentService(
       const [items, total] = await Promise.all([
         commentModel
           .find(filter)
-          .populate("author", "name email")
-          .populate("recipe", "title")
+          .populate<{ author: Pick<IUserDocument, "_id" | "name" | "email"> }>(
+            "author",
+            "name email",
+          )
+          .populate<{ recipe: Pick<IRecipeDocument, "_id" | "title"> }>(
+            "recipe",
+            "title",
+          )
           .sort("-createdAt")
           .skip((page - 1) * limit)
           .limit(limit)
