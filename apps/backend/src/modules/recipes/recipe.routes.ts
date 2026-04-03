@@ -1,6 +1,10 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { authGuard, optionalAuth } from "@/common/middleware/auth.guard.js";
+import {
+  assertAuthenticated,
+  authGuard,
+  optionalAuth,
+} from "@/common/middleware/auth.guard.js";
 import type { CommentService } from "@/modules/comments/index.js";
 import {
   commentParamsSchema,
@@ -76,12 +80,8 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
-        const recipe = await service.create(request.body, userId);
+        assertAuthenticated(request);
+        const recipe = await service.create(request.body, request.user.userId);
         return reply.status(201).send(recipe);
       },
     )
@@ -98,15 +98,11 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
+        assertAuthenticated(request);
         const recipe = await service.update(
           request.params.recipeId,
           request.body,
-          userId,
+          request.user.userId,
         );
         return reply.send(recipe);
       },
@@ -123,12 +119,8 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
-        await service.delete(request.params.recipeId, userId);
+        assertAuthenticated(request);
+        await service.delete(request.params.recipeId, request.user.userId);
         return reply.status(204).send();
       },
     )
@@ -144,13 +136,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
+        assertAuthenticated(request);
         const result = await favoriteService.add(
-          userId,
+          request.user.userId,
           request.params.recipeId,
         );
         return reply.send(result);
@@ -168,13 +156,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
+        assertAuthenticated(request);
         const result = await favoriteService.remove(
-          userId,
+          request.user.userId,
           request.params.recipeId,
         );
         return reply.send(result);
@@ -234,14 +218,10 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
+        assertAuthenticated(request);
         const comment = await commentService.create(
           request.params.recipeId,
-          userId,
+          request.user.userId,
           request.body,
         );
         return reply.status(201).send(comment);
@@ -259,12 +239,11 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
-        await commentService.delete(request.params.commentId, userId);
+        assertAuthenticated(request);
+        await commentService.delete(
+          request.params.commentId,
+          request.user.userId,
+        );
         return reply.status(204).send();
       },
     );

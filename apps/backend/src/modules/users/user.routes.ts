@@ -1,6 +1,9 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { authGuard } from "@/common/middleware/auth.guard.js";
+import {
+  assertAuthenticated,
+  authGuard,
+} from "@/common/middleware/auth.guard.js";
 import { commentQuerySchema } from "@/modules/comments/index.js";
 import { favoriteQuerySchema } from "@/modules/favorites/favorite.schema.js";
 import type { UserService } from "@/modules/users/index.js";
@@ -26,12 +29,8 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
-        const user = await service.getCurrentUser(userId);
+        assertAuthenticated(request);
+        const user = await service.getCurrentUser(request.user.userId);
         return reply.send(user);
       },
     )
@@ -47,12 +46,11 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
-        const result = await service.getFavorites(userId, request.query);
+        assertAuthenticated(request);
+        const result = await service.getFavorites(
+          request.user.userId,
+          request.query,
+        );
         return reply.send(result);
       },
     )
@@ -68,12 +66,11 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
         preHandler: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.status(401).send({ error: "Not authorized" });
-        }
-
-        const result = await service.getComments(userId, request.query);
+        assertAuthenticated(request);
+        const result = await service.getComments(
+          request.user.userId,
+          request.query,
+        );
         return reply.send(result);
       },
     );
