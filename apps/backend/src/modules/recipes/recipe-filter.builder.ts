@@ -1,6 +1,8 @@
 import type { QueryFilter } from "mongoose";
-import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
-import type { SearchRecipeQuery } from "@/modules/recipes/recipe.schema.js";
+import type {
+  IRecipeDocument,
+  SearchRecipeQuery,
+} from "@/modules/recipes/index.js";
 
 export function buildRecipeFilter(
   query: SearchRecipeQuery,

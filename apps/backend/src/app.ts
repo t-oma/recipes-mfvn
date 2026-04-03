@@ -7,13 +7,33 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
-import { errorHandler } from "./common/middleware/errorHandler.js";
-import { env } from "./config/env.js";
-import { swaggerOptions, swaggerUiOptions } from "./config/swagger.js";
-import { authRoutes } from "./modules/auth/auth.routes.js";
-import { categoryRoutes } from "./modules/categories/category.routes.js";
-import { recipeRoutes } from "./modules/recipes/recipe.routes.js";
-import { userRoutes } from "./modules/users/user.routes.js";
+import { errorHandler } from "@/common/middleware/errorHandler.js";
+import { env } from "@/config/env.js";
+import { swaggerOptions, swaggerUiOptions } from "@/config/swagger.js";
+import { authRoutes, createAuthService } from "@/modules/auth/index.js";
+import {
+  CategoryModel,
+  categoryRoutes,
+  createCategoryService,
+} from "@/modules/categories/index.js";
+import {
+  CommentModel,
+  createCommentService,
+} from "@/modules/comments/index.js";
+import {
+  createFavoriteService,
+  FavoriteModel,
+} from "@/modules/favorites/index.js";
+import {
+  createRecipeService,
+  RecipeModel,
+  recipeRoutes,
+} from "@/modules/recipes/index.js";
+import {
+  createUserService,
+  UserModel,
+  userRoutes,
+} from "@/modules/users/index.js";
 
 export function buildApp() {
   const app = Fastify({
@@ -44,10 +64,37 @@ export function buildApp() {
   app.get("/health", async () => ({ status: "ok" }));
 
   // Routes
-  app.register(authRoutes, { prefix: "/api/auth" });
-  app.register(userRoutes, { prefix: "/api/users" });
-  app.register(recipeRoutes, { prefix: "/api/recipes" });
-  app.register(categoryRoutes, { prefix: "/api/categories" });
+  app.register(authRoutes, {
+    service: createAuthService(UserModel),
+    prefix: "/api/auth",
+  });
+  app.register(userRoutes, {
+    service: createUserService(
+      createCommentService(CommentModel, RecipeModel, UserModel),
+      createFavoriteService(FavoriteModel, RecipeModel, UserModel),
+      UserModel,
+    ),
+    prefix: "/api/users",
+  });
+  app.register(recipeRoutes, {
+    service: createRecipeService(
+      RecipeModel,
+      UserModel,
+      FavoriteModel,
+      CategoryModel,
+    ),
+    favoriteService: createFavoriteService(
+      FavoriteModel,
+      RecipeModel,
+      UserModel,
+    ),
+    commentService: createCommentService(CommentModel, RecipeModel, UserModel),
+    prefix: "/api/recipes",
+  });
+  app.register(categoryRoutes, {
+    service: createCategoryService(CategoryModel),
+    prefix: "/api/categories",
+  });
 
   return app;
 }

@@ -1,45 +1,47 @@
-import type { AuthResponse } from "@recipes/shared";
+import type { AuthResponse, LoginBody, RegisterBody } from "@recipes/shared";
+import type { Model } from "mongoose";
 import { AppError } from "@/common/errors.js";
-import type { JwtPayload } from "@/common/utils/jwt.js";
 import { signToken } from "@/common/utils/jwt.js";
 import { toUser } from "@/common/utils/mongo.js";
-import type { LoginBody, RegisterBody } from "@/modules/auth/auth.schema.js";
-import { UserModel } from "@/modules/users/user.model.js";
+import type { IUserDocument } from "@/modules/users/index.js";
 
-export class AuthService {
-  async register(data: RegisterBody): Promise<AuthResponse> {
-    const exists = await UserModel.findOne({ email: data.email });
-    if (exists) {
-      throw new AppError("Email already in use", 409);
-    }
+export interface AuthService {
+  register(data: RegisterBody): Promise<AuthResponse>;
+  login(data: LoginBody): Promise<AuthResponse>;
+}
 
-    const user = await UserModel.create(data);
-    const token = this.generateToken(user.id, user.email);
+export function createAuthService(
+  userModel: Model<IUserDocument>,
+): AuthService {
+  return {
+    register: async (data) => {
+      const exists = await userModel.findOne({ email: data.email });
+      if (exists) {
+        throw new AppError("Email already in use", 409);
+      }
 
-    return {
-      user: toUser(user.toObject()),
-      token,
-    };
-  }
+      const user = await userModel.create(data);
+      const token = signToken({ userId: user.id, email: user.email });
 
-  async login(data: LoginBody): Promise<AuthResponse> {
-    const user = await UserModel.findOne({ email: data.email }).select(
-      "+password",
-    );
-    if (!user || !(await user.comparePassword(data.password))) {
-      throw new AppError("Invalid email or password", 401);
-    }
+      return {
+        user: toUser(user.toObject()),
+        token,
+      };
+    },
+    login: async (data) => {
+      const user = await userModel
+        .findOne({ email: data.email })
+        .select("+password");
+      if (!user || !(await user.comparePassword(data.password))) {
+        throw new AppError("Invalid email or password", 401);
+      }
 
-    const token = this.generateToken(user.id, user.email);
+      const token = signToken({ userId: user.id, email: user.email });
 
-    return {
-      user: toUser(user.toObject()),
-      token,
-    };
-  }
-
-  private generateToken(userId: string, email: string): string {
-    const payload: JwtPayload = { userId, email };
-    return signToken(payload);
-  }
+      return {
+        user: toUser(user.toObject()),
+        token,
+      };
+    },
+  };
 }
