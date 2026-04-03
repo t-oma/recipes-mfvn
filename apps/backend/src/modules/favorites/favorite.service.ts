@@ -28,8 +28,8 @@ export function createFavoriteService(
       throw new AppError("Invalid user ID", 400);
     }
 
-    const userExtists = await userModel.exists({ _id: userId });
-    if (!userExtists) {
+    const userExists = await userModel.exists({ _id: userId });
+    if (!userExists) {
       throw new AppError("User not found", 404);
     }
   }
@@ -38,8 +38,8 @@ export function createFavoriteService(
       throw new AppError("Invalid recipe ID", 400);
     }
 
-    const recipeExtists = await recipeModel.exists({ _id: recipeId });
-    if (!recipeExtists) {
+    const recipeExists = await recipeModel.exists({ _id: recipeId });
+    if (!recipeExists) {
       throw new AppError("Recipe not found", 404);
     }
   }
