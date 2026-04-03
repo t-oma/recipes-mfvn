@@ -16,13 +16,13 @@ import {
   updateRecipeSchema,
 } from "@/modules/recipes/index.js";
 
-export interface RecipePluginOptions {
+export interface RecipeModuleOptions {
   service: RecipeService;
   favoriteService: FavoriteService;
   commentService: CommentService;
 }
 
-export const recipeRoutes: FastifyPluginAsync<RecipePluginOptions> = async (
+export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
   fastify,
   { service, favoriteService, commentService },
 ) => {

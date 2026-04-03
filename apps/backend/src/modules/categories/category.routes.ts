@@ -7,11 +7,11 @@ import {
 } from "@/modules/categories/category.schema.js";
 import type { CategoryService } from "@/modules/categories/category.service.js";
 
-export interface CategoryPluginOptions {
+export interface CategoryModuleOptions {
   service: CategoryService;
 }
 
-export const categoryRoutes: FastifyPluginAsync<CategoryPluginOptions> = async (
+export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
   fastify,
   { service },
 ) => {
