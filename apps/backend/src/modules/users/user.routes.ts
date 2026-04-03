@@ -26,7 +26,7 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
           summary: "Get current user",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -43,7 +43,7 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
           summary: "Get current user's favorite recipes",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -63,7 +63,7 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
           summary: "Get current user's comments",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);

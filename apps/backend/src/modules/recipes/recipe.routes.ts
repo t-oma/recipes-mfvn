@@ -40,7 +40,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           tags: ["Recipes"],
           summary: "Get all recipes with pagination",
         },
-        preHandler: optionalAuth,
+        onRequest: optionalAuth,
       },
       async (request, reply) => {
         const result = await service.findAll(
@@ -58,7 +58,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           tags: ["Recipes"],
           summary: "Get recipe by ID",
         },
-        preHandler: optionalAuth,
+        onRequest: optionalAuth,
       },
       async (request, reply) => {
         const recipe = await service.findById(
@@ -77,7 +77,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           summary: "Create a recipe",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -95,7 +95,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           summary: "Update a recipe",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -116,7 +116,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           summary: "Delete a recipe",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -133,7 +133,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           summary: "Add recipe to favorites",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -153,7 +153,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           summary: "Remove recipe from favorites",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -172,7 +172,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           tags: ["Recipes"],
           summary: "Check if recipe is favorited",
         },
-        preHandler: optionalAuth,
+        onRequest: optionalAuth,
       },
       async (request, reply) => {
         const userId = request.user?.userId;
@@ -215,7 +215,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           summary: "Create a comment",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -236,7 +236,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           summary: "Delete a comment",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         assertAuthenticated(request);

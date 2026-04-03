@@ -39,7 +39,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
           summary: "Create a category",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         const category = await service.create(request.body);
@@ -55,7 +55,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
           summary: "Delete a category",
           security: [{ bearerAuth: [] }],
         },
-        preHandler: authGuard,
+        onRequest: authGuard,
       },
       async (request, reply) => {
         await service.deleteById(request.params.categoryId);
