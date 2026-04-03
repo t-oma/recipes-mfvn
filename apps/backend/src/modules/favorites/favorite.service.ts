@@ -1,9 +1,10 @@
-import type { Paginated, Recipe } from "@recipes/shared";
+import type { Paginated, Recipe, Replace } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { Model } from "mongoose";
 import mongoose from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toRecipe } from "@/common/utils/mongo.js";
+import type { ICategoryDocument } from "@/modules/categories/index.js";
 import type {
   FavoriteQuery,
   IFavoriteDocument,
@@ -68,7 +69,15 @@ export function createFavoriteService(
         favoriteModel
           .find({ user: userId })
           .select({ recipe: 1, createdAt: 1 })
-          .populate({
+          .populate<{
+            recipe: Replace<
+              IRecipeDocument,
+              {
+                category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+                author: Pick<IUserDocument, "_id" | "name" | "email">;
+              }
+            >;
+          }>({
             path: "recipe",
             match: { $or: [{ isPublic: true }, { author: userId }] },
             populate: [
@@ -88,7 +97,7 @@ export function createFavoriteService(
       const items = favorites
         .map((fav) => fav.recipe)
         .filter((recipe) => recipe != null)
-        .map((recipe) => toRecipe(recipe as unknown as IRecipeDocument, true));
+        .map((recipe) => toRecipe(recipe, true));
 
       return withPagination(items, total, page, limit);
     },

@@ -59,8 +59,12 @@ export function createRecipeService(
       const [items, total] = await Promise.all([
         recipeModel
           .find(filter)
-          .populate("author", "name email")
-          .populate("category", "name slug")
+          .populate<{
+            author: Pick<IUserDocument, "_id" | "name" | "email">;
+          }>("author", "name email")
+          .populate<{
+            category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+          }>("category", "name slug")
           .sort(sort)
           .skip((page - 1) * limit)
           .limit(limit)
@@ -92,8 +96,12 @@ export function createRecipeService(
     findById: async (id, userId) => {
       const recipe = await recipeModel
         .findById(id)
-        .populate("author", "name email")
-        .populate("category", "name slug")
+        .populate<{
+          author: Pick<IUserDocument, "_id" | "name" | "email">;
+        }>("author", "name email")
+        .populate<{
+          category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+        }>("category", "name slug")
         .lean();
       if (!recipe) {
         throw new AppError("Recipe not found", 404);
@@ -130,11 +138,14 @@ export function createRecipeService(
       }
 
       const recipe = await recipeModel.create({ ...data, author: authorId });
-      const populated = await recipe.populate([
+      const populated = await recipe.populate<{
+        author: Pick<IUserDocument, "_id" | "name" | "email">;
+        category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+      }>([
         { path: "author", select: "name email" },
         { path: "category", select: "name slug" },
       ]);
-      return toRecipe(populated.toObject(), false);
+      return toRecipe(populated.toObject<typeof populated>(), false);
     },
 
     update: async (id, data, userId) => {
@@ -149,7 +160,10 @@ export function createRecipeService(
 
       Object.assign(recipe, data);
       await recipe.save();
-      const populated = await recipe.populate([
+      const populated = await recipe.populate<{
+        author: Pick<IUserDocument, "_id" | "name" | "email">;
+        category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+      }>([
         { path: "author", select: "name email" },
         { path: "category", select: "name slug" },
       ]);
@@ -165,7 +179,7 @@ export function createRecipeService(
         isFavorited = !!favorite;
       }
 
-      return toRecipe(populated.toObject(), isFavorited);
+      return toRecipe(populated.toObject<typeof populated>(), isFavorited);
     },
 
     delete: async (id, userId) => {

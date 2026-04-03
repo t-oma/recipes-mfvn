@@ -2,6 +2,12 @@ export type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
+export type Replace<T, R extends Record<PropertyKey, unknown>> = Omit<
+  T,
+  keyof R
+> &
+  R;
+
 export type RenameField<
   T extends object,
   K extends keyof T,
