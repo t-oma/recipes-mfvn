@@ -1,8 +1,19 @@
+## [0.4.1] - 2026-04-03
+
+### ⚙️ Miscellaneous Tasks
+
+- Release v0.4.1 (#15)
+
+
 ## [0.4.0] - 2026-04-02
 
 ### 🚀 Features
 
 - Add favorites feature with backend architecture refactoring (#12)
+
+### 📚 Documentation
+
+- Updated changelog for v0.4.0
 
 
 ## [0.3.0] - 2026-03-30
