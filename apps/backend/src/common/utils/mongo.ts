@@ -3,8 +3,6 @@ import type {
   CategorySummary,
   Comment,
   CommentForRecipe,
-  Difficulty,
-  Minutes,
   Recipe,
   RecipeSummary,
   User,
@@ -38,8 +36,8 @@ export function toRecipe<T extends IRecipeDocument>(
       email: author.email,
       name: author.name,
     } satisfies UserSummary,
-    difficulty: doc.difficulty as Difficulty,
-    cookingTime: doc.cookingTime as Minutes,
+    difficulty: doc.difficulty,
+    cookingTime: doc.cookingTime,
     servings: doc.servings,
     isPublic: doc.isPublic,
     isFavorited,
@@ -75,8 +73,8 @@ export function toComment(doc: ICommentDocument): Comment {
       email: author.email,
       name: author.name,
     } satisfies UserSummary,
-    createdAt: (doc.createdAt as Date).toISOString(),
-    updatedAt: (doc.updatedAt as Date).toISOString(),
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
   };
 }
 
@@ -91,8 +89,8 @@ export function toCommentForRecipe(doc: ICommentDocument): CommentForRecipe {
       email: author.email,
       name: author.name,
     } satisfies UserSummary,
-    createdAt: (doc.createdAt as Date).toISOString(),
-    updatedAt: (doc.updatedAt as Date).toISOString(),
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
   };
 }
 
