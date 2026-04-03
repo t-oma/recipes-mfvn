@@ -1,5 +1,6 @@
 import "dotenv/config";
 import fastifyCors from "@fastify/cors";
+import fastifyHelmet from "@fastify/helmet";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
@@ -57,6 +58,11 @@ export function buildApp() {
 
   // CORS
   app.register(fastifyCors, { origin: true });
+
+  // Security headers
+  app.register(fastifyHelmet, {
+    contentSecurityPolicy: false,
+  });
 
   // Rate limiting
   app.register(fastifyRateLimit, createRateLimitOptions());
