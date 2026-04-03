@@ -4,10 +4,12 @@ import type { Model } from "mongoose";
 import mongoose from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toRecipe } from "@/common/utils/mongo.js";
-import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
-import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
+import type {
+  FavoriteQuery,
+  IFavoriteDocument,
+} from "@/modules/favorites/index.js";
+import type { IRecipeDocument } from "@/modules/recipes/index.js";
 import type { IUserDocument } from "@/modules/users/index.js";
-import type { FavoriteQuery } from "./favorite.schema.js";
 
 export interface FavoriteService {
   add(userId: string, recipeId: string): Promise<{ favorited: true }>;
@@ -17,6 +19,7 @@ export interface FavoriteService {
 }
 
 export function createFavoriteService(
+  favoriteModel: Model<IFavoriteDocument>,
   recipeModel: Model<IRecipeDocument>,
   userModel: Model<IUserDocument>,
 ): FavoriteService {
@@ -46,14 +49,14 @@ export function createFavoriteService(
       await validateUser(userId);
       await validateRecipe(recipeId);
 
-      await FavoriteModel.create({ user: userId, recipe: recipeId });
+      await favoriteModel.create({ user: userId, recipe: recipeId });
       return { favorited: true };
     },
     remove: async (userId, recipeId) => {
       await validateUser(userId);
       await validateRecipe(recipeId);
 
-      await FavoriteModel.findOneAndDelete({ user: userId, recipe: recipeId });
+      await favoriteModel.findOneAndDelete({ user: userId, recipe: recipeId });
       return { favorited: false };
     },
     findByUser: async (userId, query) => {
@@ -62,7 +65,8 @@ export function createFavoriteService(
       const { page, limit } = query;
 
       const [favorites, total] = await Promise.all([
-        FavoriteModel.find({ user: userId })
+        favoriteModel
+          .find({ user: userId })
           .select({ recipe: 1, createdAt: 1 })
           .populate({
             path: "recipe",
@@ -76,7 +80,7 @@ export function createFavoriteService(
           .skip((page - 1) * limit)
           .limit(limit)
           .lean(),
-        FavoriteModel.countDocuments({
+        favoriteModel.countDocuments({
           user: userId,
         }),
       ]);
@@ -89,7 +93,7 @@ export function createFavoriteService(
       return withPagination(items, total, page, limit);
     },
     isFavorited: async (userId, recipeId) => {
-      return !!(await FavoriteModel.exists({ user: userId, recipe: recipeId }));
+      return !!(await favoriteModel.exists({ user: userId, recipe: recipeId }));
     },
   };
 }

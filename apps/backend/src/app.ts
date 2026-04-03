@@ -71,7 +71,7 @@ export function buildApp() {
   app.register(userRoutes, {
     service: createUserService(
       createCommentService(CommentModel, RecipeModel, UserModel),
-      createFavoriteService(RecipeModel, UserModel),
+      createFavoriteService(FavoriteModel, RecipeModel, UserModel),
       UserModel,
     ),
     prefix: "/api/users",
@@ -83,7 +83,11 @@ export function buildApp() {
       FavoriteModel,
       CategoryModel,
     ),
-    favoriteService: createFavoriteService(RecipeModel, UserModel),
+    favoriteService: createFavoriteService(
+      FavoriteModel,
+      RecipeModel,
+      UserModel,
+    ),
     commentService: createCommentService(CommentModel, RecipeModel, UserModel),
     prefix: "/api/recipes",
   });
