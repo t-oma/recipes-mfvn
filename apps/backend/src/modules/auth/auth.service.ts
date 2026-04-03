@@ -15,7 +15,7 @@ export function createAuthService(
 ): AuthService {
   return {
     register: async (data) => {
-      const exists = await userModel.findOne({ email: data.email });
+      const exists = await userModel.exists({ email: data.email });
       if (exists) {
         throw new AppError("Email already in use", 409);
       }
