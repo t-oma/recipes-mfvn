@@ -9,8 +9,6 @@ async function start() {
 
   try {
     await app.listen({ port: env.PORT, host: env.HOST });
-    console.log(`🚀 Server running on http://${env.HOST}:${env.PORT}`);
-    console.log(`📚 Swagger docs at http://localhost:${env.PORT}/docs`);
   } catch (err) {
     app.log.error(err);
     process.exit(1);

@@ -1,44 +1,40 @@
 import type { Comment, Paginated, Recipe, User } from "@recipes/shared";
+import type { Model } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toUser } from "@/common/utils/mongo.js";
-import type { CommentQuery } from "@/modules/comments/comment.schema.js";
-import { CommentService } from "@/modules/comments/comment.service.js";
+import type { CommentQuery, CommentService } from "@/modules/comments/index.js";
 import type { FavoriteQuery } from "@/modules/favorites/favorite.schema.js";
-import { FavoriteService } from "@/modules/favorites/favorite.service.js";
-import { UserModel } from "@/modules/users/user.model.js";
+import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
+import type { IUserDocument } from "@/modules/users/index.js";
 
-export class UserService {
-  private readonly favoriteService: FavoriteService;
-  private readonly commentService: CommentService;
-
-  constructor(
-    favoriteService: FavoriteService = new FavoriteService(),
-    commentService: CommentService = new CommentService(),
-  ) {
-    this.favoriteService = favoriteService;
-    this.commentService = commentService;
-  }
-
-  async getCurrentUser(userId: string): Promise<User> {
-    const user = await UserModel.findById(userId).lean();
-    if (!user) {
-      throw new AppError("User not found", 404);
-    }
-
-    return toUser(user);
-  }
-
-  async getFavorites(
+export interface UserService {
+  getCurrentUser(userId: string): Promise<User>;
+  getFavorites(
     userId: string,
     query: FavoriteQuery,
-  ): Promise<Paginated<Recipe>> {
-    return this.favoriteService.findByUser(userId, query);
-  }
+  ): Promise<Paginated<Recipe>>;
+  getComments(userId: string, query: CommentQuery): Promise<Paginated<Comment>>;
+}
 
-  async getComments(
-    userId: string,
-    query: CommentQuery,
-  ): Promise<Paginated<Comment>> {
-    return this.commentService.findByUser(userId, query);
-  }
+export function createUserService(
+  commentService: CommentService,
+  favoriteService: FavoriteService,
+  userModel: Model<IUserDocument>,
+): UserService {
+  return {
+    getCurrentUser: async (userId) => {
+      const user = await userModel.findById(userId).lean();
+      if (!user) {
+        throw new AppError("User not found", 404);
+      }
+
+      return toUser(user);
+    },
+    getFavorites: async (userId, query) => {
+      return favoriteService.findByUser(userId, query);
+    },
+    getComments: async (userId, query) => {
+      return commentService.findByUser(userId, query);
+    },
+  };
 }

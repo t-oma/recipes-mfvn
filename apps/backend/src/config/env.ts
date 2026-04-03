@@ -6,8 +6,8 @@ const envSchema = z.object({
     .default("development"),
   PORT: z.coerce.number().default(3000),
   HOST: z.string().default("0.0.0.0"),
-  MONGO_URI: z.string().default("mongodb://localhost:27017/recipes-vem"),
-  JWT_SECRET: z.string().default("super-secret-change-me"),
+  MONGO_URI: z.string(),
+  JWT_SECRET: z.string(),
   JWT_EXPIRES_IN: z.string().default("7d"),
 });
 

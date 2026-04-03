@@ -1,10 +1,23 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
+import { AppError } from "../errors.js";
 import type { JwtPayload } from "../utils/jwt.js";
 import { verifyToken } from "../utils/jwt.js";
 
 declare module "fastify" {
   interface FastifyRequest {
     user?: JwtPayload;
+  }
+}
+
+export type AuthenticatedRequest = FastifyRequest & {
+  user: JwtPayload;
+};
+
+export function assertAuthenticated(
+  request: FastifyRequest,
+): asserts request is AuthenticatedRequest {
+  if (!request.user) {
+    throw new AppError("Not authorized", 401);
   }
 }
 
@@ -27,10 +40,7 @@ export function extractToken(request: FastifyRequest): string {
   return parts[1];
 }
 
-export async function authGuard(
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<void> {
+export async function authGuard(request: FastifyRequest, reply: FastifyReply) {
   try {
     const token = extractToken(request);
     request.user = verifyToken(token);
@@ -39,11 +49,13 @@ export async function authGuard(
   }
 }
 
-export async function optionalAuth(request: FastifyRequest): Promise<void> {
-  try {
-    const token = extractToken(request);
-    request.user = verifyToken(token);
-  } catch {
-    // Token invalid, but we don't throw — just leave user undefined
+export async function optionalAuth(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  if (!request.headers.authorization) {
+    return;
   }
+
+  authGuard(request, reply);
 }
