@@ -1,5 +1,6 @@
 import "dotenv/config";
 import fastifyCors from "@fastify/cors";
+import fastifyRateLimit from "@fastify/rate-limit";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import Fastify from "fastify";
@@ -9,6 +10,7 @@ import {
 } from "fastify-type-provider-zod";
 import { errorHandler } from "@/common/middleware/errorHandler.js";
 import { env } from "@/config/env.js";
+import { createRateLimitOptions } from "@/config/rate-limit.js";
 import { swaggerOptions, swaggerUiOptions } from "@/config/swagger.js";
 import { authRoutes, createAuthService } from "@/modules/auth/index.js";
 import {
@@ -55,6 +57,9 @@ export function buildApp() {
 
   // CORS
   app.register(fastifyCors, { origin: true });
+
+  // Rate limiting
+  app.register(fastifyRateLimit, createRateLimitOptions());
 
   // Swagger
   app.register(fastifySwagger, swaggerOptions);
