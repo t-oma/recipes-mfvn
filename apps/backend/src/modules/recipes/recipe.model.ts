@@ -1,17 +1,18 @@
 import type { Difficulty, Minutes } from "@recipes/shared";
-import type { Document, Types } from "mongoose";
-import mongoose, { Schema } from "mongoose";
+import type { Types } from "mongoose";
+import { model, Schema } from "mongoose";
 
-export interface IIngredient {
+export interface IngredientDocument {
   name: string;
   quantity: number;
   unit: string;
 }
 
-export interface IRecipeDocument extends Document {
+export interface RecipeDocument {
+  _id: Types.ObjectId;
   title: string;
   description: string;
-  ingredients: IIngredient[];
+  ingredients: IngredientDocument[];
   instructions: string[];
   category: Types.ObjectId;
   author: Types.ObjectId;
@@ -23,7 +24,7 @@ export interface IRecipeDocument extends Document {
   updatedAt: Date;
 }
 
-const ingredientSchema = new Schema<IIngredient>(
+const ingredientSchema = new Schema<IngredientDocument>(
   {
     name: { type: String, required: true, trim: true },
     quantity: { type: Number, required: true },
@@ -32,25 +33,25 @@ const ingredientSchema = new Schema<IIngredient>(
   { _id: false },
 );
 
-const recipeSchema = new Schema<IRecipeDocument>(
+const recipeSchema = new Schema<RecipeDocument>(
   {
     title: { type: String, required: true, trim: true, index: "text" },
     description: { type: String, required: true, trim: true },
     ingredients: {
       type: [ingredientSchema],
       required: true,
-      validate: [
-        (v: IIngredient[]) => v.length > 0,
-        "At least one ingredient required",
-      ],
+      validate: {
+        validator: (v: IngredientDocument[]) => v.length > 0,
+        message: "At least one ingredient required",
+      },
     },
     instructions: {
       type: [String],
       required: true,
-      validate: [
-        (v: string[]) => v.length > 0,
-        "At least one instruction required",
-      ],
+      validate: {
+        validator: (v: string[]) => v.length > 0,
+        message: "At least one instruction required",
+      },
     },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -65,14 +66,6 @@ const recipeSchema = new Schema<IRecipeDocument>(
   },
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-      versionKey: false,
-      transform: (_doc, ret) => {
-        const { _id, ...rest } = ret;
-        return rest;
-      },
-    },
     toObject: { virtuals: true },
   },
 );
@@ -80,7 +73,4 @@ const recipeSchema = new Schema<IRecipeDocument>(
 recipeSchema.index({ title: "text", description: "text" });
 recipeSchema.index({ category: 1, createdAt: -1 });
 
-export const RecipeModel = mongoose.model<IRecipeDocument>(
-  "Recipe",
-  recipeSchema,
-);
+export const RecipeModel = model<RecipeDocument>("Recipe", recipeSchema);

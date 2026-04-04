@@ -1,7 +1,8 @@
-import type { Document, Types } from "mongoose";
-import mongoose, { Schema } from "mongoose";
+import type { Types } from "mongoose";
+import { model, Schema } from "mongoose";
 
-export interface ICommentDocument extends Document {
+export interface CommentDocument {
+  _id: Types.ObjectId;
   text: string;
   recipe: Types.ObjectId;
   author: Types.ObjectId;
@@ -9,7 +10,7 @@ export interface ICommentDocument extends Document {
   updatedAt: Date;
 }
 
-const commentSchema = new Schema<ICommentDocument>(
+const commentSchema = new Schema<CommentDocument>(
   {
     text: {
       type: String,
@@ -23,21 +24,10 @@ const commentSchema = new Schema<ICommentDocument>(
   },
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-      versionKey: false,
-      transform: (_doc, ret) => {
-        const { _id, ...rest } = ret;
-        return rest;
-      },
-    },
     toObject: { virtuals: true },
   },
 );
 
 commentSchema.index({ recipe: 1, createdAt: -1 });
 
-export const CommentModel = mongoose.model<ICommentDocument>(
-  "Comment",
-  commentSchema,
-);
+export const CommentModel = model<CommentDocument>("Comment", commentSchema);

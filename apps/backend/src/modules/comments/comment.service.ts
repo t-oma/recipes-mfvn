@@ -5,13 +5,13 @@ import mongoose from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toComment, toCommentForRecipe } from "@/common/utils/mongo.js";
 import type {
+  CommentDocument,
   CommentQuery,
   CreateCommentBody,
-  ICommentDocument,
   RecipeCommentsParams,
 } from "@/modules/comments/index.js";
-import type { IRecipeDocument } from "@/modules/recipes/index.js";
-import type { IUserDocument } from "@/modules/users/index.js";
+import type { RecipeDocument } from "@/modules/recipes/index.js";
+import type { UserDocument } from "@/modules/users/index.js";
 
 export interface CommentService {
   findByRecipe(
@@ -28,9 +28,9 @@ export interface CommentService {
 }
 
 export function createCommentService(
-  commentModel: Model<ICommentDocument>,
-  recipeModel: Model<IRecipeDocument>,
-  userModel: Model<IUserDocument>,
+  commentModel: Model<CommentDocument>,
+  recipeModel: Model<RecipeDocument>,
+  userModel: Model<UserDocument>,
 ): CommentService {
   return {
     findByRecipe: async (params, query) => {
@@ -45,12 +45,12 @@ export function createCommentService(
         throw new AppError("Recipe not found", 404);
       }
 
-      const filter: QueryFilter<ICommentDocument> = { recipe: recipeId };
+      const filter: QueryFilter<CommentDocument> = { recipe: recipeId };
 
       const [items, total] = await Promise.all([
         commentModel
           .find(filter)
-          .populate<{ author: Pick<IUserDocument, "_id" | "name" | "email"> }>(
+          .populate<{ author: Pick<UserDocument, "_id" | "name" | "email"> }>(
             "author",
             "name email",
           )
@@ -92,7 +92,7 @@ export function createCommentService(
         author: authorId,
       });
       const populated = await comment.populate<{
-        author: Pick<IUserDocument, "_id" | "name" | "email">;
+        author: Pick<UserDocument, "_id" | "name" | "email">;
       }>("author", "name email");
 
       return toCommentForRecipe(populated.toObject<typeof populated>());
@@ -104,16 +104,16 @@ export function createCommentService(
       }
 
       const { page, limit } = query;
-      const filter: QueryFilter<ICommentDocument> = { author: userId };
+      const filter: QueryFilter<CommentDocument> = { author: userId };
 
       const [items, total] = await Promise.all([
         commentModel
           .find(filter)
-          .populate<{ author: Pick<IUserDocument, "_id" | "name" | "email"> }>(
+          .populate<{ author: Pick<UserDocument, "_id" | "name" | "email"> }>(
             "author",
             "name email",
           )
-          .populate<{ recipe: Pick<IRecipeDocument, "_id" | "title"> }>(
+          .populate<{ recipe: Pick<RecipeDocument, "_id" | "title"> }>(
             "recipe",
             "title",
           )

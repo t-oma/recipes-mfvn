@@ -5,7 +5,7 @@ import { toUser } from "@/common/utils/mongo.js";
 import type { CommentQuery, CommentService } from "@/modules/comments/index.js";
 import type { FavoriteQuery } from "@/modules/favorites/favorite.schema.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
-import type { IUserDocument } from "@/modules/users/index.js";
+import type { UserDocument } from "@/modules/users/index.js";
 
 export interface UserService {
   getCurrentUser(userId: string): Promise<User>;
@@ -19,7 +19,7 @@ export interface UserService {
 export function createUserService(
   commentService: CommentService,
   favoriteService: FavoriteService,
-  userModel: Model<IUserDocument>,
+  userModel: Model<UserDocument>,
 ): UserService {
   return {
     getCurrentUser: async (userId) => {

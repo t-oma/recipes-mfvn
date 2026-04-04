@@ -1,8 +1,9 @@
 import bcrypt from "bcryptjs";
-import type { Document } from "mongoose";
-import mongoose, { Schema } from "mongoose";
+import type { Types } from "mongoose";
+import { model, Schema } from "mongoose";
 
-export interface IUserDocument extends Document {
+export interface UserDocument {
+  _id: Types.ObjectId;
   email: string;
   password: string;
   name: string;
@@ -11,7 +12,7 @@ export interface IUserDocument extends Document {
   comparePassword(candidate: string): Promise<boolean>;
 }
 
-const userSchema = new Schema<IUserDocument>(
+const userSchema = new Schema<UserDocument>(
   {
     email: {
       type: String,
@@ -25,14 +26,6 @@ const userSchema = new Schema<IUserDocument>(
   },
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-      versionKey: false,
-      transform: (_doc, ret) => {
-        const { _id, ...rest } = ret;
-        return rest;
-      },
-    },
     toObject: { virtuals: true },
   },
 );
@@ -48,4 +41,4 @@ userSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidate, this.password);
 };
 
-export const UserModel = mongoose.model<IUserDocument>("User", userSchema);
+export const UserModel = model<UserDocument>("User", userSchema);

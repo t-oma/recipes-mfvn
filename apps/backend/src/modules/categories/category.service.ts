@@ -3,8 +3,8 @@ import type { Model } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toCategory } from "@/common/utils/mongo.js";
 import type {
+  CategoryDocument,
   CreateCategoryBody,
-  ICategoryDocument,
 } from "@/modules/categories/index.js";
 
 export interface CategoryService {
@@ -14,7 +14,7 @@ export interface CategoryService {
 }
 
 export function createCategoryService(
-  categoryModel: Model<ICategoryDocument>,
+  categoryModel: Model<CategoryDocument>,
 ): CategoryService {
   return {
     findAll: async () => {

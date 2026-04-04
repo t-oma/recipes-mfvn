@@ -9,17 +9,17 @@ import type {
   User,
   UserSummary,
 } from "@recipes/shared";
-import type { ICategoryDocument } from "@/modules/categories/category.model.js";
-import type { ICommentDocument } from "@/modules/comments/comment.model.js";
-import type { IRecipeDocument } from "@/modules/recipes/recipe.model.js";
-import type { IUserDocument } from "@/modules/users/user.model.js";
+import type { CategoryDocument } from "@/modules/categories/category.model.js";
+import type { CommentDocument } from "@/modules/comments/comment.model.js";
+import type { RecipeDocument } from "@/modules/recipes/recipe.model.js";
+import type { UserDocument } from "@/modules/users/user.model.js";
 
-export function toRecipe<T extends IRecipeDocument>(
+export function toRecipe<T extends RecipeDocument>(
   doc: Replace<
     T,
     {
-      category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
-      author: Pick<IUserDocument, "_id" | "name" | "email">;
+      category: Pick<CategoryDocument, "_id" | "name" | "slug">;
+      author: Pick<UserDocument, "_id" | "name" | "email">;
     }
   >,
   isFavorited: boolean,
@@ -50,7 +50,7 @@ export function toRecipe<T extends IRecipeDocument>(
   };
 }
 
-export function toCategory(doc: ICategoryDocument): Category {
+export function toCategory(doc: CategoryDocument): Category {
   return {
     id: doc._id.toString(),
     name: doc.name,
@@ -61,12 +61,12 @@ export function toCategory(doc: ICategoryDocument): Category {
   };
 }
 
-export function toComment<T extends ICommentDocument>(
+export function toComment<T extends CommentDocument>(
   doc: Replace<
     T,
     {
-      author: Pick<IUserDocument, "_id" | "name" | "email">;
-      recipe: Pick<IRecipeDocument, "_id" | "title">;
+      author: Pick<UserDocument, "_id" | "name" | "email">;
+      recipe: Pick<RecipeDocument, "_id" | "title">;
     }
   >,
 ): Comment {
@@ -87,11 +87,11 @@ export function toComment<T extends ICommentDocument>(
   };
 }
 
-export function toCommentForRecipe<T extends ICommentDocument>(
+export function toCommentForRecipe<T extends CommentDocument>(
   doc: Replace<
     T,
     {
-      author: Pick<IUserDocument, "_id" | "name" | "email">;
+      author: Pick<UserDocument, "_id" | "name" | "email">;
     }
   >,
 ): CommentForRecipe {
@@ -108,7 +108,7 @@ export function toCommentForRecipe<T extends ICommentDocument>(
   };
 }
 
-export function toUser(doc: IUserDocument): User {
+export function toUser(doc: UserDocument): User {
   return {
     id: doc._id.toString(),
     email: doc.email,

@@ -4,13 +4,13 @@ import type { Model } from "mongoose";
 import mongoose from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toRecipe } from "@/common/utils/mongo.js";
-import type { ICategoryDocument } from "@/modules/categories/index.js";
+import type { CategoryDocument } from "@/modules/categories/index.js";
 import type {
+  FavoriteDocument,
   FavoriteQuery,
-  IFavoriteDocument,
 } from "@/modules/favorites/index.js";
-import type { IRecipeDocument } from "@/modules/recipes/index.js";
-import type { IUserDocument } from "@/modules/users/index.js";
+import type { RecipeDocument } from "@/modules/recipes/index.js";
+import type { UserDocument } from "@/modules/users/index.js";
 
 export interface FavoriteService {
   add(userId: string, recipeId: string): Promise<{ favorited: true }>;
@@ -20,9 +20,9 @@ export interface FavoriteService {
 }
 
 export function createFavoriteService(
-  favoriteModel: Model<IFavoriteDocument>,
-  recipeModel: Model<IRecipeDocument>,
-  userModel: Model<IUserDocument>,
+  favoriteModel: Model<FavoriteDocument>,
+  recipeModel: Model<RecipeDocument>,
+  userModel: Model<UserDocument>,
 ): FavoriteService {
   async function validateUser(userId: string): Promise<void> {
     if (!mongoose.isValidObjectId(userId)) {
@@ -71,10 +71,10 @@ export function createFavoriteService(
           .select({ recipe: 1, createdAt: 1 })
           .populate<{
             recipe: Replace<
-              IRecipeDocument,
+              RecipeDocument,
               {
-                category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
-                author: Pick<IUserDocument, "_id" | "name" | "email">;
+                category: Pick<CategoryDocument, "_id" | "name" | "slug">;
+                author: Pick<UserDocument, "_id" | "name" | "email">;
               }
             >;
           }>({

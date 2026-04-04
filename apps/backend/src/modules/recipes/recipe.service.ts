@@ -4,11 +4,11 @@ import type { Model } from "mongoose";
 import mongoose from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toRecipe } from "@/common/utils/mongo.js";
-import type { ICategoryDocument } from "@/modules/categories/index.js";
-import type { IFavoriteDocument } from "@/modules/favorites/index.js";
+import type { CategoryDocument } from "@/modules/categories/index.js";
+import type { FavoriteDocument } from "@/modules/favorites/index.js";
 import type {
   CreateRecipeBody,
-  IRecipeDocument,
+  RecipeDocument,
   SearchRecipeQuery,
   UpdateRecipeBody,
 } from "@/modules/recipes/index.js";
@@ -16,7 +16,7 @@ import {
   buildRecipeFilter,
   withVisibilityFilter,
 } from "@/modules/recipes/index.js";
-import type { IUserDocument } from "@/modules/users/index.js";
+import type { UserDocument } from "@/modules/users/index.js";
 
 export interface RecipeService {
   findAll(
@@ -30,10 +30,10 @@ export interface RecipeService {
 }
 
 export function createRecipeService(
-  recipeModel: Model<IRecipeDocument>,
-  userModel: Model<IUserDocument>,
-  favoriteModel: Model<IFavoriteDocument>,
-  categoryModel: Model<ICategoryDocument>,
+  recipeModel: Model<RecipeDocument>,
+  userModel: Model<UserDocument>,
+  favoriteModel: Model<FavoriteDocument>,
+  categoryModel: Model<CategoryDocument>,
 ): RecipeService {
   return {
     findAll: async (query, userId) => {
@@ -61,10 +61,10 @@ export function createRecipeService(
         recipeModel
           .find(filter)
           .populate<{
-            author: Pick<IUserDocument, "_id" | "name" | "email">;
+            author: Pick<UserDocument, "_id" | "name" | "email">;
           }>("author", "name email")
           .populate<{
-            category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+            category: Pick<CategoryDocument, "_id" | "name" | "slug">;
           }>("category", "name slug")
           .sort(sort)
           .skip((page - 1) * limit)
@@ -102,10 +102,10 @@ export function createRecipeService(
       const recipe = await recipeModel
         .findById(id)
         .populate<{
-          author: Pick<IUserDocument, "_id" | "name" | "email">;
+          author: Pick<UserDocument, "_id" | "name" | "email">;
         }>("author", "name email")
         .populate<{
-          category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+          category: Pick<CategoryDocument, "_id" | "name" | "slug">;
         }>("category", "name slug")
         .lean();
       if (!recipe) {
@@ -151,8 +151,8 @@ export function createRecipeService(
 
       const recipe = await recipeModel.create({ ...data, author: authorId });
       const populated = await recipe.populate<{
-        author: Pick<IUserDocument, "_id" | "name" | "email">;
-        category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+        author: Pick<UserDocument, "_id" | "name" | "email">;
+        category: Pick<CategoryDocument, "_id" | "name" | "slug">;
       }>([
         { path: "author", select: "name email" },
         { path: "category", select: "name slug" },
@@ -176,8 +176,8 @@ export function createRecipeService(
       Object.assign(recipe, data);
       await recipe.save();
       const populated = await recipe.populate<{
-        author: Pick<IUserDocument, "_id" | "name" | "email">;
-        category: Pick<ICategoryDocument, "_id" | "name" | "slug">;
+        author: Pick<UserDocument, "_id" | "name" | "email">;
+        category: Pick<CategoryDocument, "_id" | "name" | "slug">;
       }>([
         { path: "author", select: "name email" },
         { path: "category", select: "name slug" },

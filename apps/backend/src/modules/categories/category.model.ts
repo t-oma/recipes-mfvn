@@ -1,7 +1,8 @@
-import type { Document } from "mongoose";
-import mongoose, { Schema } from "mongoose";
+import type { Types } from "mongoose";
+import { model, Schema } from "mongoose";
 
-export interface ICategoryDocument extends Document {
+export interface CategoryDocument {
+  _id: Types.ObjectId;
   name: string;
   slug: string;
   description?: string;
@@ -9,7 +10,7 @@ export interface ICategoryDocument extends Document {
   updatedAt: Date;
 }
 
-const categorySchema = new Schema<ICategoryDocument>(
+const categorySchema = new Schema<CategoryDocument>(
   {
     name: { type: String, required: true, unique: true, trim: true },
     slug: { type: String, required: true, unique: true, lowercase: true },
@@ -17,14 +18,6 @@ const categorySchema = new Schema<ICategoryDocument>(
   },
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-      versionKey: false,
-      transform: (_doc, ret) => {
-        const { _id, ...rest } = ret;
-        return rest;
-      },
-    },
     toObject: { virtuals: true },
   },
 );
@@ -39,7 +32,7 @@ categorySchema.pre("validate", async function () {
   }
 });
 
-export const CategoryModel = mongoose.model<ICategoryDocument>(
+export const CategoryModel = model<CategoryDocument>(
   "Category",
   categorySchema,
 );
