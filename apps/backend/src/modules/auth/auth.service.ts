@@ -3,16 +3,14 @@ import type { Model } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { signToken } from "@/common/utils/jwt.js";
 import { toUser } from "@/common/utils/mongo.js";
-import type { IUserDocument } from "@/modules/users/index.js";
+import type { UserDocument } from "@/modules/users/index.js";
 
 export interface AuthService {
   register(data: RegisterBody): Promise<AuthResponse>;
   login(data: LoginBody): Promise<AuthResponse>;
 }
 
-export function createAuthService(
-  userModel: Model<IUserDocument>,
-): AuthService {
+export function createAuthService(userModel: Model<UserDocument>): AuthService {
   return {
     register: async (data) => {
       const exists = await userModel.exists({ email: data.email });

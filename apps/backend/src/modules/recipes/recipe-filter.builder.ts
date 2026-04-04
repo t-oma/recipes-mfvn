@@ -1,14 +1,14 @@
 import type { QueryFilter } from "mongoose";
 import type {
-  IRecipeDocument,
+  RecipeDocument,
   SearchRecipeQuery,
 } from "@/modules/recipes/index.js";
 
 export function buildRecipeFilter(
   query: SearchRecipeQuery,
-): QueryFilter<IRecipeDocument> {
+): QueryFilter<RecipeDocument> {
   const { categoryId, difficulty, search } = query;
-  const filter: QueryFilter<IRecipeDocument> = {};
+  const filter: QueryFilter<RecipeDocument> = {};
 
   if (categoryId) {
     filter.category = categoryId;
@@ -24,9 +24,9 @@ export function buildRecipeFilter(
 }
 
 export function withVisibilityFilter(
-  filter: QueryFilter<IRecipeDocument>,
+  filter: QueryFilter<RecipeDocument>,
   userId?: string,
-): QueryFilter<IRecipeDocument> {
+): QueryFilter<RecipeDocument> {
   if (!userId) {
     filter.isPublic = true;
   } else {

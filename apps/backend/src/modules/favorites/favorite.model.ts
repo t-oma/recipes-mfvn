@@ -1,27 +1,26 @@
-import type { Document, Types } from "mongoose";
-import mongoose, { Schema } from "mongoose";
+import type { Types } from "mongoose";
+import { model, Schema } from "mongoose";
+import { RECIPE_MODEL_NAME } from "@/modules/recipes/index.js";
+import { USER_MODEL_NAME } from "@/modules/users/index.js";
 
-export interface IFavoriteDocument extends Document {
+export interface FavoriteDocument {
+  _id: Types.ObjectId;
   user: Types.ObjectId;
   recipe: Types.ObjectId;
   createdAt: Date;
 }
 
-const favoriteSchema = new Schema<IFavoriteDocument>(
+const favoriteSchema = new Schema<FavoriteDocument>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    recipe: { type: Schema.Types.ObjectId, ref: "Recipe", required: true },
+    user: { type: Schema.Types.ObjectId, ref: USER_MODEL_NAME, required: true },
+    recipe: {
+      type: Schema.Types.ObjectId,
+      ref: RECIPE_MODEL_NAME,
+      required: true,
+    },
   },
   {
     timestamps: { createdAt: true, updatedAt: false },
-    toJSON: {
-      virtuals: true,
-      versionKey: false,
-      transform: (_doc, ret) => {
-        const { _id, ...rest } = ret;
-        return rest;
-      },
-    },
     toObject: { virtuals: true },
   },
 );
@@ -29,7 +28,8 @@ const favoriteSchema = new Schema<IFavoriteDocument>(
 favoriteSchema.index({ user: 1, recipe: 1 }, { unique: true });
 favoriteSchema.index({ user: 1, createdAt: -1 });
 
-export const FavoriteModel = mongoose.model<IFavoriteDocument>(
-  "Favorite",
+export const FAVORITE_MODEL_NAME = "Favorite";
+export const FavoriteModel = model<FavoriteDocument>(
+  FAVORITE_MODEL_NAME,
   favoriteSchema,
 );
