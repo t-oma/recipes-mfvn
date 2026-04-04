@@ -32,7 +32,8 @@ categorySchema.pre("validate", async function () {
   }
 });
 
+export const CATEGORY_MODEL_NAME = "Category";
 export const CategoryModel = model<CategoryDocument>(
-  "Category",
+  CATEGORY_MODEL_NAME,
   categorySchema,
 );

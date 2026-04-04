@@ -1,5 +1,7 @@
 import type { Types } from "mongoose";
 import { model, Schema } from "mongoose";
+import { RECIPE_MODEL_NAME } from "@/modules/recipes/index.js";
+import { USER_MODEL_NAME } from "@/modules/users/index.js";
 
 export interface CommentDocument {
   _id: Types.ObjectId;
@@ -19,8 +21,16 @@ const commentSchema = new Schema<CommentDocument>(
       minlength: 1,
       maxlength: 2000,
     },
-    recipe: { type: Schema.Types.ObjectId, ref: "Recipe", required: true },
-    author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    recipe: {
+      type: Schema.Types.ObjectId,
+      ref: RECIPE_MODEL_NAME,
+      required: true,
+    },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: USER_MODEL_NAME,
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -30,4 +40,8 @@ const commentSchema = new Schema<CommentDocument>(
 
 commentSchema.index({ recipe: 1, createdAt: -1 });
 
-export const CommentModel = model<CommentDocument>("Comment", commentSchema);
+export const COMMENT_MODEL_NAME = "Comment";
+export const CommentModel = model<CommentDocument>(
+  COMMENT_MODEL_NAME,
+  commentSchema,
+);

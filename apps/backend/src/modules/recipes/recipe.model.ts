@@ -1,6 +1,8 @@
 import type { Difficulty, Minutes } from "@recipes/shared";
 import type { Types } from "mongoose";
 import { model, Schema } from "mongoose";
+import { CATEGORY_MODEL_NAME } from "@/modules/categories/index.js";
+import { USER_MODEL_NAME } from "@/modules/users/index.js";
 
 export interface IngredientDocument {
   name: string;
@@ -53,8 +55,16 @@ const recipeSchema = new Schema<RecipeDocument>(
         message: "At least one instruction required",
       },
     },
-    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
-    author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: CATEGORY_MODEL_NAME,
+      required: true,
+    },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: USER_MODEL_NAME,
+      required: true,
+    },
     difficulty: {
       type: String,
       required: true,
@@ -73,4 +83,8 @@ const recipeSchema = new Schema<RecipeDocument>(
 recipeSchema.index({ title: "text", description: "text" });
 recipeSchema.index({ category: 1, createdAt: -1 });
 
-export const RecipeModel = model<RecipeDocument>("Recipe", recipeSchema);
+export const RECIPE_MODEL_NAME = "Recipe";
+export const RecipeModel = model<RecipeDocument>(
+  RECIPE_MODEL_NAME,
+  recipeSchema,
+);
