@@ -1,3 +1,4 @@
+import type { Model } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 
@@ -7,7 +8,9 @@ export interface CategoryDocument extends BaseDocument {
   description?: string;
 }
 
-const categorySchema = new Schema<CategoryDocument>(
+export interface CategoryModelType extends Model<CategoryDocument> {}
+
+const categorySchema = new Schema<CategoryDocument, CategoryModelType>(
   {
     name: { type: String, required: true, unique: true, trim: true },
     slug: { type: String, required: true, unique: true, lowercase: true },
@@ -29,7 +32,7 @@ categorySchema.pre("validate", function () {
 });
 
 export const CATEGORY_MODEL_NAME = "Category";
-export const CategoryModel = model<CategoryDocument>(
+export const CategoryModel = model<CategoryDocument, CategoryModelType>(
   CATEGORY_MODEL_NAME,
   categorySchema,
 );

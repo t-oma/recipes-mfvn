@@ -1,12 +1,11 @@
 import type { Category } from "@recipes/shared";
-import type { Model } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toCategory } from "@/common/utils/mongo.js";
 import type {
-  CategoryDocument,
+  CategoryModelType,
   CreateCategoryBody,
 } from "@/modules/categories/index.js";
-import type { RecipeDocument } from "@/modules/recipes/index.js";
+import type { RecipeModelType } from "@/modules/recipes/index.js";
 
 export interface CategoryService {
   findAll(): Promise<Category[]>;
@@ -15,8 +14,8 @@ export interface CategoryService {
 }
 
 export function createCategoryService(
-  categoryModel: Model<CategoryDocument>,
-  recipeModel: Model<RecipeDocument>,
+  categoryModel: CategoryModelType,
+  recipeModel: RecipeModelType,
 ): CategoryService {
   return {
     findAll: async () => {

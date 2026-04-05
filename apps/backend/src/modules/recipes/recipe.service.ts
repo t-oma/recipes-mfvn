@@ -1,14 +1,16 @@
 import type { Paginated, Recipe } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
-import type { Model } from "mongoose";
-import mongoose from "mongoose";
+import { isValidObjectId } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toRecipe } from "@/common/utils/mongo.js";
-import type { CategoryDocument } from "@/modules/categories/index.js";
-import type { FavoriteDocument } from "@/modules/favorites/index.js";
+import type {
+  CategoryDocument,
+  CategoryModelType,
+} from "@/modules/categories/index.js";
+import type { FavoriteModelType } from "@/modules/favorites/index.js";
 import type {
   CreateRecipeBody,
-  RecipeDocument,
+  RecipeModelType,
   SearchRecipeQuery,
   UpdateRecipeBody,
 } from "@/modules/recipes/index.js";
@@ -16,7 +18,7 @@ import {
   buildRecipeFilter,
   withVisibilityFilter,
 } from "@/modules/recipes/index.js";
-import type { UserDocument } from "@/modules/users/index.js";
+import type { UserDocument, UserModelType } from "@/modules/users/index.js";
 
 export interface RecipeService {
   findAll(
@@ -30,10 +32,10 @@ export interface RecipeService {
 }
 
 export function createRecipeService(
-  recipeModel: Model<RecipeDocument>,
-  userModel: Model<UserDocument>,
-  favoriteModel: Model<FavoriteDocument>,
-  categoryModel: Model<CategoryDocument>,
+  recipeModel: RecipeModelType,
+  userModel: UserModelType,
+  favoriteModel: FavoriteModelType,
+  categoryModel: CategoryModelType,
 ): RecipeService {
   return {
     findAll: async (query, userId) => {
@@ -97,7 +99,7 @@ export function createRecipeService(
     },
 
     findById: async (id, userId) => {
-      if (!mongoose.isValidObjectId(id)) {
+      if (!isValidObjectId(id)) {
         throw new AppError("Invalid recipe ID", 400);
       }
 
@@ -134,10 +136,10 @@ export function createRecipeService(
     },
 
     create: async (data, authorId) => {
-      if (!mongoose.isValidObjectId(authorId)) {
+      if (!isValidObjectId(authorId)) {
         throw new AppError("Invalid author ID", 400);
       }
-      if (!mongoose.isValidObjectId(data.category)) {
+      if (!isValidObjectId(data.category)) {
         throw new AppError("Invalid category ID", 400);
       }
 
@@ -163,7 +165,7 @@ export function createRecipeService(
     },
 
     update: async (id, data, userId) => {
-      if (!mongoose.isValidObjectId(id)) {
+      if (!isValidObjectId(id)) {
         throw new AppError("Invalid recipe ID", 400);
       }
       const recipe = await recipeModel.findById(id);
@@ -200,7 +202,7 @@ export function createRecipeService(
     },
 
     delete: async (id, userId) => {
-      if (!mongoose.isValidObjectId(id)) {
+      if (!isValidObjectId(id)) {
         throw new AppError("Invalid recipe ID", 400);
       }
       const recipe = await recipeModel.findById(id);
