@@ -103,7 +103,7 @@ export function buildApp() {
     prefix: "/api/recipes",
   });
   app.register(categoryRoutes, {
-    service: createCategoryService(CategoryModel),
+    service: createCategoryService(CategoryModel, RecipeModel),
     prefix: "/api/categories",
   });
 

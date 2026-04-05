@@ -57,5 +57,5 @@ export async function optionalAuth(
     return;
   }
 
-  authGuard(request, reply);
+  return authGuard(request, reply);
 }
