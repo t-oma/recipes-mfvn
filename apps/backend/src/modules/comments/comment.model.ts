@@ -1,4 +1,4 @@
-import type { Types } from "mongoose";
+import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 import { RECIPE_MODEL_NAME } from "@/modules/recipes/index.js";
@@ -10,7 +10,9 @@ export interface CommentDocument extends BaseDocument {
   author: Types.ObjectId;
 }
 
-const commentSchema = new Schema<CommentDocument>(
+export interface CommentModelType extends Model<CommentDocument> {}
+
+const commentSchema = new Schema<CommentDocument, CommentModelType>(
   {
     text: {
       type: String,
@@ -38,7 +40,7 @@ const commentSchema = new Schema<CommentDocument>(
 commentSchema.index({ recipe: 1, createdAt: -1 });
 
 export const COMMENT_MODEL_NAME = "Comment";
-export const CommentModel = model<CommentDocument>(
+export const CommentModel = model<CommentDocument, CommentModelType>(
   COMMENT_MODEL_NAME,
   commentSchema,
 );

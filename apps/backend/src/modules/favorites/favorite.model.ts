@@ -1,4 +1,4 @@
-import type { Types } from "mongoose";
+import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocumentWithoutUpdate } from "@/common/types/mongoose.js";
 import { RECIPE_MODEL_NAME } from "@/modules/recipes/index.js";
@@ -9,7 +9,9 @@ export interface FavoriteDocument extends BaseDocumentWithoutUpdate {
   recipe: Types.ObjectId;
 }
 
-const favoriteSchema = new Schema<FavoriteDocument>(
+export interface FavoriteModelType extends Model<FavoriteDocument> {}
+
+const favoriteSchema = new Schema<FavoriteDocument, FavoriteModelType>(
   {
     user: { type: Schema.Types.ObjectId, ref: USER_MODEL_NAME, required: true },
     recipe: {
@@ -27,7 +29,7 @@ favoriteSchema.index({ user: 1, recipe: 1 }, { unique: true });
 favoriteSchema.index({ user: 1, createdAt: -1 });
 
 export const FAVORITE_MODEL_NAME = "Favorite";
-export const FavoriteModel = model<FavoriteDocument>(
+export const FavoriteModel = model<FavoriteDocument, FavoriteModelType>(
   FAVORITE_MODEL_NAME,
   favoriteSchema,
 );

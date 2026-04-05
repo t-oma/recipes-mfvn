@@ -1,17 +1,21 @@
 import type { Comment, CommentForRecipe, Paginated } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
-import type { Model, QueryFilter } from "mongoose";
+import type { QueryFilter } from "mongoose";
 import mongoose from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toComment, toCommentForRecipe } from "@/common/utils/mongo.js";
 import type {
   CommentDocument,
+  CommentModelType,
   CommentQuery,
   CreateCommentBody,
   RecipeCommentsParams,
 } from "@/modules/comments/index.js";
-import type { RecipeDocument } from "@/modules/recipes/index.js";
-import type { UserDocument } from "@/modules/users/index.js";
+import type {
+  RecipeDocument,
+  RecipeModelType,
+} from "@/modules/recipes/index.js";
+import type { UserDocument, UserModelType } from "@/modules/users/index.js";
 
 export interface CommentService {
   findByRecipe(
@@ -28,9 +32,9 @@ export interface CommentService {
 }
 
 export function createCommentService(
-  commentModel: Model<CommentDocument>,
-  recipeModel: Model<RecipeDocument>,
-  userModel: Model<UserDocument>,
+  commentModel: CommentModelType,
+  recipeModel: RecipeModelType,
+  userModel: UserModelType,
 ): CommentService {
   return {
     findByRecipe: async (params, query) => {

@@ -1,5 +1,5 @@
 import type { Difficulty, Minutes } from "@recipes/shared";
-import type { Types } from "mongoose";
+import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 import { CATEGORY_MODEL_NAME } from "@/modules/categories/index.js";
@@ -24,6 +24,8 @@ export interface RecipeDocument extends BaseDocument {
   isPublic: boolean;
 }
 
+export interface RecipeModelType extends Model<RecipeDocument> {}
+
 const ingredientSchema = new Schema<IngredientDocument>(
   {
     name: { type: String, required: true, trim: true },
@@ -33,7 +35,7 @@ const ingredientSchema = new Schema<IngredientDocument>(
   { _id: false },
 );
 
-const recipeSchema = new Schema<RecipeDocument>(
+const recipeSchema = new Schema<RecipeDocument, RecipeModelType>(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
@@ -81,7 +83,7 @@ recipeSchema.index({ title: "text", description: "text" });
 recipeSchema.index({ category: 1, createdAt: -1 });
 
 export const RECIPE_MODEL_NAME = "Recipe";
-export const RecipeModel = model<RecipeDocument>(
+export const RecipeModel = model<RecipeDocument, RecipeModelType>(
   RECIPE_MODEL_NAME,
   recipeSchema,
 );

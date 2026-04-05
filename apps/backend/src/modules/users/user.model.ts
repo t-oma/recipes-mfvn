@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import type { Model } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 import { env } from "@/config/env.js";
@@ -10,7 +11,9 @@ export interface UserDocument extends BaseDocument {
   comparePassword(candidate: string): Promise<boolean>;
 }
 
-const userSchema = new Schema<UserDocument>(
+export interface UserModelType extends Model<UserDocument> {}
+
+const userSchema = new Schema<UserDocument, UserModelType>(
   {
     email: {
       type: String,
@@ -39,4 +42,7 @@ userSchema.methods.comparePassword = async function (
 };
 
 export const USER_MODEL_NAME = "User";
-export const UserModel = model<UserDocument>(USER_MODEL_NAME, userSchema);
+export const UserModel = model<UserDocument, UserModelType>(
+  USER_MODEL_NAME,
+  userSchema,
+);
