@@ -128,6 +128,10 @@ export function createCommentService(
     },
 
     delete: async (id, userId) => {
+      if (!mongoose.isValidObjectId(id)) {
+        throw new AppError("Invalid comment ID", 400);
+      }
+
       const comment = await commentModel.findById(id);
       if (!comment) {
         throw new AppError("Comment not found", 404);

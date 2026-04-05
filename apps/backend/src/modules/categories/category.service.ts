@@ -6,6 +6,7 @@ import type {
   CategoryDocument,
   CreateCategoryBody,
 } from "@/modules/categories/index.js";
+import type { RecipeDocument } from "@/modules/recipes/index.js";
 
 export interface CategoryService {
   findAll(): Promise<Category[]>;
@@ -15,6 +16,7 @@ export interface CategoryService {
 
 export function createCategoryService(
   categoryModel: Model<CategoryDocument>,
+  recipeModel: Model<RecipeDocument>,
 ): CategoryService {
   return {
     findAll: async () => {
@@ -26,6 +28,11 @@ export function createCategoryService(
       return toCategory(category.toObject());
     },
     deleteById: async (id) => {
+      const recipeCount = await recipeModel.countDocuments({ category: id });
+      if (recipeCount > 0) {
+        throw new AppError("Cannot delete category with existing recipes", 409);
+      }
+
       const result = await categoryModel.findByIdAndDelete(id);
       if (!result) {
         throw new AppError("Category not found", 404);
