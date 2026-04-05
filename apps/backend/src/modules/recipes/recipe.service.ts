@@ -14,10 +14,6 @@ import type {
   SearchRecipeQuery,
   UpdateRecipeBody,
 } from "@/modules/recipes/index.js";
-import {
-  buildRecipeFilter,
-  withVisibilityFilter,
-} from "@/modules/recipes/index.js";
 import type { UserDocument, UserModelType } from "@/modules/users/index.js";
 
 export interface RecipeService {
@@ -39,59 +35,19 @@ export function createRecipeService(
 ): RecipeService {
   return {
     findAll: async (query, userId) => {
-      const { page, limit, sort, isFavorited } = query;
-      const filter = withVisibilityFilter(buildRecipeFilter(query), userId);
+      const { page, limit, isFavorited } = query;
 
-      // Filter by favorites
-      if (isFavorited === true) {
-        if (!userId) {
-          // Can't filter favorites without auth
-          return withPagination([], 0, page, limit);
-        }
-
-        const favorites = await favoriteModel.find({ user: userId }).lean();
-        const favoritedRecipeIds = favorites.map((f) => f.recipe);
-
-        if (favoritedRecipeIds.length === 0) {
-          return withPagination([], 0, page, limit);
-        }
-
-        filter._id = { $in: favoritedRecipeIds };
+      if (isFavorited && !userId) {
+        return withPagination([], 0, page, limit);
       }
 
-      const [items, total] = await Promise.all([
-        recipeModel
-          .find(filter)
-          .populate<{
-            author: Pick<UserDocument, "_id" | "name" | "email">;
-          }>("author", "name email")
-          .populate<{
-            category: Pick<CategoryDocument, "_id" | "name" | "slug">;
-          }>("category", "name slug")
-          .sort(sort)
-          .skip((page - 1) * limit)
-          .limit(limit)
-          .lean(),
-        recipeModel.countDocuments(filter),
-      ]);
-
-      // Get favorited recipe IDs for current user
-      const favoritedIds =
-        userId && items.length > 0
-          ? new Set(
-              (
-                await favoriteModel
-                  .find({
-                    user: userId,
-                    recipe: { $in: items.map((item) => String(item._id)) },
-                  })
-                  .lean()
-              ).map((f) => String(f.recipe)),
-            )
-          : new Set<string>();
+      const [recipes, total] = await recipeModel.searchFull(query, userId);
+      if (!recipes) {
+        return withPagination([], 0, page, limit);
+      }
 
       return withPagination(
-        items.map((item) => toRecipe(item, favoritedIds.has(String(item._id)))),
+        recipes.map((recipe) => toRecipe(recipe, recipe.isFavorited)),
         total,
         page,
         limit,
@@ -181,7 +137,7 @@ export function createRecipeService(
       if (!isValidObjectId(id)) {
         throw new AppError("Invalid recipe ID", 400);
       }
-      const recipe = await recipeModel.findById(id);
+      const recipe = await recipeModel.findById(id).select("+author");
       if (!recipe) {
         throw new AppError("Recipe not found", 404);
       }
