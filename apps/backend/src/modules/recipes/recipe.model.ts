@@ -147,7 +147,7 @@ recipeSchema.statics.searchFull = async function (
   ]);
 
   if (!results.length || !results[0]?.recipes.length) {
-    return [[], 0];
+    return [[], results[0]?.total ?? 0];
   }
 
   return [results[0].recipes, results[0].total];
