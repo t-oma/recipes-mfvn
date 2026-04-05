@@ -1,8 +1,10 @@
-import type { Difficulty, Minutes } from "@recipes/shared";
-import type { Model, Types } from "mongoose";
-import { model, Schema } from "mongoose";
+import type { Difficulty, Minutes, Replace } from "@recipes/shared";
+import type { Model, QueryFilter } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
+import type { CategoryDocument } from "@/modules/categories/index.js";
 import { CATEGORY_MODEL_NAME } from "@/modules/categories/index.js";
+import type { UserDocument } from "@/modules/users/index.js";
 import { USER_MODEL_NAME } from "@/modules/users/index.js";
 
 export interface IngredientDocument {
@@ -24,7 +26,23 @@ export interface RecipeDocument extends BaseDocument {
   isPublic: boolean;
 }
 
-export interface RecipeModelType extends Model<RecipeDocument> {}
+export interface RecipeModelType extends Model<RecipeDocument> {
+  findByIdFull(
+    id: string,
+    userId?: string,
+  ): Promise<
+    | (Replace<
+        RecipeDocument,
+        {
+          category: Pick<CategoryDocument, "_id" | "name" | "slug">;
+          author: Pick<UserDocument, "_id" | "name" | "email">;
+        }
+      > & {
+        isFavorited: boolean;
+      })
+    | null
+  >;
+}
 
 const ingredientSchema = new Schema<IngredientDocument>(
   {
@@ -78,6 +96,135 @@ const recipeSchema = new Schema<RecipeDocument, RecipeModelType>(
     timestamps: true,
   },
 );
+
+recipeSchema.statics.findByIdFull = async function (
+  id: string,
+  userId?: string,
+) {
+  const recipeOid = Types.ObjectId.createFromHexString(id);
+
+  const filter: QueryFilter<RecipeDocument> = {
+    _id: recipeOid,
+  };
+  if (userId) {
+    filter.$or = [
+      { isPublic: true },
+      { author: Types.ObjectId.createFromHexString(userId) },
+    ];
+  } else {
+    filter.isPublic = true;
+  }
+
+  const recipe = await this.aggregate<
+    Replace<
+      RecipeDocument,
+      {
+        category: Pick<CategoryDocument, "_id" | "name" | "slug">;
+        author: Pick<UserDocument, "_id" | "name" | "email">;
+      }
+    > & {
+      isFavorited: boolean;
+    }
+  >([
+    {
+      $match: filter,
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              slug: 1,
+            },
+          },
+        ],
+        as: "category",
+      },
+    },
+    { $unwind: "$category" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              email: 1,
+            },
+          },
+        ],
+        as: "author",
+      },
+    },
+    { $unwind: "$author" },
+    { $unset: "__v" },
+  ]).append(...favoritedPipeline(this, userId));
+
+  if (!recipe.length) {
+    return null;
+  }
+
+  console.log(recipe);
+
+  return recipe[0];
+};
+
+function favoritedPipeline(model: RecipeModelType, userId?: string) {
+  if (!userId) {
+    return model
+      .aggregate([
+        {
+          $addFields: {
+            isFavorited: false,
+          },
+        },
+      ])
+      .pipeline();
+  }
+  const userOid = Types.ObjectId.createFromHexString(userId);
+
+  return model
+    .aggregate([
+      {
+        $lookup: {
+          from: "favorites",
+          localField: "_id",
+          foreignField: "recipe",
+          pipeline: [
+            {
+              $match: {
+                user: userOid,
+              },
+            },
+            {
+              $project: {
+                user: 1,
+              },
+            },
+          ],
+          as: "favoritedBy",
+        },
+      },
+      { $unwind: { path: "$favoritedBy", preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          isFavorited: {
+            $eq: ["$favoritedBy.user", userOid],
+          },
+        },
+      },
+      { $unset: "favoritedBy" },
+    ])
+    .pipeline();
+}
 
 recipeSchema.index({ title: "text", description: "text" });
 recipeSchema.index({ category: 1, createdAt: -1 });

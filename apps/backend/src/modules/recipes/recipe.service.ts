@@ -103,36 +103,12 @@ export function createRecipeService(
         throw new AppError("Invalid recipe ID", 400);
       }
 
-      const recipe = await recipeModel
-        .findById(id)
-        .populate<{
-          author: Pick<UserDocument, "_id" | "name" | "email">;
-        }>("author", "name email")
-        .populate<{
-          category: Pick<CategoryDocument, "_id" | "name" | "slug">;
-        }>("category", "name slug")
-        .lean();
+      const recipe = await recipeModel.findByIdFull(id, userId);
       if (!recipe) {
         throw new AppError("Recipe not found", 404);
       }
 
-      // Check access to private recipes
-      if (!recipe.isPublic && !recipe.author._id.equals(userId)) {
-        throw new AppError("Recipe not found", 404);
-      }
-
-      let isFavorited = false;
-      if (userId) {
-        const favorite = await favoriteModel
-          .findOne({
-            user: userId,
-            recipe: id,
-          })
-          .lean();
-        isFavorited = !!favorite;
-      }
-
-      return toRecipe(recipe, isFavorited);
+      return toRecipe(recipe, recipe.isFavorited);
     },
 
     create: async (data, authorId) => {
