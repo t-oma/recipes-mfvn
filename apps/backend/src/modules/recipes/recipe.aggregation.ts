@@ -109,3 +109,11 @@ export function withPagination(page: number, limit: number) {
     { $limit: limit },
   ] satisfies PipelineStage[];
 }
+
+export function byFavorited(isFavorited: boolean | undefined) {
+  if (isFavorited === undefined) {
+    return [];
+  }
+
+  return [{ $match: { isFavorited } }];
+}

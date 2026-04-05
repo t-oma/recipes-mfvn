@@ -8,6 +8,7 @@ import type { SearchRecipeQuery } from "@/modules/recipes/index.js";
 import type { UserDocument } from "@/modules/users/index.js";
 import { USER_MODEL_NAME } from "@/modules/users/index.js";
 import {
+  byFavorited,
   withAuthor,
   withCategories,
   withFavorited,
@@ -128,6 +129,8 @@ recipeSchema.statics.searchFull = async function (
       $match: filter,
     },
     { $unset: "__v" },
+    ...withFavorited(userId),
+    ...byFavorited(isFavorited),
     {
       $facet: {
         recipes: [
@@ -135,7 +138,6 @@ recipeSchema.statics.searchFull = async function (
           ...withPagination(page, limit),
           ...withCategories(),
           ...withAuthor(),
-          ...withFavorited(userId),
         ],
         total: [{ $count: "count" }],
       },
@@ -145,7 +147,7 @@ recipeSchema.statics.searchFull = async function (
   ]);
 
   if (!results.length || !results[0]?.recipes.length) {
-    return [null, 0];
+    return [[], 0];
   }
 
   return [results[0].recipes, results[0].total];
