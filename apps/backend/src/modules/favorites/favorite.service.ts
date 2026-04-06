@@ -1,18 +1,14 @@
-import type { Paginated, Recipe, Replace } from "@recipes/shared";
+import type { Paginated, Recipe } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import { isValidObjectId } from "mongoose";
 import { AppError } from "@/common/errors.js";
 import { toRecipe } from "@/common/utils/mongo.js";
-import type { CategoryDocument } from "@/modules/categories/index.js";
 import type {
   FavoriteModelType,
   FavoriteQuery,
 } from "@/modules/favorites/index.js";
-import type {
-  RecipeDocument,
-  RecipeModelType,
-} from "@/modules/recipes/index.js";
-import type { UserDocument, UserModelType } from "@/modules/users/index.js";
+import type { RecipeModelType } from "@/modules/recipes/index.js";
+import type { UserModelType } from "@/modules/users/index.js";
 
 export interface FavoriteService {
   add(userId: string, recipeId: string): Promise<{ favorited: true }>;
