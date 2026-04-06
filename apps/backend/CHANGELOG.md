@@ -1,4 +1,33 @@
+## [0.5.0] - 2026-04-06
+
+### 🚀 Features
+
+- Add rate limiting, security headers, input sanitization and docker compose (#18)
+
+### 🐛 Bug Fixes
+
+- Patch optionalAuth await, category dependency check, comment ID validation (#22)
+
+### 🚜 Refactor
+
+- Rename model interfaces and add constant model names (#20)
+- Add BaseDocument types, remove unused toObject options, clean up model schemas (#21)
+- *(api)* Rename resource-specific params to 'id' (#24)
+- Add ModelType interfaces for all models, replace Model<XxxDocument> in services (#25)
+- Move recipe retrieval to aggregation pipeline (#26)
+- Move user favorites retrieval to aggregation pipeline (#27)
+- Move comment retrieval to aggregation pipeline with visibility filter (#28)
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove unsafe JWT cast, extract bcrypt rounds to env, simplify favoritedIds (#23)
+
+
 ## [0.4.1] - 2026-04-03
+
+### 📚 Documentation
+
+- Updated for v0.4.1
 
 ### ⚙️ Miscellaneous Tasks
 
