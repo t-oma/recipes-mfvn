@@ -108,25 +108,11 @@ export function createCommentService(
       }
 
       const { page, limit } = query;
-      const filter: QueryFilter<CommentDocument> = { author: userId };
 
-      const [items, total] = await Promise.all([
-        commentModel
-          .find(filter)
-          .populate<{ author: Pick<UserDocument, "_id" | "name" | "email"> }>(
-            "author",
-            "name email",
-          )
-          .populate<{ recipe: Pick<RecipeDocument, "_id" | "title"> }>(
-            "recipe",
-            "title",
-          )
-          .sort("-createdAt")
-          .skip((page - 1) * limit)
-          .limit(limit)
-          .lean(),
-        commentModel.countDocuments(filter),
-      ]);
+      const [items, total] = await commentModel.findByUser(userId, query);
+      if (!items) {
+        return withPagination([], 0, page, limit);
+      }
 
       return withPagination(items.map(toComment), total, page, limit);
     },
