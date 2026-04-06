@@ -2,6 +2,13 @@ import type { Difficulty, Minutes, Replace } from "@recipes/shared";
 import type { Model, QueryFilter } from "mongoose";
 import { model, Schema, Types } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
+
+import {
+  WithTotalCountResult,
+  withPagination,
+  withSort,
+  withTotalCount,
+} from "@/common/utils/mongoose.aggregation.js";
 import type { CategoryDocument } from "@/modules/categories/index.js";
 import { CATEGORY_MODEL_NAME } from "@/modules/categories/index.js";
 import type { SearchRecipeQuery } from "@/modules/recipes/index.js";
@@ -12,8 +19,6 @@ import {
   withAuthor,
   withCategories,
   withFavorited,
-  withPagination,
-  withSort,
 } from "./recipe.aggregation.js";
 import {
   applyVisibilityFilter,
@@ -121,36 +126,30 @@ recipeSchema.statics.searchFull = async function (
   const { page, limit, sort, isFavorited } = query;
   const filter = buildRecipeFilter(query, userId);
 
-  const results = await this.aggregate<{
-    recipes: RecipeDocumentPopulated[];
-    total: number;
-  }>([
+  const recipes = await this.aggregate<
+    WithTotalCountResult<RecipeDocumentPopulated>
+  >([
     {
       $match: filter,
     },
     { $unset: "__v" },
+
     ...withFavorited(userId),
     ...byFavorited(isFavorited),
-    {
-      $facet: {
-        recipes: [
-          ...withSort(sort),
-          ...withPagination(page, limit),
-          ...withCategories(),
-          ...withAuthor(),
-        ],
-        total: [{ $count: "count" }],
-      },
-    },
-    { $unwind: "$total" },
-    { $set: { total: "$total.count" } },
+
+    ...withTotalCount(
+      ...withSort(sort),
+      ...withPagination(page, limit),
+      ...withCategories(),
+      ...withAuthor(),
+    ),
   ]);
 
-  if (!results.length || !results[0]?.recipes.length) {
-    return [[], results[0]?.total ?? 0];
+  if (!recipes.length || !recipes[0]?.items.length) {
+    return [[], recipes[0]?.total ?? 0];
   }
 
-  return [results[0].recipes, results[0].total];
+  return [recipes[0].items, recipes[0].total];
 };
 
 recipeSchema.statics.findByIdFull = async function (

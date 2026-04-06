@@ -73,6 +73,7 @@ export function withFavorited(userId?: string) {
           },
           {
             $project: {
+              _id: 0,
               user: 1,
             },
           },
@@ -89,24 +90,6 @@ export function withFavorited(userId?: string) {
       },
     },
     { $unset: "favoritedBy" },
-  ] satisfies PipelineStage[];
-}
-
-export function withSort(sort: string) {
-  const sortName = sort.startsWith("-") ? sort.slice(1) : sort;
-  const sortOrder = sort.startsWith("-") ? -1 : 1;
-
-  return [
-    {
-      $sort: { [sortName]: sortOrder },
-    },
-  ] satisfies PipelineStage[];
-}
-
-export function withPagination(page: number, limit: number) {
-  return [
-    { $skip: (page - 1) * limit },
-    { $limit: limit },
   ] satisfies PipelineStage[];
 }
 
