@@ -1,6 +1,19 @@
 import type { PipelineStage } from "mongoose";
 import { Types } from "mongoose";
 
+export function byVisibility(userId: string | undefined) {
+  if (userId) {
+    return {
+      $or: [
+        { isPublic: true },
+        { author: Types.ObjectId.createFromHexString(userId) },
+      ],
+    };
+  }
+
+  return { isPublic: true };
+}
+
 export function withCategories() {
   return [
     {
@@ -91,12 +104,4 @@ export function withFavorited(userId?: string) {
     },
     { $unset: "favoritedBy" },
   ] satisfies PipelineStage[];
-}
-
-export function byFavorited(isFavorited: boolean | undefined) {
-  if (isFavorited === undefined) {
-    return [];
-  }
-
-  return [{ $match: { isFavorited } }];
 }

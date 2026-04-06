@@ -1,10 +1,9 @@
 import type { Difficulty, Minutes, Replace } from "@recipes/shared";
-import type { Model, QueryFilter } from "mongoose";
+import type { Model } from "mongoose";
 import { model, Schema, Types } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
-
+import type { WithTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import {
-  WithTotalCountResult,
   withPagination,
   withSort,
   withTotalCount,
@@ -15,15 +14,11 @@ import type { SearchRecipeQuery } from "@/modules/recipes/index.js";
 import type { UserDocument } from "@/modules/users/index.js";
 import { USER_MODEL_NAME } from "@/modules/users/index.js";
 import {
-  byFavorited,
+  byVisibility,
   withAuthor,
   withCategories,
   withFavorited,
 } from "./recipe.aggregation.js";
-import {
-  applyVisibilityFilter,
-  buildRecipeFilter,
-} from "./recipe-filter.builder.js";
 
 export interface IngredientDocument {
   name: string;
@@ -123,19 +118,28 @@ recipeSchema.statics.searchFull = async function (
   query: SearchRecipeQuery,
   userId?: string,
 ) {
-  const { page, limit, sort, isFavorited } = query;
-  const filter = buildRecipeFilter(query, userId);
+  const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
+    query;
 
   const recipes = await this.aggregate<
     WithTotalCountResult<RecipeDocumentPopulated>
   >([
     {
-      $match: filter,
+      $match: {
+        ...byVisibility(userId),
+        ...(search && { $text: { $search: search } }),
+        ...(categoryId && { category: categoryId }),
+        ...(difficulty && { difficulty }),
+      },
     },
     { $unset: "__v" },
 
     ...withFavorited(userId),
-    ...byFavorited(isFavorited),
+    {
+      $match: {
+        ...(isFavorited !== undefined && { isFavorited }),
+      },
+    },
 
     ...withTotalCount(
       ...withSort(sort),
@@ -156,16 +160,12 @@ recipeSchema.statics.findByIdFull = async function (
   id: string,
   userId?: string,
 ) {
-  const recipeOid = Types.ObjectId.createFromHexString(id);
-
-  const filter: QueryFilter<RecipeDocument> = {
-    _id: recipeOid,
-  };
-  applyVisibilityFilter(filter, userId);
-
   const recipes = await this.aggregate<RecipeDocumentPopulated>([
     {
-      $match: filter,
+      $match: {
+        _id: Types.ObjectId.createFromHexString(id),
+        ...byVisibility(userId),
+      },
     },
     { $unset: "__v" },
     ...withCategories(),
