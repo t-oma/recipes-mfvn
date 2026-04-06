@@ -60,12 +60,11 @@ favoriteSchema.statics.findByUser = async function (
         user: Types.ObjectId.createFromHexString(userId),
       },
     },
-    { $unset: "__v" },
-    { $unset: "user" },
+    { $unset: ["__v", "user"] },
+    ...withRecipe(userId),
     ...withTotalCount(
       ...withSort("-createdAt"),
       ...withPagination(query.page, query.limit),
-      ...withRecipe(userId),
     ),
   ]);
   if (!recipes.length || !recipes[0]?.items.length) {
