@@ -1,7 +1,9 @@
 import type { PipelineStage } from "mongoose";
 import { byVisibility } from "@/modules/recipes/index.js";
 
-export function withRecipe(userId: string): PipelineStage.FacetPipelineStage[] {
+export function withRecipe(
+  userId: string | undefined,
+): PipelineStage.FacetPipelineStage[] {
   return [
     {
       $lookup: {
@@ -14,7 +16,6 @@ export function withRecipe(userId: string): PipelineStage.FacetPipelineStage[] {
               ...byVisibility(userId),
             },
           },
-          { $unset: "__v" },
           {
             $project: {
               _id: 1,

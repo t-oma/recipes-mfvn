@@ -35,6 +35,10 @@ export interface CommentModelType extends Model<CommentDocument> {
     userId: string,
     query: CommentQuery,
   ): Promise<[CommentDocumentPopulated[], number] | [null, 0]>;
+  findByRecipe(
+    params: { recipeId: string; userId?: string },
+    query: CommentQuery,
+  ): Promise<[CommentDocumentPopulated[], number] | [null, 0]>;
 }
 
 const commentSchema = new Schema<CommentDocument, CommentModelType>(
@@ -77,6 +81,33 @@ commentSchema.statics.findByUser = async function (
     { $unset: "__v" },
     ...withAuthor(),
     ...withRecipe(userId),
+    ...withTotalCount(
+      ...withSort("-createdAt"),
+      ...withPagination(query.page, query.limit),
+    ),
+  ]);
+  if (!comments.length || !comments[0]?.items.length) {
+    return [[], comments[0]?.total ?? 0];
+  }
+
+  return [comments[0].items, comments[0].total];
+};
+
+commentSchema.statics.findByRecipe = async function (
+  params: { recipeId: string; userId?: string },
+  query: CommentQuery,
+) {
+  const comments = await this.aggregate<
+    WithTotalCountResult<CommentDocumentPopulated>
+  >([
+    {
+      $match: {
+        recipe: Types.ObjectId.createFromHexString(params.recipeId),
+      },
+    },
+    { $unset: "__v" },
+    ...withAuthor(),
+    ...withRecipe(params.userId),
     ...withTotalCount(
       ...withSort("-createdAt"),
       ...withPagination(query.page, query.limit),
