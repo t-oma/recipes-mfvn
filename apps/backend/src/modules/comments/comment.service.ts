@@ -17,16 +17,20 @@ import type { UserDocument, UserModelType } from "@/modules/users/index.js";
 
 export interface CommentService {
   findByRecipe(
-    params: { recipeId: string; userId?: string },
+    params: { recipeId: string; viewer?: string },
     query: CommentQuery,
   ): Promise<Paginated<CommentForRecipe>>;
-  findByUser(userId: string, query: CommentQuery): Promise<Paginated<Comment>>;
+  findByUser(
+    target: string,
+    viewer: string,
+    query: CommentQuery,
+  ): Promise<Paginated<Comment>>;
   create(
     recipeId: string,
-    authorId: string,
+    author: string,
     data: CreateCommentBody,
   ): Promise<CommentForRecipe>;
-  delete(id: string, userId: string): Promise<void>;
+  delete(id: string, owner: string): Promise<void>;
 }
 
 export function createCommentService(
@@ -47,7 +51,7 @@ export function createCommentService(
 
       const [comments, total] = await commentModel.findFull(
         { by: "recipe", recipeId: params.recipeId },
-        { viewerId: params.userId },
+        { viewerId: params.viewer },
         query,
       );
       if (!comments) {
@@ -62,16 +66,16 @@ export function createCommentService(
       );
     },
 
-    findByUser: async (userId, query) => {
-      if (!mongoose.isValidObjectId(userId)) {
+    findByUser: async (target, viewer, query) => {
+      if (!mongoose.isValidObjectId(target)) {
         throw new BadRequestError("Invalid user ID");
       }
 
       const { page, limit } = query;
 
       const [comments, total] = await commentModel.findFull(
-        { by: "author", authorId: userId },
-        { viewerId: userId },
+        { by: "author", authorId: target },
+        { viewerId: viewer },
         query,
       );
       if (!comments) {
@@ -81,11 +85,11 @@ export function createCommentService(
       return withPagination(comments.map(toComment), total, page, limit);
     },
 
-    create: async (recipeId, authorId, data) => {
+    create: async (recipeId, author, data) => {
       if (!mongoose.isValidObjectId(recipeId)) {
         throw new BadRequestError("Invalid recipe ID");
       }
-      if (!mongoose.isValidObjectId(authorId)) {
+      if (!mongoose.isValidObjectId(author)) {
         throw new BadRequestError("Invalid author ID");
       }
 
@@ -93,7 +97,7 @@ export function createCommentService(
       if (!recipeExists) {
         throw new NotFoundError("Recipe not found");
       }
-      const authorExists = await userModel.exists({ _id: authorId });
+      const authorExists = await userModel.exists({ _id: author });
       if (!authorExists) {
         throw new NotFoundError("Author not found");
       }
@@ -101,7 +105,7 @@ export function createCommentService(
       const comment = await commentModel.create({
         text: data.text,
         recipe: recipeId,
-        author: authorId,
+        author,
       });
       const populated = await comment.populate<{
         author: Pick<UserDocument, "_id" | "name" | "email">;
@@ -110,7 +114,7 @@ export function createCommentService(
       return toCommentForRecipe(populated.toObject<typeof populated>());
     },
 
-    delete: async (id, userId) => {
+    delete: async (id, owner) => {
       if (!mongoose.isValidObjectId(id)) {
         throw new BadRequestError("Invalid comment ID");
       }
@@ -120,7 +124,7 @@ export function createCommentService(
         throw new NotFoundError("Comment not found");
       }
 
-      if (!comment.author.equals(userId)) {
+      if (!comment.author.equals(owner)) {
         throw new ForbiddenError("Not authorized to delete this comment");
       }
 

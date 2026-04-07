@@ -200,7 +200,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       },
       async (request, reply) => {
         const result = await commentService.findByRecipe(
-          { recipeId: request.params.id, userId: request.user?.userId },
+          { recipeId: request.params.id, viewer: request.user?.userId },
           request.query,
         );
         return reply.send(result);
