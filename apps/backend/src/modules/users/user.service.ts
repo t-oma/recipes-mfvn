@@ -1,18 +1,21 @@
 import type { Comment, Paginated, Recipe, User } from "@recipes/shared";
 import { NotFoundError } from "@/common/errors.js";
+import type { PaginationQuery } from "@/common/schemas.js";
 import { toUser } from "@/common/utils/mongo.js";
-import type { CommentQuery, CommentService } from "@/modules/comments/index.js";
-import type { FavoriteQuery } from "@/modules/favorites/favorite.schema.js";
+import type { CommentService } from "@/modules/comments/index.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import type { UserModelType } from "@/modules/users/index.js";
 
 export interface UserService {
   getCurrentUser(target: string): Promise<User>;
   getFavorites(
-    target: string,
-    query: FavoriteQuery,
+    userId: string,
+    query: PaginationQuery,
   ): Promise<Paginated<Recipe>>;
-  getComments(target: string, query: CommentQuery): Promise<Paginated<Comment>>;
+  getComments(
+    userId: string,
+    query: PaginationQuery,
+  ): Promise<Paginated<Comment>>;
 }
 
 export function createUserService(
@@ -21,19 +24,19 @@ export function createUserService(
   userModel: UserModelType,
 ): UserService {
   return {
-    getCurrentUser: async (target) => {
-      const user = await userModel.findById(target).lean();
+    getCurrentUser: async (userId) => {
+      const user = await userModel.findById(userId).lean();
       if (!user) {
         throw new NotFoundError("User not found");
       }
 
       return toUser(user);
     },
-    getFavorites: async (target, query) => {
-      return favoriteService.findByUser(target, target, query);
+    getFavorites: async (userId, query) => {
+      return favoriteService.findByUser(userId, userId, query);
     },
-    getComments: async (target, query) => {
-      return commentService.findByUser(target, target, query);
+    getComments: async (userId, query) => {
+      return commentService.findByAuthor(userId, { query, initiator: userId });
     },
   };
 }

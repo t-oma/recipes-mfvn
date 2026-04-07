@@ -199,10 +199,10 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         onRequest: optionalAuth,
       },
       async (request, reply) => {
-        const result = await commentService.findByRecipe(
-          { recipeId: request.params.id, viewer: request.user?.userId },
-          request.query,
-        );
+        const result = await commentService.findByRecipe(request.params.id, {
+          query: request.query,
+          initiator: request.user?.userId,
+        });
         return reply.send(result);
       },
     )
@@ -220,11 +220,10 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       },
       async (request, reply) => {
         assertAuthenticated(request);
-        const comment = await commentService.create(
-          request.params.id,
-          request.user.userId,
-          request.body,
-        );
+        const comment = await commentService.create(request.params.id, {
+          data: request.body,
+          initiator: request.user.userId,
+        });
         return reply.status(201).send(comment);
       },
     )
@@ -241,7 +240,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       },
       async (request, reply) => {
         assertAuthenticated(request);
-        await commentService.delete(request.params.id, request.user.userId);
+        await commentService.delete(request.params.id, {
+          initiator: request.user.userId,
+        });
         return reply.status(204).send();
       },
     );
