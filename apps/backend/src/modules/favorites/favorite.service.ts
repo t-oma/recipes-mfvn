@@ -71,12 +71,12 @@ export function createFavoriteService(
       return { favorited: false };
     },
 
-    findByUser: async (userId, { query }) => {
+    findByUser: async (userId, params) => {
       await validateUser(userId);
 
-      const { page, limit } = query;
+      const { page, limit } = params.query;
 
-      const [favorites, total] = await favoriteModel.findByUser(userId, query);
+      const [favorites, total] = await favoriteModel.findByUser(userId, params);
       if (!favorites) {
         return withPagination([], 0, page, limit);
       }
