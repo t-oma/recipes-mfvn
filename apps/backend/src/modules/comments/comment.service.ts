@@ -20,12 +20,12 @@ export interface CommentService {
     params: { recipeId: string; userId?: string },
     query: CommentQuery,
   ): Promise<Paginated<CommentForRecipe>>;
+  findByUser(userId: string, query: CommentQuery): Promise<Paginated<Comment>>;
   create(
     recipeId: string,
     authorId: string,
     data: CreateCommentBody,
   ): Promise<CommentForRecipe>;
-  findByUser(userId: string, query: CommentQuery): Promise<Paginated<Comment>>;
   delete(id: string, userId: string): Promise<void>;
 }
 
