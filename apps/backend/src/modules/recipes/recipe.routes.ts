@@ -144,7 +144,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       async (request, reply) => {
         assertAuthenticated(request);
 
-        const result = await favoriteService.add(request.user.userId, {
+        const result = await favoriteService.add(request.params.id, {
           initiator: request.user.userId,
         });
         return reply.send(result);
@@ -164,7 +164,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       async (request, reply) => {
         assertAuthenticated(request);
 
-        const result = await favoriteService.remove(request.user.userId, {
+        const result = await favoriteService.remove(request.params.id, {
           initiator: request.user.userId,
         });
         return reply.send(result);
@@ -186,7 +186,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           return reply.send({ favorited: false });
         }
 
-        const favorited = await favoriteService.isFavorited(userId, {
+        const favorited = await favoriteService.isFavorited(request.params.id, {
           initiator: userId,
         });
         return reply.send({ favorited });
