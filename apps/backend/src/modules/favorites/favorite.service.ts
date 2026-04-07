@@ -11,10 +11,14 @@ import type { RecipeModelType } from "@/modules/recipes/index.js";
 import type { UserModelType } from "@/modules/users/index.js";
 
 export interface FavoriteService {
-  add(userId: string, recipeId: string): Promise<{ favorited: true }>;
-  remove(userId: string, recipeId: string): Promise<{ favorited: false }>;
-  findByUser(userId: string, query: FavoriteQuery): Promise<Paginated<Recipe>>;
-  isFavorited(userId: string, recipeId: string): Promise<boolean>;
+  add(owner: string, recipeId: string): Promise<{ favorited: true }>;
+  remove(owner: string, recipeId: string): Promise<{ favorited: false }>;
+  findByUser(
+    target: string,
+    viewer: string,
+    query: FavoriteQuery,
+  ): Promise<Paginated<Recipe>>;
+  isFavorited(viewer: string, recipeId: string): Promise<boolean>;
 }
 
 export function createFavoriteService(
@@ -44,28 +48,28 @@ export function createFavoriteService(
   }
 
   return {
-    add: async (userId, recipeId) => {
-      await validateUser(userId);
+    add: async (owner, recipeId) => {
+      await validateUser(owner);
       await validateRecipe(recipeId);
 
-      await favoriteModel.create({ user: userId, recipe: recipeId });
+      await favoriteModel.create({ user: owner, recipe: recipeId });
       return { favorited: true };
     },
 
-    remove: async (userId, recipeId) => {
-      await validateUser(userId);
+    remove: async (owner, recipeId) => {
+      await validateUser(owner);
       await validateRecipe(recipeId);
 
-      await favoriteModel.findOneAndDelete({ user: userId, recipe: recipeId });
+      await favoriteModel.findOneAndDelete({ user: owner, recipe: recipeId });
       return { favorited: false };
     },
 
-    findByUser: async (userId, query) => {
-      await validateUser(userId);
+    findByUser: async (target, viewer, query) => {
+      await validateUser(target);
 
       const { page, limit } = query;
 
-      const [favorites, total] = await favoriteModel.findByUser(userId, query);
+      const [favorites, total] = await favoriteModel.findByUser(target, query);
       if (!favorites) {
         return withPagination([], 0, page, limit);
       }
@@ -78,8 +82,8 @@ export function createFavoriteService(
       return withPagination(items, total, page, limit);
     },
 
-    isFavorited: async (userId, recipeId) => {
-      return !!(await favoriteModel.exists({ user: userId, recipe: recipeId }));
+    isFavorited: async (viewer, recipeId) => {
+      return !!(await favoriteModel.exists({ user: viewer, recipe: recipeId }));
     },
   };
 }

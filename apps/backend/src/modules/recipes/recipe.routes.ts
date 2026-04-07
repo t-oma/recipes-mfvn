@@ -175,13 +175,13 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         onRequest: optionalAuth,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
+        const viewer = request.user?.userId;
+        if (!viewer) {
           return reply.send({ favorited: false });
         }
 
         const favorited = await favoriteService.isFavorited(
-          userId,
+          viewer,
           request.params.id,
         );
         return reply.send({ favorited });
