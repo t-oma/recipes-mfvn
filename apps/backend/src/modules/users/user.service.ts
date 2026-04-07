@@ -11,7 +11,7 @@ import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import type { UserModelType } from "@/modules/users/index.js";
 
 export interface UserService {
-  getCurrentUser(target: string): Promise<User>;
+  getCurrentUser(userId: string): Promise<User>;
   getFavorites(
     userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,

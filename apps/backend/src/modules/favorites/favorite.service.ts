@@ -19,7 +19,7 @@ export interface FavoriteService {
     params: DefaultInitiator,
   ): Promise<{ favorited: false }>;
   findByUser(
-    target: string,
+    userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,
   ): Promise<Paginated<Recipe>>;
   isFavorited(recipeId: string, params: DefaultInitiator): Promise<boolean>;
