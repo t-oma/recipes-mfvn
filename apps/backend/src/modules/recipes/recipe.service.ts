@@ -6,6 +6,12 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "@/common/errors.js";
+import type {
+  CreateMethodParams,
+  DefaultInitiator,
+  QueryMethodParams,
+  UpdateMethodParams,
+} from "@/common/types/methods.js";
 import { toRecipe } from "@/common/utils/mongo.js";
 import type {
   CategoryDocument,
@@ -22,13 +28,15 @@ import type { UserDocument, UserModelType } from "@/modules/users/index.js";
 
 export interface RecipeService {
   findAll(
-    query: SearchRecipeQuery,
-    viewer?: string,
+    params: QueryMethodParams<SearchRecipeQuery>,
   ): Promise<Paginated<Recipe>>;
-  findById(id: string, viewer?: string): Promise<Recipe>;
-  create(data: CreateRecipeBody, author: string): Promise<Recipe>;
-  update(id: string, data: UpdateRecipeBody, owner: string): Promise<Recipe>;
-  delete(id: string, owner: string): Promise<void>;
+  findById(id: string, params: Partial<DefaultInitiator>): Promise<Recipe>;
+  create(params: CreateMethodParams<CreateRecipeBody>): Promise<Recipe>;
+  update(
+    id: string,
+    params: UpdateMethodParams<UpdateRecipeBody>,
+  ): Promise<Recipe>;
+  delete(id: string, params: DefaultInitiator): Promise<void>;
 }
 
 export function createRecipeService(
@@ -38,14 +46,14 @@ export function createRecipeService(
   categoryModel: CategoryModelType,
 ): RecipeService {
   return {
-    findAll: async (query, viewer) => {
+    findAll: async ({ query, initiator }) => {
       const { page, limit, isFavorited } = query;
 
-      if (isFavorited && !viewer) {
+      if (isFavorited && !initiator) {
         return withPagination([], 0, page, limit);
       }
 
-      const [recipes, total] = await recipeModel.searchFull(query, viewer);
+      const [recipes, total] = await recipeModel.searchFull(query, initiator);
       if (!recipes) {
         return withPagination([], 0, page, limit);
       }
@@ -58,12 +66,12 @@ export function createRecipeService(
       );
     },
 
-    findById: async (id, viewer) => {
+    findById: async (id, { initiator }) => {
       if (!isValidObjectId(id)) {
         throw new BadRequestError("Invalid recipe ID");
       }
 
-      const recipe = await recipeModel.findByIdFull(id, viewer);
+      const recipe = await recipeModel.findByIdFull(id, initiator);
       if (!recipe) {
         throw new NotFoundError("Recipe not found");
       }
@@ -71,8 +79,8 @@ export function createRecipeService(
       return toRecipe(recipe, recipe.isFavorited);
     },
 
-    create: async (data, author) => {
-      if (!isValidObjectId(author)) {
+    create: async ({ data, initiator }) => {
+      if (!isValidObjectId(initiator)) {
         throw new BadRequestError("Invalid author ID");
       }
       if (!isValidObjectId(data.category)) {
@@ -84,12 +92,12 @@ export function createRecipeService(
         throw new NotFoundError("Category not found");
       }
 
-      const authorExists = await userModel.exists({ _id: author });
+      const authorExists = await userModel.exists({ _id: initiator });
       if (!authorExists) {
         throw new NotFoundError("Author not found");
       }
 
-      const recipe = await recipeModel.create({ ...data, author });
+      const recipe = await recipeModel.create({ ...data, author: initiator });
       const populated = await recipe.populate<{
         author: Pick<UserDocument, "_id" | "name" | "email">;
         category: Pick<CategoryDocument, "_id" | "name" | "slug">;
@@ -100,7 +108,7 @@ export function createRecipeService(
       return toRecipe(populated.toObject<typeof populated>(), false);
     },
 
-    update: async (id, data, owner) => {
+    update: async (id, { data, initiator }) => {
       if (!isValidObjectId(id)) {
         throw new BadRequestError("Invalid recipe ID");
       }
@@ -109,7 +117,7 @@ export function createRecipeService(
         throw new NotFoundError("Recipe not found");
       }
 
-      if (!recipe.author.equals(owner)) {
+      if (!recipe.author.equals(initiator)) {
         throw new ForbiddenError("Not authorized to update this recipe");
       }
 
@@ -124,10 +132,10 @@ export function createRecipeService(
       ]);
 
       let isFavorited = false;
-      if (owner) {
+      if (initiator) {
         const favorite = await favoriteModel
           .findOne({
-            user: owner,
+            user: initiator,
             recipe: id,
           })
           .lean();
@@ -137,7 +145,7 @@ export function createRecipeService(
       return toRecipe(populated.toObject<typeof populated>(), isFavorited);
     },
 
-    delete: async (id, owner) => {
+    delete: async (id, { initiator }) => {
       if (!isValidObjectId(id)) {
         throw new BadRequestError("Invalid recipe ID");
       }
@@ -146,7 +154,7 @@ export function createRecipeService(
         throw new NotFoundError("Recipe not found");
       }
 
-      if (!recipe.author.equals(owner)) {
+      if (!recipe.author.equals(initiator)) {
         throw new ForbiddenError("Not authorized to delete this recipe");
       }
 
