@@ -12,10 +12,7 @@ export interface UserService {
     target: string,
     query: FavoriteQuery,
   ): Promise<Paginated<Recipe>>;
-  getComments(
-    target: string,
-    query: CommentQuery,
-  ): Promise<Paginated<Comment>>;
+  getComments(target: string, query: CommentQuery): Promise<Paginated<Comment>>;
 }
 
 export function createUserService(

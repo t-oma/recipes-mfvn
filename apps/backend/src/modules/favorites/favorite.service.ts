@@ -64,7 +64,7 @@ export function createFavoriteService(
       return { favorited: false };
     },
 
-    findByUser: async (target, viewer, query) => {
+    findByUser: async (target, _viewer, query) => {
       await validateUser(target);
 
       const { page, limit } = query;
