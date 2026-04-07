@@ -45,7 +45,11 @@ export function createCommentService(
         throw new NotFoundError("Recipe not found");
       }
 
-      const [comments, total] = await commentModel.findByRecipe(params, query);
+      const [comments, total] = await commentModel.findFull(
+        { recipeId: params.recipeId },
+        { userId: params.userId },
+        query,
+      );
       if (!comments) {
         return withPagination([], 0, page, limit);
       }
@@ -56,6 +60,25 @@ export function createCommentService(
         page,
         limit,
       );
+    },
+
+    findByUser: async (userId, query) => {
+      if (!mongoose.isValidObjectId(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const { page, limit } = query;
+
+      const [comments, total] = await commentModel.findFull(
+        { authorId: userId },
+        { userId },
+        query,
+      );
+      if (!comments) {
+        return withPagination([], 0, page, limit);
+      }
+
+      return withPagination(comments.map(toComment), total, page, limit);
     },
 
     create: async (recipeId, authorId, data) => {
@@ -85,21 +108,6 @@ export function createCommentService(
       }>("author", "name email");
 
       return toCommentForRecipe(populated.toObject<typeof populated>());
-    },
-
-    findByUser: async (userId, query) => {
-      if (!mongoose.isValidObjectId(userId)) {
-        throw new BadRequestError("Invalid user ID");
-      }
-
-      const { page, limit } = query;
-
-      const [comments, total] = await commentModel.findByUser(userId, query);
-      if (!comments) {
-        return withPagination([], 0, page, limit);
-      }
-
-      return withPagination(comments.map(toComment), total, page, limit);
     },
 
     delete: async (id, userId) => {
