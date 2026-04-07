@@ -7,12 +7,15 @@ import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import type { UserModelType } from "@/modules/users/index.js";
 
 export interface UserService {
-  getCurrentUser(userId: string): Promise<User>;
+  getCurrentUser(target: string): Promise<User>;
   getFavorites(
-    userId: string,
+    target: string,
     query: FavoriteQuery,
   ): Promise<Paginated<Recipe>>;
-  getComments(userId: string, query: CommentQuery): Promise<Paginated<Comment>>;
+  getComments(
+    target: string,
+    query: CommentQuery,
+  ): Promise<Paginated<Comment>>;
 }
 
 export function createUserService(
@@ -21,19 +24,19 @@ export function createUserService(
   userModel: UserModelType,
 ): UserService {
   return {
-    getCurrentUser: async (userId) => {
-      const user = await userModel.findById(userId).lean();
+    getCurrentUser: async (target) => {
+      const user = await userModel.findById(target).lean();
       if (!user) {
         throw new NotFoundError("User not found");
       }
 
       return toUser(user);
     },
-    getFavorites: async (userId, query) => {
-      return favoriteService.findByUser(userId, query);
+    getFavorites: async (target, query) => {
+      return favoriteService.findByUser(target, target, query);
     },
-    getComments: async (userId, query) => {
-      return commentService.findByUser(userId, query);
+    getComments: async (target, query) => {
+      return commentService.findByUser(target, target, query);
     },
   };
 }
