@@ -53,8 +53,7 @@ export function createCommentService(
 
       const [comments, total] = await commentModel.findFull(
         { by: "recipe", recipeId },
-        { viewerId: initiator },
-        query,
+        { query, initiator },
       );
       if (!comments) {
         return withPagination([], 0, page, limit);
@@ -76,8 +75,7 @@ export function createCommentService(
 
       const [comments, total] = await commentModel.findFull(
         { by: "author", authorId },
-        { viewerId: initiator },
-        query,
+        { query, initiator },
       );
       if (!comments) {
         return withPagination([], 0, page, limit);
