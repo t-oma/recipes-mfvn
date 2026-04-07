@@ -1,24 +1,19 @@
 export type DefaultQuery = { page: number; limit: number };
-export type DefaultInitiator = string;
+export type DefaultInitiator = { initiator: string };
 
 export type QueryMethodParams<
   TQuery = DefaultQuery,
-  TInitiator = DefaultInitiator,
+  TInitiator = Partial<DefaultInitiator>,
 > = {
   query: TQuery;
-  initiator?: TInitiator;
-};
+} & TInitiator;
 
-export type DeleteMethodParams<TInitiator = DefaultInitiator> = {
-  initiator: TInitiator;
-};
+export type DeleteMethodParams<TInitiator = DefaultInitiator> = TInitiator;
 
 export type CreateMethodParams<TData, TInitiator = DefaultInitiator> = {
   data: TData;
-  initiator: TInitiator;
-};
+} & TInitiator;
 
 export type UpdateMethodParams<TData, TInitiator = DefaultInitiator> = {
   data: TData;
-  initiator: TInitiator;
-};
+} & TInitiator;
