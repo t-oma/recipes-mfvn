@@ -31,15 +31,15 @@ export interface CommentDocumentPopulated
     }
   > {}
 
-type FindFullByAuthor = { authorId: string };
-type FindFullByRecipe = { recipeId: string };
+type FindFullByAuthor = { by: "author"; authorId: string };
+type FindFullByRecipe = { by: "recipe"; recipeId: string };
 type FindFullParams = FindFullByAuthor | FindFullByRecipe;
-type FindFullAuth = { userId?: string };
+type FindFullViewer = { viewerId?: string };
 
 export interface CommentModelType extends Model<CommentDocument> {
   findFull(
     params: FindFullParams,
-    auth: FindFullAuth,
+    viewer: FindFullViewer,
     pagination: PaginationQuery,
   ): Promise<[CommentDocumentPopulated[], number] | [null, 0]>;
 }
@@ -71,11 +71,11 @@ const commentSchema = new Schema<CommentDocument, CommentModelType>(
 
 commentSchema.statics.findFull = async function (
   params: FindFullParams,
-  auth: FindFullAuth,
+  viewer: FindFullViewer,
   pagination: PaginationQuery,
 ) {
   const filter =
-    "recipeId" in params
+    params.by === "recipe"
       ? { recipe: toObjectId(params.recipeId) }
       : { author: toObjectId(params.authorId) };
 
@@ -89,7 +89,7 @@ commentSchema.statics.findFull = async function (
     },
     { $unset: "__v" },
     ...withAuthor(),
-    ...withRecipe(auth.userId),
+    ...withRecipe(viewer.viewerId),
     ...withTotalCount(
       ...withSort("-createdAt"),
       ...withPagination(pagination.page, pagination.limit),

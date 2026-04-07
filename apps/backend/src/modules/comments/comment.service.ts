@@ -46,8 +46,8 @@ export function createCommentService(
       }
 
       const [comments, total] = await commentModel.findFull(
-        { recipeId: params.recipeId },
-        { userId: params.userId },
+        { by: "recipe", recipeId: params.recipeId },
+        { viewerId: params.userId },
         query,
       );
       if (!comments) {
@@ -70,8 +70,8 @@ export function createCommentService(
       const { page, limit } = query;
 
       const [comments, total] = await commentModel.findFull(
-        { authorId: userId },
-        { userId },
+        { by: "author", authorId: userId },
+        { viewerId: userId },
         query,
       );
       if (!comments) {
