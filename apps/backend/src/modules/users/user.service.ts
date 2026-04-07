@@ -1,6 +1,7 @@
 import type { Comment, Paginated, Recipe, User } from "@recipes/shared";
 import { NotFoundError } from "@/common/errors.js";
 import type { PaginationQuery } from "@/common/schemas.js";
+import type { QueryMethodParams } from "@/common/types/methods.js";
 import { toUser } from "@/common/utils/mongo.js";
 import type { CommentService } from "@/modules/comments/index.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
@@ -10,11 +11,11 @@ export interface UserService {
   getCurrentUser(target: string): Promise<User>;
   getFavorites(
     userId: string,
-    query: PaginationQuery,
+    params: QueryMethodParams<PaginationQuery, { initiator: string }>,
   ): Promise<Paginated<Recipe>>;
   getComments(
     userId: string,
-    query: PaginationQuery,
+    params: QueryMethodParams<PaginationQuery, { initiator: string }>,
   ): Promise<Paginated<Comment>>;
 }
 
@@ -32,11 +33,11 @@ export function createUserService(
 
       return toUser(user);
     },
-    getFavorites: async (userId, query) => {
-      return favoriteService.findByUser(userId, userId, query);
+    getFavorites: async (userId, { query, initiator }) => {
+      return favoriteService.findByUser(userId, initiator, query);
     },
-    getComments: async (userId, query) => {
-      return commentService.findByAuthor(userId, { query, initiator: userId });
+    getComments: async (userId, params) => {
+      return commentService.findByAuthor(userId, params);
     },
   };
 }
