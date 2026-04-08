@@ -1,8 +1,8 @@
 import type { PipelineStage } from "mongoose";
 import { Types } from "mongoose";
-import type { DefaultInitiator } from "@/common/types/methods.js";
+import type { OptionalInitiator } from "@/common/types/methods.js";
 
-export function byVisibility({ id }: Partial<DefaultInitiator>) {
+export function byVisibility({ id }: OptionalInitiator) {
   if (id) {
     return {
       $or: [

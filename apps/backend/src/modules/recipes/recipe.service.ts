@@ -8,8 +8,9 @@ import {
 } from "@/common/errors.js";
 import type {
   CreateMethodParams,
-  DefaultInitiator,
+  DeleteMethodParams,
   InitiatedMethodParams,
+  OptionalInitiator,
   QueryMethodParams,
   UpdateMethodParams,
 } from "@/common/types/methods.js";
@@ -33,14 +34,14 @@ export interface RecipeService {
   ): Promise<Paginated<Recipe>>;
   findById(
     id: string,
-    params: InitiatedMethodParams<Partial<DefaultInitiator>>,
+    params: InitiatedMethodParams<OptionalInitiator>,
   ): Promise<Recipe>;
   create(params: CreateMethodParams<CreateRecipeBody>): Promise<Recipe>;
   update(
     id: string,
     params: UpdateMethodParams<UpdateRecipeBody>,
   ): Promise<Recipe>;
-  delete(id: string, params: InitiatedMethodParams): Promise<void>;
+  delete(id: string, params: DeleteMethodParams): Promise<void>;
 }
 
 export function createRecipeService(

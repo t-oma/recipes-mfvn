@@ -2,8 +2,8 @@ import type { Difficulty, Minutes, Replace } from "@recipes/shared";
 import type { Model } from "mongoose";
 import { model, Schema, Types } from "mongoose";
 import type {
-  DefaultInitiator,
   InitiatedMethodParams,
+  OptionalInitiator,
   QueryMethodParams,
 } from "@/common/types/methods.js";
 import type { BaseDocument } from "@/common/types/mongoose.js";
@@ -61,7 +61,7 @@ export interface RecipeModelType extends Model<RecipeDocument> {
   ): Promise<[RecipeDocumentPopulated[], number] | [null, 0]>;
   findByIdFull(
     id: string,
-    params: InitiatedMethodParams<Partial<DefaultInitiator>>,
+    params: InitiatedMethodParams<OptionalInitiator>,
   ): Promise<RecipeDocumentPopulated | null>;
 }
 
@@ -162,7 +162,7 @@ recipeSchema.statics.searchFull = async function ({
 
 recipeSchema.statics.findByIdFull = async function (
   id: string,
-  { initiator }: InitiatedMethodParams<Partial<DefaultInitiator>>,
+  { initiator }: InitiatedMethodParams<OptionalInitiator>,
 ) {
   const recipes = await this.aggregate<RecipeDocumentPopulated>([
     {

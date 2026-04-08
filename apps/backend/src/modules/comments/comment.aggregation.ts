@@ -1,9 +1,9 @@
 import type { PipelineStage } from "mongoose";
-import type { DefaultInitiator } from "@/common/types/methods.js";
+import type { OptionalInitiator } from "@/common/types/methods.js";
 import { byVisibility } from "@/modules/recipes/index.js";
 
 export function withRecipe(
-  initiator: Partial<DefaultInitiator>,
+  initiator: OptionalInitiator,
 ): PipelineStage.FacetPipelineStage[] {
   return [
     {
