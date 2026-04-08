@@ -53,7 +53,7 @@ export function createRecipeService(
     findAll: async ({ query, initiator }) => {
       const { page, limit, isFavorited } = query;
 
-      if (isFavorited && !initiator) {
+      if (isFavorited && !initiator.id) {
         return withPagination([], 0, page, limit);
       }
 
@@ -87,7 +87,7 @@ export function createRecipeService(
     },
 
     create: async ({ data, initiator }) => {
-      if (!isValidObjectId(initiator)) {
+      if (!isValidObjectId(initiator.id)) {
         throw new BadRequestError("Invalid author ID");
       }
       if (!isValidObjectId(data.category)) {

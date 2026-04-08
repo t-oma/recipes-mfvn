@@ -130,7 +130,7 @@ recipeSchema.statics.searchFull = async function ({
   >([
     {
       $match: {
-        ...byVisibility(initiator.id),
+        ...byVisibility(initiator),
         ...(search && { $text: { $search: search } }),
         ...(categoryId && { category: categoryId }),
         ...(difficulty && { difficulty }),
@@ -168,7 +168,7 @@ recipeSchema.statics.findByIdFull = async function (
     {
       $match: {
         _id: Types.ObjectId.createFromHexString(id),
-        ...byVisibility(initiator.id),
+        ...byVisibility(initiator),
       },
     },
     { $unset: "__v" },

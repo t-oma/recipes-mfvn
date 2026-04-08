@@ -88,7 +88,7 @@ export function createCommentService(
       if (!mongoose.isValidObjectId(recipeId)) {
         throw new BadRequestError("Invalid recipe ID");
       }
-      if (!mongoose.isValidObjectId(initiator)) {
+      if (!mongoose.isValidObjectId(initiator.id)) {
         throw new BadRequestError("Invalid author ID");
       }
 

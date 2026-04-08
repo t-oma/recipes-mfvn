@@ -1,12 +1,13 @@
 import type { PipelineStage } from "mongoose";
 import { Types } from "mongoose";
+import type { DefaultInitiator } from "@/common/types/methods.js";
 
-export function byVisibility(userId: string | undefined) {
-  if (userId) {
+export function byVisibility({ id }: Partial<DefaultInitiator>) {
+  if (id) {
     return {
       $or: [
         { isPublic: true },
-        { author: Types.ObjectId.createFromHexString(userId) },
+        { author: Types.ObjectId.createFromHexString(id) },
       ],
     };
   }
