@@ -2,7 +2,11 @@ import type { PipelineStage } from "mongoose";
 import { Types } from "mongoose";
 import type { OptionalInitiator } from "@/common/types/methods.js";
 
-export function byVisibility({ id }: OptionalInitiator) {
+export function byVisibility({ id, role }: OptionalInitiator) {
+  if (role === "admin") {
+    return {};
+  }
+
   if (id) {
     return {
       $or: [

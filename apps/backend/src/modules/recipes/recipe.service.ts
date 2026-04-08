@@ -128,7 +128,7 @@ export function createRecipeService(
         throw new NotFoundError("Recipe not found");
       }
 
-      if (!recipe.author.equals(initiator.id)) {
+      if (!recipe.author.equals(initiator.id) && initiator.role !== "admin") {
         throw new ForbiddenError("Not authorized to update this recipe");
       }
 
@@ -142,16 +142,12 @@ export function createRecipeService(
         { path: "category", select: "name slug" },
       ]);
 
-      let isFavorited = false;
-      if (initiator) {
-        const favorite = await favoriteModel
-          .findOne({
-            user: initiator.id,
-            recipe: id,
-          })
-          .lean();
-        isFavorited = !!favorite;
-      }
+      const isFavorited = !!(await favoriteModel
+        .findOne({
+          user: initiator.id,
+          recipe: id,
+        })
+        .lean());
 
       return toRecipe(populated.toObject<typeof populated>(), isFavorited);
     },
@@ -165,7 +161,7 @@ export function createRecipeService(
         throw new NotFoundError("Recipe not found");
       }
 
-      if (!recipe.author.equals(initiator.id)) {
+      if (!recipe.author.equals(initiator.id) && initiator.role !== "admin") {
         throw new ForbiddenError("Not authorized to delete this recipe");
       }
 
