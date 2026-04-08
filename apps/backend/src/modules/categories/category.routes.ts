@@ -49,7 +49,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
 
         const category = await service.create({
           data: request.body,
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.status(201).send(category);
       },
@@ -69,7 +69,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
         assertAuthenticated(request);
 
         await service.deleteById(request.params.id, {
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.status(204).send();
       },

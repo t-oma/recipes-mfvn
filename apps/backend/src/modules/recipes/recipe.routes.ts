@@ -45,7 +45,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       async (request, reply) => {
         const result = await service.findAll({
           query: request.query,
-          initiator: { id: request.user?.userId },
+          initiator: { id: request.user?.userId, role: request.user?.role },
         });
         return reply.send(result);
       },
@@ -62,7 +62,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       },
       async (request, reply) => {
         const recipe = await service.findById(request.params.id, {
-          initiator: { id: request.user?.userId },
+          initiator: { id: request.user?.userId, role: request.user?.role },
         });
         return reply.send(recipe);
       },
@@ -83,7 +83,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
 
         const recipe = await service.create({
           data: request.body,
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.status(201).send(recipe);
       },
@@ -105,7 +105,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
 
         const recipe = await service.update(request.params.id, {
           data: request.body,
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.send(recipe);
       },
@@ -125,7 +125,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         assertAuthenticated(request);
 
         await service.delete(request.params.id, {
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.status(204).send();
       },
@@ -145,7 +145,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         assertAuthenticated(request);
 
         const result = await favoriteService.add(request.params.id, {
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.send(result);
       },
@@ -165,7 +165,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         assertAuthenticated(request);
 
         const result = await favoriteService.remove(request.params.id, {
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.send(result);
       },
@@ -178,16 +178,13 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           tags: ["Recipes"],
           summary: "Check if recipe is favorited",
         },
-        onRequest: optionalAuth,
+        onRequest: authGuard,
       },
       async (request, reply) => {
-        const userId = request.user?.userId;
-        if (!userId) {
-          return reply.send({ favorited: false });
-        }
+        assertAuthenticated(request);
 
         const favorited = await favoriteService.isFavorited(request.params.id, {
-          initiator: { id: userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.send({ favorited });
       },
@@ -206,7 +203,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       async (request, reply) => {
         const result = await commentService.findByRecipe(request.params.id, {
           query: request.query,
-          initiator: { id: request.user?.userId },
+          initiator: { id: request.user?.userId, role: request.user?.role },
         });
         return reply.send(result);
       },
@@ -228,7 +225,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
 
         const comment = await commentService.create(request.params.id, {
           data: request.body,
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.status(201).send(comment);
       },
@@ -248,7 +245,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         assertAuthenticated(request);
 
         await commentService.delete(request.params.id, {
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.status(204).send();
       },
