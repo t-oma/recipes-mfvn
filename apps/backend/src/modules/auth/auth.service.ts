@@ -18,7 +18,11 @@ export function createAuthService(userModel: UserModelType): AuthService {
       }
 
       const user = await userModel.create(data);
-      const token = signToken({ userId: user.id, email: user.email });
+      const token = signToken({
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      });
 
       return {
         user: toUser(user.toObject()),
@@ -33,7 +37,11 @@ export function createAuthService(userModel: UserModelType): AuthService {
         throw new UnauthorizedError("Invalid email or password");
       }
 
-      const token = signToken({ userId: user.id, email: user.email });
+      const token = signToken({
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      });
 
       return {
         user: toUser(user.toObject()),
