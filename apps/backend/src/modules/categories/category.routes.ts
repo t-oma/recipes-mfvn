@@ -4,6 +4,7 @@ import {
   assertAuthenticated,
   authGuard,
 } from "@/common/middleware/auth.guard.js";
+import { rolesGuard } from "@/common/middleware/role.guard.js";
 import {
   categoryParamsSchema,
   createCategorySchema,
@@ -42,7 +43,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
           summary: "Create a category",
           security: [{ bearerAuth: [] }],
         },
-        onRequest: authGuard,
+        onRequest: [authGuard, rolesGuard("admin")],
       },
       async (request, reply) => {
         assertAuthenticated(request);
@@ -63,7 +64,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
           summary: "Delete a category",
           security: [{ bearerAuth: [] }],
         },
-        onRequest: authGuard,
+        onRequest: [authGuard, rolesGuard("admin")],
       },
       async (request, reply) => {
         assertAuthenticated(request);
