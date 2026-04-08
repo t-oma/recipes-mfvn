@@ -1,12 +1,13 @@
 import type { Difficulty, Minutes, Replace } from "@recipes/shared";
-import type { Model } from "mongoose";
-import { model, Schema, Types } from "mongoose";
+import type { Model, Types } from "mongoose";
+import { model, Schema } from "mongoose";
 import type {
   InitiatedMethodParams,
   OptionalInitiator,
   QueryMethodParams,
 } from "@/common/types/methods.js";
 import type { BaseDocument } from "@/common/types/mongoose.js";
+import { toObjectId } from "@/common/utils/mongo.js";
 import type { WithTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import {
   withPagination,
@@ -167,7 +168,7 @@ recipeSchema.statics.findByIdFull = async function (
   const recipes = await this.aggregate<RecipeDocumentPopulated>([
     {
       $match: {
-        _id: Types.ObjectId.createFromHexString(id),
+        _id: toObjectId(id),
         ...byVisibility(initiator),
       },
     },
