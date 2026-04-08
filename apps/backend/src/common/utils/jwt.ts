@@ -1,11 +1,12 @@
 import jwt from "jsonwebtoken";
 import type { StringValue } from "ms";
 import { env } from "@/config/env.js";
+import type { UserRole } from "@/modules/users/user.model.js";
 
 export interface JwtPayload {
   userId: string;
   email: string;
-  role: string;
+  role: UserRole;
 }
 
 export function signToken(payload: JwtPayload): string {
