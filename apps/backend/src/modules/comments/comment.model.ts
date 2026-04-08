@@ -69,7 +69,7 @@ const commentSchema = new Schema<CommentDocument, CommentModelType>(
 
 commentSchema.statics.findFull = async function (
   filter: FindFullFilter,
-  params: QueryMethodParams,
+  { query, initiator }: QueryMethodParams,
 ) {
   const comments = await this.aggregate<
     WithTotalCountResult<CommentDocumentPopulated>
@@ -83,10 +83,10 @@ commentSchema.statics.findFull = async function (
     },
     { $unset: "__v" },
     ...withAuthor(),
-    ...withRecipe(params.initiator),
+    ...withRecipe(initiator),
     ...withTotalCount(
       ...withSort("-createdAt"),
-      ...withPagination(params.query.page, params.query.limit),
+      ...withPagination(query.page, query.limit),
     ),
   ]);
   if (!comments.length || !comments[0]?.items.length) {

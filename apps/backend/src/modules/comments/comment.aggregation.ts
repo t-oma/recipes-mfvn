@@ -1,8 +1,9 @@
 import type { PipelineStage } from "mongoose";
+import type { OptionalInitiator } from "@/common/types/methods.js";
 import { byVisibility } from "@/modules/recipes/index.js";
 
 export function withRecipe(
-  userId: string | undefined,
+  initiator: OptionalInitiator,
 ): PipelineStage.FacetPipelineStage[] {
   return [
     {
@@ -13,7 +14,7 @@ export function withRecipe(
         pipeline: [
           {
             $match: {
-              ...byVisibility(userId),
+              ...byVisibility(initiator),
             },
           },
           {

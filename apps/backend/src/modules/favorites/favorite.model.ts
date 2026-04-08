@@ -50,7 +50,7 @@ const favoriteSchema = new Schema<FavoriteDocument, FavoriteModelType>(
 
 favoriteSchema.statics.findByUser = async function (
   userId: string,
-  params: QueryMethodParams,
+  { query, initiator }: QueryMethodParams,
 ) {
   const recipes = await this.aggregate<
     WithTotalCountResult<FavoriteDocumentPopulated>
@@ -61,10 +61,10 @@ favoriteSchema.statics.findByUser = async function (
       },
     },
     { $unset: ["__v", "user"] },
-    ...withRecipe(params.initiator),
+    ...withRecipe(initiator),
     ...withTotalCount(
       ...withSort("-createdAt"),
-      ...withPagination(params.query.page, params.query.limit),
+      ...withPagination(query.page, query.limit),
     ),
   ]);
   if (!recipes.length || !recipes[0]?.items.length) {

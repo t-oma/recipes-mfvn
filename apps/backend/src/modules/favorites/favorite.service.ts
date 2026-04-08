@@ -5,6 +5,7 @@ import { BadRequestError, NotFoundError } from "@/common/errors.js";
 import type { PaginationQuery } from "@/common/schemas.js";
 import type {
   DefaultInitiator,
+  InitiatedMethodParams,
   QueryMethodParams,
 } from "@/common/types/methods.js";
 import { toRecipe } from "@/common/utils/mongo.js";
@@ -13,16 +14,22 @@ import type { RecipeModelType } from "@/modules/recipes/index.js";
 import type { UserModelType } from "@/modules/users/index.js";
 
 export interface FavoriteService {
-  add(recipeId: string, params: DefaultInitiator): Promise<{ favorited: true }>;
+  add(
+    recipeId: string,
+    params: InitiatedMethodParams,
+  ): Promise<{ favorited: true }>;
   remove(
     recipeId: string,
-    params: DefaultInitiator,
+    params: InitiatedMethodParams,
   ): Promise<{ favorited: false }>;
   findByUser(
     userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,
   ): Promise<Paginated<Recipe>>;
-  isFavorited(recipeId: string, params: DefaultInitiator): Promise<boolean>;
+  isFavorited(
+    recipeId: string,
+    params: InitiatedMethodParams,
+  ): Promise<boolean>;
 }
 
 export function createFavoriteService(
@@ -53,19 +60,19 @@ export function createFavoriteService(
 
   return {
     add: async (recipeId, { initiator }) => {
-      await validateUser(initiator);
+      await validateUser(initiator.id);
       await validateRecipe(recipeId);
 
-      await favoriteModel.create({ user: initiator, recipe: recipeId });
+      await favoriteModel.create({ user: initiator.id, recipe: recipeId });
       return { favorited: true };
     },
 
     remove: async (recipeId, { initiator }) => {
-      await validateUser(initiator);
+      await validateUser(initiator.id);
       await validateRecipe(recipeId);
 
       await favoriteModel.findOneAndDelete({
-        user: initiator,
+        user: initiator.id,
         recipe: recipeId,
       });
       return { favorited: false };
@@ -91,7 +98,7 @@ export function createFavoriteService(
 
     isFavorited: async (recipeId, { initiator }) => {
       return !!(await favoriteModel.exists({
-        user: initiator,
+        user: initiator.id,
         recipe: recipeId,
       }));
     },

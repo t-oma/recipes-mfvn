@@ -88,7 +88,7 @@ export function createCommentService(
       if (!mongoose.isValidObjectId(recipeId)) {
         throw new BadRequestError("Invalid recipe ID");
       }
-      if (!mongoose.isValidObjectId(initiator)) {
+      if (!mongoose.isValidObjectId(initiator.id)) {
         throw new BadRequestError("Invalid author ID");
       }
 
@@ -96,7 +96,7 @@ export function createCommentService(
       if (!recipeExists) {
         throw new NotFoundError("Recipe not found");
       }
-      const authorExists = await userModel.exists({ _id: initiator });
+      const authorExists = await userModel.exists({ _id: initiator.id });
       if (!authorExists) {
         throw new NotFoundError("Author not found");
       }
@@ -104,7 +104,7 @@ export function createCommentService(
       const comment = await commentModel.create({
         text: data.text,
         recipe: recipeId,
-        author: initiator,
+        author: initiator.id,
       });
       const populated = await comment.populate<{
         author: Pick<UserDocument, "_id" | "name" | "email">;
@@ -123,7 +123,7 @@ export function createCommentService(
         throw new NotFoundError("Comment not found");
       }
 
-      if (!comment.author.equals(initiator)) {
+      if (!comment.author.equals(initiator.id)) {
         throw new ForbiddenError("Not authorized to delete this comment");
       }
 
