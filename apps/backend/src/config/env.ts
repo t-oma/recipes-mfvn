@@ -14,6 +14,14 @@ const envSchema = z.object({
   RATE_LIMIT_AUTH_WINDOW: z.string().default("3 minutes"),
   RATE_LIMIT_GLOBAL_MAX: z.coerce.number().default(100),
   RATE_LIMIT_GLOBAL_WINDOW: z.string().default("1 minute"),
+  ROOT_ADMIN_EMAIL: z.string().min(6),
+  ROOT_ADMIN_PASSWORD: z
+    .string()
+    .min(10)
+    .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
 });
 
 const parsed = envSchema.safeParse(process.env);
