@@ -9,6 +9,7 @@ import {
 import type {
   CreateMethodParams,
   DefaultInitiator,
+  InitiatedMethodParams,
   QueryMethodParams,
   UpdateMethodParams,
 } from "@/common/types/methods.js";
@@ -30,13 +31,16 @@ export interface RecipeService {
   findAll(
     params: QueryMethodParams<SearchRecipeQuery>,
   ): Promise<Paginated<Recipe>>;
-  findById(id: string, params: Partial<DefaultInitiator>): Promise<Recipe>;
+  findById(
+    id: string,
+    params: InitiatedMethodParams<Partial<DefaultInitiator>>,
+  ): Promise<Recipe>;
   create(params: CreateMethodParams<CreateRecipeBody>): Promise<Recipe>;
   update(
     id: string,
     params: UpdateMethodParams<UpdateRecipeBody>,
   ): Promise<Recipe>;
-  delete(id: string, params: DefaultInitiator): Promise<void>;
+  delete(id: string, params: InitiatedMethodParams): Promise<void>;
 }
 
 export function createRecipeService(
@@ -53,7 +57,10 @@ export function createRecipeService(
         return withPagination([], 0, page, limit);
       }
 
-      const [recipes, total] = await recipeModel.searchFull(query, initiator);
+      const [recipes, total] = await recipeModel.searchFull({
+        query,
+        initiator,
+      });
       if (!recipes) {
         return withPagination([], 0, page, limit);
       }
@@ -66,12 +73,12 @@ export function createRecipeService(
       );
     },
 
-    findById: async (id, { initiator }) => {
+    findById: async (id, params) => {
       if (!isValidObjectId(id)) {
         throw new BadRequestError("Invalid recipe ID");
       }
 
-      const recipe = await recipeModel.findByIdFull(id, initiator);
+      const recipe = await recipeModel.findByIdFull(id, params);
       if (!recipe) {
         throw new NotFoundError("Recipe not found");
       }
@@ -92,12 +99,15 @@ export function createRecipeService(
         throw new NotFoundError("Category not found");
       }
 
-      const authorExists = await userModel.exists({ _id: initiator });
+      const authorExists = await userModel.exists({ _id: initiator.id });
       if (!authorExists) {
         throw new NotFoundError("Author not found");
       }
 
-      const recipe = await recipeModel.create({ ...data, author: initiator });
+      const recipe = await recipeModel.create({
+        ...data,
+        author: initiator.id,
+      });
       const populated = await recipe.populate<{
         author: Pick<UserDocument, "_id" | "name" | "email">;
         category: Pick<CategoryDocument, "_id" | "name" | "slug">;
@@ -117,7 +127,7 @@ export function createRecipeService(
         throw new NotFoundError("Recipe not found");
       }
 
-      if (!recipe.author.equals(initiator)) {
+      if (!recipe.author.equals(initiator.id)) {
         throw new ForbiddenError("Not authorized to update this recipe");
       }
 
@@ -135,7 +145,7 @@ export function createRecipeService(
       if (initiator) {
         const favorite = await favoriteModel
           .findOne({
-            user: initiator,
+            user: initiator.id,
             recipe: id,
           })
           .lean();
@@ -154,7 +164,7 @@ export function createRecipeService(
         throw new NotFoundError("Recipe not found");
       }
 
-      if (!recipe.author.equals(initiator)) {
+      if (!recipe.author.equals(initiator.id)) {
         throw new ForbiddenError("Not authorized to delete this recipe");
       }
 

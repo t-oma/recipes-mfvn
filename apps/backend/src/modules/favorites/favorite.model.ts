@@ -61,7 +61,7 @@ favoriteSchema.statics.findByUser = async function (
       },
     },
     { $unset: ["__v", "user"] },
-    ...withRecipe(params.initiator),
+    ...withRecipe(params.initiator.id),
     ...withTotalCount(
       ...withSort("-createdAt"),
       ...withPagination(params.query.page, params.query.limit),

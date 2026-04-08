@@ -1,6 +1,11 @@
 import type { Difficulty, Minutes, Replace } from "@recipes/shared";
 import type { Model } from "mongoose";
 import { model, Schema, Types } from "mongoose";
+import type {
+  DefaultInitiator,
+  InitiatedMethodParams,
+  QueryMethodParams,
+} from "@/common/types/methods.js";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 import type { WithTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import {
@@ -52,12 +57,11 @@ export interface RecipeDocumentPopulated
 
 export interface RecipeModelType extends Model<RecipeDocument> {
   searchFull(
-    query: SearchRecipeQuery,
-    userId?: string,
+    params: QueryMethodParams<SearchRecipeQuery>,
   ): Promise<[RecipeDocumentPopulated[], number] | [null, 0]>;
   findByIdFull(
     id: string,
-    userId?: string,
+    params: InitiatedMethodParams<Partial<DefaultInitiator>>,
   ): Promise<RecipeDocumentPopulated | null>;
 }
 
@@ -114,10 +118,10 @@ const recipeSchema = new Schema<RecipeDocument, RecipeModelType>(
   },
 );
 
-recipeSchema.statics.searchFull = async function (
-  query: SearchRecipeQuery,
-  userId?: string,
-) {
+recipeSchema.statics.searchFull = async function ({
+  query,
+  initiator,
+}: QueryMethodParams<SearchRecipeQuery>) {
   const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
     query;
 
@@ -126,7 +130,7 @@ recipeSchema.statics.searchFull = async function (
   >([
     {
       $match: {
-        ...byVisibility(userId),
+        ...byVisibility(initiator.id),
         ...(search && { $text: { $search: search } }),
         ...(categoryId && { category: categoryId }),
         ...(difficulty && { difficulty }),
@@ -134,7 +138,7 @@ recipeSchema.statics.searchFull = async function (
     },
     { $unset: "__v" },
 
-    ...withFavorited(userId),
+    ...withFavorited(initiator.id),
     {
       $match: {
         ...(isFavorited !== undefined && { isFavorited }),
@@ -158,19 +162,19 @@ recipeSchema.statics.searchFull = async function (
 
 recipeSchema.statics.findByIdFull = async function (
   id: string,
-  userId?: string,
+  { initiator }: InitiatedMethodParams<Partial<DefaultInitiator>>,
 ) {
   const recipes = await this.aggregate<RecipeDocumentPopulated>([
     {
       $match: {
         _id: Types.ObjectId.createFromHexString(id),
-        ...byVisibility(userId),
+        ...byVisibility(initiator.id),
       },
     },
     { $unset: "__v" },
     ...withCategories(),
     ...withAuthor(),
-    ...withFavorited(userId),
+    ...withFavorited(initiator.id),
   ]);
 
   if (!recipes.length) {

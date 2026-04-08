@@ -83,7 +83,7 @@ commentSchema.statics.findFull = async function (
     },
     { $unset: "__v" },
     ...withAuthor(),
-    ...withRecipe(params.initiator),
+    ...withRecipe(params.initiator.id),
     ...withTotalCount(
       ...withSort("-createdAt"),
       ...withPagination(params.query.page, params.query.limit),
