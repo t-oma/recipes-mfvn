@@ -1,197 +1,177 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ZodError } from "zod";
-
-vi.mock("@/config/env.js", () => ({
-  env: { NODE_ENV: "development" },
-}));
-
-const { errorHandler } = await import("@/common/middleware/errorHandler.js");
-const {
+import { createMockReply, createMockRequest } from "@/__tests__/helpers.js";
+import {
   AppError,
   BadRequestError,
-  UnauthorizedError,
+  ConflictError,
   ForbiddenError,
   NotFoundError,
-  ConflictError,
-} = await import("@/common/errors.js");
+  UnauthorizedError,
+} from "@/common/errors.js";
+import { errorHandler } from "@/common/middleware/errorHandler.js";
 
-function createMockReply() {
-  const send = vi.fn();
-  const status = vi.fn(() => ({ send }));
-  return {
-    reply: { status } as unknown as Parameters<typeof errorHandler>[2],
-    send,
-    status,
-  };
-}
-
-function createMockRequest() {
-  return {
-    log: { error: vi.fn() },
-    method: "GET",
-    url: "/test",
-  } as unknown as Parameters<typeof errorHandler>[1];
-}
+vi.mock("@/config/env.js", () => ({
+  env: { NODE_ENV: "development" as const },
+}));
 
 describe("errorHandler", () => {
   let request: ReturnType<typeof createMockRequest>;
-  let reply: Parameters<typeof errorHandler>[2];
-  let send: ReturnType<typeof createMockReply>["send"];
-  let status: ReturnType<typeof createMockReply>["status"];
+  let reply: ReturnType<typeof createMockReply>;
 
   beforeEach(() => {
     vi.clearAllMocks();
     request = createMockRequest();
-    const mock = createMockReply();
-    reply = mock.reply;
-    send = mock.send;
-    status = mock.status;
+    reply = createMockReply();
   });
 
-  it("should handle AppError with custom statusCode", () => {
-    const error = new AppError("Not found", 404);
+  describe("AppError subclasses", () => {
+    it("should handle AppError with custom statusCode", () => {
+      errorHandler(new AppError("Not found", 404), request, reply);
 
-    errorHandler(error, request, reply);
+      expect(reply.status).toHaveBeenCalledWith(404);
+      expect(reply.send).toHaveBeenCalledWith({ error: "Not found" });
+    });
 
-    expect(status).toHaveBeenCalledWith(404);
-    expect(send).toHaveBeenCalledWith({ error: "Not found" });
-  });
+    it("should handle AppError with 403", () => {
+      errorHandler(new AppError("Forbidden", 403), request, reply);
 
-  it("should handle AppError with 403", () => {
-    const error = new AppError("Forbidden", 403);
+      expect(reply.status).toHaveBeenCalledWith(403);
+      expect(reply.send).toHaveBeenCalledWith({ error: "Forbidden" });
+    });
 
-    errorHandler(error, request, reply);
+    it("should handle BadRequestError", () => {
+      errorHandler(new BadRequestError("Invalid recipe ID"), request, reply);
 
-    expect(status).toHaveBeenCalledWith(403);
-    expect(send).toHaveBeenCalledWith({ error: "Forbidden" });
-  });
+      expect(reply.status).toHaveBeenCalledWith(400);
+      expect(reply.send).toHaveBeenCalledWith({ error: "Invalid recipe ID" });
+    });
 
-  it("should handle BadRequestError", () => {
-    const error = new BadRequestError("Invalid recipe ID");
+    it("should handle UnauthorizedError", () => {
+      errorHandler(new UnauthorizedError("Not authorized"), request, reply);
 
-    errorHandler(error, request, reply);
+      expect(reply.status).toHaveBeenCalledWith(401);
+      expect(reply.send).toHaveBeenCalledWith({ error: "Not authorized" });
+    });
 
-    expect(status).toHaveBeenCalledWith(400);
-    expect(send).toHaveBeenCalledWith({ error: "Invalid recipe ID" });
-  });
+    it("should handle ForbiddenError", () => {
+      errorHandler(
+        new ForbiddenError("Not authorized to delete this recipe"),
+        request,
+        reply,
+      );
 
-  it("should handle UnauthorizedError", () => {
-    const error = new UnauthorizedError("Not authorized");
+      expect(reply.status).toHaveBeenCalledWith(403);
+      expect(reply.send).toHaveBeenCalledWith({
+        error: "Not authorized to delete this recipe",
+      });
+    });
 
-    errorHandler(error, request, reply);
+    it("should handle NotFoundError", () => {
+      errorHandler(new NotFoundError("Recipe not found"), request, reply);
 
-    expect(status).toHaveBeenCalledWith(401);
-    expect(send).toHaveBeenCalledWith({ error: "Not authorized" });
-  });
+      expect(reply.status).toHaveBeenCalledWith(404);
+      expect(reply.send).toHaveBeenCalledWith({ error: "Recipe not found" });
+    });
 
-  it("should handle ForbiddenError", () => {
-    const error = new ForbiddenError("Not authorized to delete this recipe");
+    it("should handle ConflictError", () => {
+      errorHandler(new ConflictError("Email already in use"), request, reply);
 
-    errorHandler(error, request, reply);
-
-    expect(status).toHaveBeenCalledWith(403);
-    expect(send).toHaveBeenCalledWith({
-      error: "Not authorized to delete this recipe",
+      expect(reply.status).toHaveBeenCalledWith(409);
+      expect(reply.send).toHaveBeenCalledWith({
+        error: "Email already in use",
+      });
     });
   });
 
-  it("should handle NotFoundError", () => {
-    const error = new NotFoundError("Recipe not found");
+  describe("Zod and Mongoose errors", () => {
+    it("should handle ZodError with validation details", () => {
+      const error = new ZodError([
+        {
+          code: "too_small",
+          origin: "string",
+          minimum: 1,
+          inclusive: true,
+          path: ["text"],
+          message: "Required",
+        },
+      ]);
 
-    errorHandler(error, request, reply);
+      errorHandler(error, request, reply);
 
-    expect(status).toHaveBeenCalledWith(404);
-    expect(send).toHaveBeenCalledWith({ error: "Recipe not found" });
-  });
+      expect(reply.status).toHaveBeenCalledWith(400);
+      expect(reply.send).toHaveBeenCalledWith({
+        error: "Validation error",
+        details: error.issues,
+      });
+    });
 
-  it("should handle ConflictError", () => {
-    const error = new ConflictError("Email already in use");
+    it("should handle Mongoose CastError", () => {
+      const error = Object.assign(new Error("Cast to ObjectId failed"), {
+        name: "CastError",
+        path: "_id",
+        value: "invalid-id",
+      });
 
-    errorHandler(error, request, reply);
+      errorHandler(error, request, reply);
 
-    expect(status).toHaveBeenCalledWith(409);
-    expect(send).toHaveBeenCalledWith({ error: "Email already in use" });
-  });
+      expect(reply.status).toHaveBeenCalledWith(400);
+      expect(reply.send).toHaveBeenCalledWith({
+        error: "Invalid _id: invalid-id",
+      });
+    });
 
-  it("should handle ZodError with validation details", () => {
-    const error = new ZodError([
-      {
-        code: "too_small",
-        minimum: 1,
-        type: "string",
-        inclusive: true,
-        path: ["text"],
-        message: "Required",
-      } as never,
-    ]);
+    it("should handle MongoDB duplicate key error", () => {
+      const error = Object.assign(new Error("Duplicate key"), {
+        code: 11000,
+      });
 
-    errorHandler(error, request, reply);
+      errorHandler(error, request, reply);
 
-    expect(status).toHaveBeenCalledWith(400);
-    expect(send).toHaveBeenCalledWith({
-      error: "Validation error",
-      details: error.issues,
+      expect(reply.status).toHaveBeenCalledWith(409);
+      expect(reply.send).toHaveBeenCalledWith({ error: "Duplicate entry" });
     });
   });
 
-  it("should handle Mongoose CastError", () => {
-    const error = Object.assign(new Error("Cast to ObjectId failed"), {
-      name: "CastError",
-      path: "_id",
-      value: "invalid-id",
+  describe("generic errors", () => {
+    it("should pass through statusCode when not 500", () => {
+      const error = Object.assign(new Error("Bad request"), {
+        statusCode: 400,
+      });
+
+      errorHandler(error, request, reply);
+
+      expect(reply.status).toHaveBeenCalledWith(400);
+      expect(reply.send).toHaveBeenCalledWith({ error: "Bad request" });
     });
 
-    errorHandler(error, request, reply);
+    it("should show message and stack in development for 500", () => {
+      const error = new Error("Something broke");
+      error.stack = "Error: Something broke\n    at test";
 
-    expect(status).toHaveBeenCalledWith(400);
-    expect(send).toHaveBeenCalledWith({
-      error: "Invalid _id: invalid-id",
-    });
-  });
+      errorHandler(error, request, reply);
 
-  it("should handle MongoDB duplicate key error", () => {
-    const error = Object.assign(new Error("Duplicate key"), {
-      code: 11000,
-    });
-
-    errorHandler(error, request, reply);
-
-    expect(status).toHaveBeenCalledWith(409);
-    expect(send).toHaveBeenCalledWith({
-      error: "Duplicate entry",
+      expect(reply.status).toHaveBeenCalledWith(500);
+      expect(reply.send).toHaveBeenCalledWith({
+        error: "Something broke",
+        stack: error.stack,
+      });
     });
   });
 
-  it("should handle error with statusCode (not 500)", () => {
-    const error = Object.assign(new Error("Bad request"), { statusCode: 400 });
+  describe("logging", () => {
+    it("should log error code for typed errors", () => {
+      errorHandler(new NotFoundError("Recipe not found"), request, reply);
 
-    errorHandler(error, request, reply);
-
-    expect(status).toHaveBeenCalledWith(400);
-    expect(send).toHaveBeenCalledWith({ error: "Bad request" });
-  });
-
-  it("should show error message and stack in development for 500", () => {
-    const error = new Error("Something broke");
-    error.stack = "Error: Something broke\n    at test";
-
-    errorHandler(error, request, reply);
-
-    expect(status).toHaveBeenCalledWith(500);
-    expect(send).toHaveBeenCalledWith({
-      error: "Something broke",
-      stack: error.stack,
+      expect(request.log.error).toHaveBeenCalledWith(
+        {
+          err: expect.any(NotFoundError),
+          method: "GET",
+          url: "/test",
+          errorCode: "NOT_FOUND",
+        },
+        "Request error",
+      );
     });
-  });
-
-  it("should log error code for typed errors", () => {
-    const error = new NotFoundError("Recipe not found");
-
-    errorHandler(error, request, reply);
-
-    expect(request.log.error).toHaveBeenCalledWith(
-      { err: error, method: "GET", url: "/test", errorCode: "NOT_FOUND" },
-      "Request error",
-    );
   });
 });
