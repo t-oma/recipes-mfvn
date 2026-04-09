@@ -4,6 +4,7 @@ import {
   assertAuthenticated,
   authGuard,
 } from "@/common/middleware/auth.guard.js";
+import { rolesGuard } from "@/common/middleware/role.guard.js";
 import {
   categoryParamsSchema,
   createCategorySchema,
@@ -42,14 +43,14 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
           summary: "Create a category",
           security: [{ bearerAuth: [] }],
         },
-        onRequest: authGuard,
+        onRequest: [authGuard, rolesGuard("admin")],
       },
       async (request, reply) => {
         assertAuthenticated(request);
 
         const category = await service.create({
           data: request.body,
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.status(201).send(category);
       },
@@ -63,13 +64,13 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
           summary: "Delete a category",
           security: [{ bearerAuth: [] }],
         },
-        onRequest: authGuard,
+        onRequest: [authGuard, rolesGuard("admin")],
       },
       async (request, reply) => {
         assertAuthenticated(request);
 
         await service.deleteById(request.params.id, {
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.status(204).send();
       },

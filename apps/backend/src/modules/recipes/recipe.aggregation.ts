@@ -1,14 +1,15 @@
 import type { PipelineStage } from "mongoose";
-import { Types } from "mongoose";
 import type { OptionalInitiator } from "@/common/types/methods.js";
+import { toObjectId } from "@/common/utils/mongo.js";
 
-export function byVisibility({ id }: OptionalInitiator) {
+export function byVisibility({ id, role }: OptionalInitiator) {
+  if (role === "admin") {
+    return {};
+  }
+
   if (id) {
     return {
-      $or: [
-        { isPublic: true },
-        { author: Types.ObjectId.createFromHexString(id) },
-      ],
+      $or: [{ isPublic: true }, { author: toObjectId(id) }],
     };
   }
 
@@ -71,7 +72,7 @@ export function withFavorited(userId?: string) {
       },
     ] satisfies PipelineStage[];
   }
-  const userOid = Types.ObjectId.createFromHexString(userId);
+  const userOid = toObjectId(userId);
 
   return [
     {

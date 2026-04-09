@@ -1,8 +1,12 @@
 import type { Prettify } from "@recipes/shared";
+import type { UserRole } from "@/modules/users/user.model.js";
 
 export type DefaultQuery = { page: number; limit: number };
-export type DefaultInitiator = { readonly id: string /* role:TODO */ };
-export type OptionalInitiator = { readonly id?: string };
+export type DefaultInitiator = { readonly id: string; readonly role: UserRole };
+export type OptionalInitiator = {
+  readonly id?: string;
+  readonly role?: UserRole;
+};
 
 export type InitiatedMethodParams<TInitiator = DefaultInitiator> = Prettify<
   Readonly<{

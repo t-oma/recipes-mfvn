@@ -4,10 +4,13 @@ import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 import { env } from "@/config/env.js";
 
+export type UserRole = "user" | "admin";
+
 export interface UserDocument extends BaseDocument {
   email: string;
   password: string;
   name: string;
+  role: UserRole;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -24,6 +27,11 @@ const userSchema = new Schema<UserDocument, UserModelType>(
     },
     password: { type: String, required: true, minlength: 6, select: false },
     name: { type: String, required: true, trim: true },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
   },
   {
     timestamps: true,

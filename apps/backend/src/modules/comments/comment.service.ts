@@ -1,6 +1,6 @@
 import type { Comment, CommentForRecipe, Paginated } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
-import mongoose from "mongoose";
+import { isValidObjectId } from "mongoose";
 import {
   BadRequestError,
   ForbiddenError,
@@ -42,7 +42,7 @@ export function createCommentService(
 ): CommentService {
   return {
     findByRecipe: async (recipeId, { query, initiator }) => {
-      if (!mongoose.isValidObjectId(recipeId)) {
+      if (!isValidObjectId(recipeId)) {
         throw new BadRequestError("Invalid recipe ID");
       }
       const recipeExists = await recipeModel.exists({ _id: recipeId });
@@ -68,7 +68,7 @@ export function createCommentService(
     },
 
     findByAuthor: async (authorId, { query, initiator }) => {
-      if (!mongoose.isValidObjectId(authorId)) {
+      if (!isValidObjectId(authorId)) {
         throw new BadRequestError("Invalid author ID");
       }
       const { page, limit } = query;
@@ -85,10 +85,10 @@ export function createCommentService(
     },
 
     create: async (recipeId, { data, initiator }) => {
-      if (!mongoose.isValidObjectId(recipeId)) {
+      if (!isValidObjectId(recipeId)) {
         throw new BadRequestError("Invalid recipe ID");
       }
-      if (!mongoose.isValidObjectId(initiator.id)) {
+      if (!isValidObjectId(initiator.id)) {
         throw new BadRequestError("Invalid author ID");
       }
 
@@ -114,7 +114,7 @@ export function createCommentService(
     },
 
     delete: async (commentId, { initiator }) => {
-      if (!mongoose.isValidObjectId(commentId)) {
+      if (!isValidObjectId(commentId)) {
         throw new BadRequestError("Invalid comment ID");
       }
 
@@ -123,7 +123,7 @@ export function createCommentService(
         throw new NotFoundError("Comment not found");
       }
 
-      if (!comment.author.equals(initiator.id)) {
+      if (!comment.author.equals(initiator.id) && initiator.role !== "admin") {
         throw new ForbiddenError("Not authorized to delete this comment");
       }
 

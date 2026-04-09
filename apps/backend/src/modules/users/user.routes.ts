@@ -30,6 +30,7 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
       },
       async (request, reply) => {
         assertAuthenticated(request);
+
         const user = await service.getCurrentUser(request.user.userId);
         return reply.send(user);
       },
@@ -47,9 +48,10 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
       },
       async (request, reply) => {
         assertAuthenticated(request);
+
         const result = await service.getFavorites(request.user.userId, {
           query: request.query,
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.send(result);
       },
@@ -67,9 +69,10 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
       },
       async (request, reply) => {
         assertAuthenticated(request);
+
         const result = await service.getComments(request.user.userId, {
           query: request.query,
-          initiator: { id: request.user.userId },
+          initiator: { id: request.user.userId, role: request.user.role },
         });
         return reply.send(result);
       },
