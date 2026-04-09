@@ -17,7 +17,7 @@ const {
 
 function createMockReply() {
   const send = vi.fn();
-  const status = vi.fn().mockReturnValue({ send });
+  const status = vi.fn(() => ({ send }));
   return {
     reply: { status } as unknown as Parameters<typeof errorHandler>[2],
     send,
