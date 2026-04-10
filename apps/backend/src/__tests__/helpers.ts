@@ -21,21 +21,13 @@ export function createMockRequest(
   } as unknown as FastifyRequest;
 }
 
-export function createMockReply(): FastifyReply & {
-  __mocks: { status: ReturnType<typeof vi.fn>; send: ReturnType<typeof vi.fn> };
-} {
+export function createMockReply(): FastifyReply {
   const send = vi.fn();
   const status = vi.fn(() => ({ send }));
   return {
     status,
     send,
-    __mocks: { status, send },
-  } as unknown as FastifyReply & {
-    __mocks: {
-      status: ReturnType<typeof vi.fn>;
-      send: ReturnType<typeof vi.fn>;
-    };
-  };
+  } as unknown as FastifyReply;
 }
 
 // ── Document factories ──
