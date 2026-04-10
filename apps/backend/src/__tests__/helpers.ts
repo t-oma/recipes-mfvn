@@ -9,6 +9,12 @@ import type { UserDocument, UserRole } from "@/modules/users/user.model.js";
 
 // ── Fastify mocks ──
 
+/**
+ * Creates a mock Fastify request.
+ *
+ * @param overrides - Overrides for the request.
+ * @returns A mock Fastify request.
+ */
 export function createMockRequest(
   overrides: Partial<FastifyRequest> = {},
 ): FastifyRequest {
@@ -21,6 +27,11 @@ export function createMockRequest(
   } as unknown as FastifyRequest;
 }
 
+/**
+ * Creates a mock Fastify reply.
+ *
+ * @returns A mock Fastify reply.
+ */
 export function createMockReply(): FastifyReply {
   const send = vi.fn();
   const status = vi.fn(() => ({ send }));
@@ -32,6 +43,11 @@ export function createMockReply(): FastifyReply {
 
 // ── Document factories ──
 
+/**
+ * Creates new ObjectId.
+ *
+ * @returns A new ObjectId.
+ */
 export function createObjectId(): Types.ObjectId {
   return new Types.ObjectId();
 }
@@ -182,6 +198,13 @@ export function createMockFavoriteModel(
 
 // ── Service param builders ──
 
+/**
+ * Creates a new initiator.
+ *
+ * @param id - The initiator's ID.
+ * @param role - The initiator's role.
+ * @returns A new initiator.
+ */
 export function initiator(id?: string, role: UserRole = "user") {
   return {
     id: id ?? createObjectId().toString(),
@@ -189,6 +212,14 @@ export function initiator(id?: string, role: UserRole = "user") {
   };
 }
 
+/**
+ * Creates a new query params with initiator.
+ *
+ * @param page - The page number.
+ * @param limit - The number of items per page.
+ * @param overrides - Overrides for the query params.
+ * @returns A new query params.
+ */
 export function queryParams(
   page = 1,
   limit = 10,
