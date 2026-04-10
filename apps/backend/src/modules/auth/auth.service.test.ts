@@ -12,6 +12,7 @@ vi.mock("@/common/utils/jwt.js", () => ({ signToken }));
 
 describe("authService", () => {
   const userModel = createMockUserModel();
+  const service = createAuthService(userModel as unknown as UserModelType);
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -23,7 +24,6 @@ describe("authService", () => {
       const doc = createUserDoc({ email: "new@test.com", name: "New User" });
       userModel.create.mockResolvedValue({ ...doc, toObject: () => doc });
 
-      const service = createAuthService(userModel as unknown as UserModelType);
       const result = await service.register({
         email: "new@test.com",
         password: "Password123!",
@@ -39,8 +39,6 @@ describe("authService", () => {
 
     it("should throw ConflictError when email already in use", async () => {
       userModel.exists.mockResolvedValue({ _id: "existing-id" });
-
-      const service = createAuthService(userModel as unknown as UserModelType);
 
       await expect(
         service.register({
@@ -69,7 +67,6 @@ describe("authService", () => {
         }),
       });
 
-      const service = createAuthService(userModel as unknown as UserModelType);
       const result = await service.login({
         email: "user@test.com",
         password: "correct-password",
@@ -86,8 +83,6 @@ describe("authService", () => {
       userModel.findOne.mockReturnValue({
         select: vi.fn().mockResolvedValue(null),
       });
-
-      const service = createAuthService(userModel as unknown as UserModelType);
 
       await expect(
         service.login({ email: "nobody@test.com", password: "pass" }),
@@ -108,8 +103,6 @@ describe("authService", () => {
           toObject: () => doc,
         }),
       });
-
-      const service = createAuthService(userModel as unknown as UserModelType);
 
       await expect(
         service.login({ email: "user@test.com", password: "wrong" }),
