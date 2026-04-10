@@ -1,11 +1,17 @@
 import type { Minutes } from "@recipes/shared";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { Types } from "mongoose";
+import type { Mock } from "vitest";
 import { vi } from "vitest";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type { RecipeDocument } from "@/modules/recipes/recipe.model.js";
 import type { UserDocument, UserRole } from "@/modules/users/user.model.js";
+
+type LocalProcedure = (...args: unknown[]) => unknown;
+function viFn<T extends LocalProcedure>(fn?: T): Mock<T> {
+  return vi.fn(fn);
+}
 
 // ── Fastify mocks ──
 
@@ -123,75 +129,61 @@ export function createCommentDoc(
 
 // ── Mongoose model mock factories ──
 
-export function createMockCategoryModel(
-  overrides: Record<string, ReturnType<typeof vi.fn>> = {},
-) {
-  const chainable = {
-    sort: vi.fn().mockReturnThis(),
-    lean: vi.fn().mockResolvedValue([]),
-  };
+const chainable = {
+  select: viFn().mockReturnThis(),
+  sort: viFn().mockReturnThis(),
+  lean: viFn().mockResolvedValue(null),
+};
 
+export function createMockCategoryModel(overrides: Record<string, Mock> = {}) {
   return {
-    find: vi.fn().mockReturnValue(chainable),
-    create: vi.fn(),
-    findByIdAndDelete: vi.fn(),
-    countDocuments: vi.fn().mockResolvedValue(0),
-    exists: vi.fn(),
+    find: viFn().mockReturnValue(chainable),
+    create: viFn(),
+    findByIdAndDelete: viFn(),
+    countDocuments: viFn().mockResolvedValue(0),
+    exists: viFn(),
     ...overrides,
   };
 }
 
-export function createMockUserModel(
-  overrides: Record<string, ReturnType<typeof vi.fn>> = {},
-) {
-  const queryChain = {
-    select: vi.fn().mockReturnThis(),
-    lean: vi.fn().mockResolvedValue(null),
-  };
-
+export function createMockUserModel(overrides: Record<string, Mock> = {}) {
   return {
-    findById: vi.fn().mockReturnValue(queryChain),
-    findOne: vi.fn().mockReturnValue(queryChain),
-    exists: vi.fn(),
-    create: vi.fn(),
+    findById: viFn().mockReturnValue(chainable),
+    findOne: viFn().mockReturnValue(chainable),
+    exists: viFn(),
+    create: viFn(),
     ...overrides,
   };
 }
 
-export function createMockRecipeModel(
-  overrides: Record<string, ReturnType<typeof vi.fn>> = {},
-) {
+export function createMockRecipeModel(overrides: Record<string, Mock> = {}) {
   return {
-    findById: vi.fn(),
-    searchFull: vi.fn(),
-    findByIdFull: vi.fn(),
-    create: vi.fn(),
-    countDocuments: vi.fn().mockResolvedValue(0),
-    exists: vi.fn(),
+    findById: viFn(),
+    searchFull: viFn(),
+    findByIdFull: viFn(),
+    create: viFn(),
+    countDocuments: viFn().mockResolvedValue(0),
+    exists: viFn(),
     ...overrides,
   };
 }
 
-export function createMockCommentModel(
-  overrides: Record<string, ReturnType<typeof vi.fn>> = {},
-) {
+export function createMockCommentModel(overrides: Record<string, Mock> = {}) {
   return {
-    findFull: vi.fn(),
-    findById: vi.fn(),
-    create: vi.fn(),
+    findFull: viFn(),
+    findById: viFn(),
+    create: viFn(),
     ...overrides,
   };
 }
 
-export function createMockFavoriteModel(
-  overrides: Record<string, ReturnType<typeof vi.fn>> = {},
-) {
+export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
   return {
-    findByUser: vi.fn(),
-    create: vi.fn(),
-    findOneAndDelete: vi.fn(),
-    exists: vi.fn(),
-    findOne: vi.fn(),
+    findByUser: viFn(),
+    create: viFn(),
+    findOneAndDelete: viFn(),
+    exists: viFn(),
+    findOne: viFn(),
     ...overrides,
   };
 }
