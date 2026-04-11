@@ -5,7 +5,10 @@ import type { Mock } from "vitest";
 import { vi } from "vitest";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
-import type { RecipeDocument } from "@/modules/recipes/recipe.model.js";
+import type {
+  RecipeDocument,
+  RecipeDocumentPopulated,
+} from "@/modules/recipes/recipe.model.js";
 import type { UserDocument, UserRole } from "@/modules/users/user.model.js";
 
 type LocalProcedure = (...args: unknown[]) => unknown;
@@ -112,6 +115,19 @@ export function createRecipeDoc(
   };
 }
 
+export function populateRecipeDoc(
+  recipe: RecipeDocument,
+  overrides: Partial<RecipeDocumentPopulated> = {},
+): RecipeDocumentPopulated {
+  return {
+    ...recipe,
+    category: { _id: createObjectId(), name: "Italian", slug: "italian" },
+    author: { _id: createObjectId(), name: "Chef", email: "chef@test.com" },
+    isFavorited: false,
+    ...overrides,
+  };
+}
+
 export function createCommentDoc(
   overrides: Partial<CommentDocument> = {},
 ): CommentDocument {
@@ -193,8 +209,8 @@ export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
 /**
  * Creates a new initiator.
  *
- * @param id - The initiator's ID.
- * @param role - The initiator's role.
+ * @param id - The initiator's ID. If not provided, a new ID will be generated.
+ * @param role - The initiator's role. Defaults to "user".
  * @returns A new initiator.
  */
 export function initiator(id?: string, role: UserRole = "user") {
@@ -202,6 +218,15 @@ export function initiator(id?: string, role: UserRole = "user") {
     id: id ?? createObjectId().toString(),
     role,
   };
+}
+
+/**
+ * Creates a new initiator without an ID or role.
+ *
+ * @returns A new initiator.
+ */
+export function noInitiator() {
+  return { id: undefined, role: undefined };
 }
 
 /**
