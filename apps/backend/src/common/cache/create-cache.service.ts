@@ -2,6 +2,7 @@ import type { CacheService } from "./cache.service.js";
 import type { MemoryCacheOptions } from "./memory-cache.service.js";
 import { createMemoryCache } from "./memory-cache.service.js";
 import type { RedisCacheOptions } from "./redis-cache.service.js";
+import { createRedisCache } from "./redis-cache.service.js";
 
 export type CacheBackend = "memory" | "redis";
 
@@ -11,23 +12,22 @@ export interface CacheFactoryOptions {
   memory?: MemoryCacheOptions;
 }
 
-/**
- * Creates a new cache service based on the provided options.
- *
- * @param options.backend - The cache backend to use. Defaults to "memory".
- * @param options.redis - Redis cache options. Only used when backend is "redis".
- * @param options.memory - Memory cache options. Only used when backend is "memory".
- * @returns A new cache service.
- */
 export async function createCacheService(
   options: CacheFactoryOptions = {},
 ): Promise<CacheService> {
   const { backend = "memory" } = options;
 
-  if (backend === "redis") {
-    console.warn(
-      "⚠️  Redis backend is not configured yet, falling back to in-memory cache",
-    );
+  if (backend === "redis" && options.redis?.url) {
+    try {
+      const cache = createRedisCache(options.redis);
+      console.log("✅ Redis cache connected");
+      return cache;
+    } catch (error) {
+      console.warn(
+        "⚠️  Redis unavailable, falling back to in-memory cache:",
+        error instanceof Error ? error.message : error,
+      );
+    }
   }
 
   return createMemoryCache(options.memory);
