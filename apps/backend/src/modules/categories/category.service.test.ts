@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCategoryDoc,
+  createMockCache,
   createMockCategoryModel,
   createMockRecipeModel,
   createObjectId,
@@ -14,13 +15,16 @@ import type { RecipeModelType } from "@/modules/recipes/index.js";
 describe("categoryService", () => {
   const categoryModel = createMockCategoryModel();
   const recipeModel = createMockRecipeModel();
+  const cache = createMockCache();
   const service = createCategoryService(
     categoryModel as unknown as CategoryModelType,
     recipeModel as unknown as RecipeModelType,
+    cache,
   );
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    await cache.flush();
   });
 
   describe("findAll", () => {
