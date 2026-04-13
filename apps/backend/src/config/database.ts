@@ -16,6 +16,7 @@ export async function connectDatabase(log: Logger): Promise<void> {
   });
 }
 
-export async function disconnectDatabase(): Promise<void> {
+export async function disconnectDatabase(log: Logger): Promise<void> {
   await mongoose.disconnect();
+  log.info("MongoDB disconnected");
 }
