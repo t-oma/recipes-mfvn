@@ -11,6 +11,7 @@ import {
 } from "fastify-type-provider-zod";
 import type { CacheService } from "@/common/cache/cache.service.js";
 import { createCacheService } from "@/common/cache/create-cache.service.js";
+import type { Logger } from "@/common/logger.js";
 import { errorHandler } from "@/common/middleware/errorHandler.js";
 import { env } from "@/config/env.js";
 import { createRateLimitOptions } from "@/config/rate-limit.js";
@@ -46,21 +47,18 @@ declare module "fastify" {
   }
 }
 
-export async function buildApp() {
+export async function buildApp(log: Logger) {
   const app = Fastify({
-    logger: {
-      level: env.NODE_ENV === "production" ? "info" : "debug",
-      transport:
-        env.NODE_ENV === "development"
-          ? { target: "pino-pretty", options: { colorize: true } }
-          : undefined,
-    },
+    loggerInstance: log,
   });
 
-  const cache = await createCacheService({
-    backend: env.CACHE_BACKEND,
-    redis: env.REDIS_URL ? { url: env.REDIS_URL } : undefined,
-  });
+  const cache = await createCacheService(
+    {
+      backend: env.CACHE_BACKEND,
+      redis: env.REDIS_URL ? { url: env.REDIS_URL } : undefined,
+    },
+    app.log,
+  );
 
   app.decorate("cache", cache);
 
@@ -91,7 +89,7 @@ export async function buildApp() {
 
   // Routes
   app.register(authRoutes, {
-    service: createAuthService(UserModel),
+    service: createAuthService(UserModel, log),
     prefix: "/api/auth",
   });
   app.register(userRoutes, {

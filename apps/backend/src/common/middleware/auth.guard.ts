@@ -44,7 +44,11 @@ export async function authGuard(request: FastifyRequest, reply: FastifyReply) {
   try {
     const token = extractToken(request);
     request.user = verifyToken(token);
-  } catch {
+  } catch (error) {
+    request.log.warn(
+      { err: error, ip: request.ip, url: request.url },
+      "Authentication failed",
+    );
     return reply.status(401).send({ error: "Invalid or expired token" });
   }
 }

@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createMockUserModel, createUserDoc } from "@/__tests__/helpers.js";
+import {
+  createMockLogger,
+  createMockUserModel,
+  createUserDoc,
+} from "@/__tests__/helpers.js";
 import { ConflictError, UnauthorizedError } from "@/common/errors.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
 import { createAuthService } from "./auth.service.js";
@@ -12,7 +16,8 @@ vi.mock("@/common/utils/jwt.js", () => ({ signToken }));
 
 describe("authService", () => {
   const userModel = createMockUserModel();
-  const service = createAuthService(userModel as unknown as UserModelType);
+  const log = createMockLogger();
+  const service = createAuthService(userModel as unknown as UserModelType, log);
 
   beforeEach(() => {
     vi.clearAllMocks();

@@ -5,6 +5,7 @@ import type { Mock } from "vitest";
 import { vi } from "vitest";
 import type { CacheService } from "@/common/cache/cache.service.js";
 import { createMemoryCache } from "@/common/cache/memory-cache.service.js";
+import type { Logger } from "@/common/logger.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type {
@@ -16,6 +17,35 @@ import type { UserDocument, UserRole } from "@/modules/users/user.model.js";
 type LocalProcedure = (...args: unknown[]) => unknown;
 function viFn<T extends LocalProcedure>(fn?: T): Mock<T> {
   return vi.fn(fn);
+}
+
+// ── Logger mocks ──
+
+export interface MockLogger extends Logger {
+  spies: {
+    fatal: Mock;
+    error: Mock;
+    warn: Mock;
+    info: Mock;
+    debug: Mock;
+    trace: Mock;
+  };
+}
+
+export function createMockLogger(): MockLogger {
+  const spies = {
+    fatal: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+    trace: vi.fn(),
+  };
+
+  return {
+    ...spies,
+    spies,
+  } as unknown as MockLogger;
 }
 
 // ── Fastify mocks ──

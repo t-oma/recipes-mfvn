@@ -1,20 +1,25 @@
 import mongoose from "mongoose";
+import type { Logger } from "@/common/logger.js";
 import { env } from "./env.js";
 
-export async function connectDatabase(): Promise<void> {
+export async function connectDatabase(log: Logger): Promise<void> {
   try {
     await mongoose.connect(env.MONGO_URI);
-    console.log("✅ MongoDB connected");
+    log.info("MongoDB connected");
   } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
+    log.fatal(error, "MongoDB connection error");
     process.exit(1);
   }
 
   mongoose.connection.on("error", (err) => {
-    console.error("MongoDB error:", err);
+    log.error(err, "MongoDB connection error");
+  });
+  mongoose.connection.on("reconnected", () => {
+    log.warn("MongoDB reconnected");
   });
 }
 
-export async function disconnectDatabase(): Promise<void> {
+export async function disconnectDatabase(log: Logger): Promise<void> {
   await mongoose.disconnect();
+  log.info("MongoDB disconnected gracefully");
 }
