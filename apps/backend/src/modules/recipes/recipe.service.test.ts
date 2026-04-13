@@ -1,6 +1,7 @@
 import type { Minutes } from "@recipes/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  createMockCache,
   createMockCategoryModel,
   createMockFavoriteModel,
   createMockRecipeModel,
@@ -27,15 +28,18 @@ describe("recipeService", () => {
   const userModel = createMockUserModel();
   const favoriteModel = createMockFavoriteModel();
   const categoryModel = createMockCategoryModel();
+  const cache = createMockCache();
   const service = createRecipeService(
     recipeModel as unknown as RecipeModelType,
     userModel as unknown as UserModelType,
     favoriteModel as unknown as FavoriteModelType,
     categoryModel as unknown as CategoryModelType,
+    cache,
   );
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    await cache.flush();
   });
 
   describe("findAll", () => {
