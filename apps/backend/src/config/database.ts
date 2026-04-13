@@ -14,9 +14,12 @@ export async function connectDatabase(log: Logger): Promise<void> {
   mongoose.connection.on("error", (err) => {
     log.error(err, "MongoDB connection error");
   });
+  mongoose.connection.on("reconnected", () => {
+    log.warn("MongoDB reconnected");
+  });
 }
 
 export async function disconnectDatabase(log: Logger): Promise<void> {
   await mongoose.disconnect();
-  log.info("MongoDB disconnected");
+  log.info("MongoDB disconnected gracefully");
 }

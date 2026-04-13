@@ -5,6 +5,7 @@ import { UserModel } from "@/modules/users/user.model.js";
 export async function ensureRootAdmin(log: Logger): Promise<void> {
   const existing = await UserModel.findOne({ role: "admin" });
   if (existing) {
+    log.info({ email: env.ROOT_ADMIN_EMAIL }, "Root admin already exists");
     return;
   }
 
