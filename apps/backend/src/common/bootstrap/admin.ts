@@ -1,7 +1,8 @@
+import type { Logger } from "@/common/logger.js";
 import { env } from "@/config/env.js";
 import { UserModel } from "@/modules/users/user.model.js";
 
-export async function ensureRootAdmin(): Promise<void> {
+export async function ensureRootAdmin(log: Logger): Promise<void> {
   const existing = await UserModel.findOne({ role: "admin" });
   if (existing) {
     return;
@@ -14,5 +15,5 @@ export async function ensureRootAdmin(): Promise<void> {
     role: "admin",
   });
 
-  console.log(`✓ Root admin created: ${env.ROOT_ADMIN_EMAIL}`);
+  log.info({ email: env.ROOT_ADMIN_EMAIL }, "Root admin created");
 }

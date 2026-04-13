@@ -1,11 +1,12 @@
 import { buildApp } from "./app.js";
 import { ensureRootAdmin } from "./common/bootstrap/admin.js";
+import { logger } from "./common/logger.js";
 import { connectDatabase, disconnectDatabase } from "./config/database.js";
 import { env } from "./config/env.js";
 
 async function start() {
-  await connectDatabase();
-  await ensureRootAdmin();
+  await connectDatabase(logger);
+  await ensureRootAdmin(logger);
 
   const app = await buildApp();
 

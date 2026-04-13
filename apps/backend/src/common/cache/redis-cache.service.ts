@@ -1,4 +1,5 @@
 import { Redis } from "ioredis";
+import type { Logger } from "@/common/logger.js";
 import type { CacheService } from "./cache.service.js";
 
 export interface RedisCacheOptions {
@@ -7,7 +8,10 @@ export interface RedisCacheOptions {
   keyPrefix?: string;
 }
 
-export function createRedisCache(options: RedisCacheOptions): CacheService {
+export function createRedisCache(
+  options: RedisCacheOptions,
+  log: Logger,
+): CacheService {
   const { url, defaultTTL, keyPrefix = "" } = options;
 
   const redis = new Redis(url, {
@@ -17,6 +21,14 @@ export function createRedisCache(options: RedisCacheOptions): CacheService {
       return Math.min(times * 200, 2000);
     },
     lazyConnect: true,
+  });
+
+  redis.on("error", (err) => {
+    log.error(err, "Redis connection error");
+  });
+
+  redis.on("reconnecting", () => {
+    log.warn("Redis reconnecting");
   });
 
   function prefixed(key: string): string {

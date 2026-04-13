@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createMockLogger } from "@/__tests__/helpers.js";
 import { ensureRootAdmin } from "@/common/bootstrap/admin.js";
 
 const { UserModel } = await vi.hoisted(async () => ({
@@ -16,6 +17,8 @@ vi.mock("@/modules/users/user.model.js", () => ({
 }));
 
 describe("ensureRootAdmin", () => {
+  const log = createMockLogger();
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -24,7 +27,7 @@ describe("ensureRootAdmin", () => {
     UserModel.findOne.mockResolvedValue(null);
     UserModel.create.mockResolvedValue({});
 
-    await ensureRootAdmin();
+    await ensureRootAdmin(log);
 
     expect(UserModel.findOne).toHaveBeenCalledWith({ role: "admin" });
     expect(UserModel.create).toHaveBeenCalledWith({
@@ -33,14 +36,16 @@ describe("ensureRootAdmin", () => {
       name: "Root Admin",
       role: "admin",
     });
+    expect(log.info).toHaveBeenCalled();
   });
 
   it("should not create admin when one already exists", async () => {
     UserModel.findOne.mockResolvedValue({ email: "existing@admin.com" });
 
-    await ensureRootAdmin();
+    await ensureRootAdmin(log);
 
     expect(UserModel.findOne).toHaveBeenCalledWith({ role: "admin" });
     expect(UserModel.create).not.toHaveBeenCalled();
+    expect(log.info).not.toHaveBeenCalled();
   });
 });
