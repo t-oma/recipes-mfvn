@@ -1,6 +1,8 @@
+import crypto from "node:crypto";
 import type { Paginated, Recipe } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import { isValidObjectId } from "mongoose";
+import type { CacheService } from "@/common/cache/cache.service.js";
 import {
   BadRequestError,
   ForbiddenError,
@@ -26,7 +28,22 @@ import type {
   SearchRecipeQuery,
   UpdateRecipeBody,
 } from "@/modules/recipes/index.js";
+import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { UserDocument, UserModelType } from "@/modules/users/index.js";
+
+function hashFilters(query: SearchRecipeQuery): string {
+  const stable = {
+    search: query.search,
+    categoryId: query.categoryId,
+    difficulty: query.difficulty,
+    sort: query.sort,
+  };
+  return crypto
+    .createHash("md5")
+    .update(JSON.stringify(stable))
+    .digest("hex")
+    .slice(0, 8);
+}
 
 export interface RecipeService {
   findAll(
@@ -49,6 +66,7 @@ export function createRecipeService(
   userModel: UserModelType,
   favoriteModel: FavoriteModelType,
   categoryModel: CategoryModelType,
+  cache: CacheService,
 ): RecipeService {
   return {
     findAll: async ({ query, initiator }) => {
@@ -56,6 +74,20 @@ export function createRecipeService(
 
       if (isFavorited && !initiator.id) {
         return withPagination([], 0, page, limit);
+      }
+
+      const isAuthenticated = !!initiator.id;
+
+      if (!isAuthenticated) {
+        const filtersHash = hashFilters(query);
+        const cacheKey = recipeCache.keys.list(
+          `${filtersHash}:${page}:${limit}`,
+        );
+
+        const cached = await cache.get<Paginated<Recipe>>(cacheKey);
+        if (cached !== undefined) {
+          return cached;
+        }
       }
 
       const [recipes, total] = await recipeModel.searchFull({
@@ -66,12 +98,22 @@ export function createRecipeService(
         return withPagination([], 0, page, limit);
       }
 
-      return withPagination(
+      const result = withPagination(
         recipes.map((recipe) => toRecipe(recipe, recipe.isFavorited)),
         total,
         page,
         limit,
       );
+
+      if (!isAuthenticated) {
+        const filtersHash = hashFilters(query);
+        const cacheKey = recipeCache.keys.list(
+          `${filtersHash}:${page}:${limit}`,
+        );
+        await cache.set(cacheKey, result, recipeCache.ttl.list);
+      }
+
+      return result;
     },
 
     findById: async (id, params) => {
@@ -79,12 +121,29 @@ export function createRecipeService(
         throw new BadRequestError("Invalid recipe ID");
       }
 
+      const isAuthenticated = !!params.initiator.id;
+
+      if (!isAuthenticated) {
+        const cacheKey = recipeCache.keys.byId(id);
+        const cached = await cache.get<Recipe>(cacheKey);
+        if (cached !== undefined) {
+          return cached;
+        }
+      }
+
       const recipe = await recipeModel.findByIdFull(id, params);
       if (!recipe) {
         throw new NotFoundError("Recipe not found");
       }
 
-      return toRecipe(recipe, recipe.isFavorited);
+      const result = toRecipe(recipe, recipe.isFavorited);
+
+      if (!isAuthenticated) {
+        const cacheKey = recipeCache.keys.byId(id);
+        await cache.set(cacheKey, result, recipeCache.ttl.byId);
+      }
+
+      return result;
     },
 
     create: async ({ data, initiator }) => {
@@ -116,6 +175,9 @@ export function createRecipeService(
         { path: "author", select: "name email" },
         { path: "category", select: "name slug" },
       ]);
+
+      await cache.deletePattern(recipeCache.keys.allPattern());
+
       return toRecipe(populated.toObject<typeof populated>(), false);
     },
 
@@ -149,6 +211,11 @@ export function createRecipeService(
         })
         .lean());
 
+      await Promise.all([
+        cache.delete(recipeCache.keys.byId(id)),
+        cache.deletePattern(recipeCache.keys.allPattern()),
+      ]);
+
       return toRecipe(populated.toObject<typeof populated>(), isFavorited);
     },
 
@@ -166,6 +233,11 @@ export function createRecipeService(
       }
 
       await recipe.deleteOne();
+
+      await Promise.all([
+        cache.delete(recipeCache.keys.byId(id)),
+        cache.deletePattern(recipeCache.keys.allPattern()),
+      ]);
     },
   };
 }
