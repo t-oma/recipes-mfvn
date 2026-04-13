@@ -1,10 +1,12 @@
 import type { Category } from "@recipes/shared";
+import type { CacheService } from "@/common/cache/cache.service.js";
 import { ConflictError, NotFoundError } from "@/common/errors.js";
 import type {
   CreateMethodParams,
   DeleteMethodParams,
 } from "@/common/types/methods.js";
 import { toCategory } from "@/common/utils/mongo.js";
+import { categoryCache } from "@/modules/categories/category.cache.js";
 import type {
   CategoryModelType,
   CreateCategoryBody,
@@ -20,16 +22,33 @@ export interface CategoryService {
 export function createCategoryService(
   categoryModel: CategoryModelType,
   recipeModel: RecipeModelType,
+  cache: CacheService,
 ): CategoryService {
   return {
     findAll: async () => {
+      const cacheKey = categoryCache.keys.all();
+
+      const cached = await cache.get<Category[]>(cacheKey);
+      if (cached !== undefined) {
+        return cached;
+      }
+
       const categories = await categoryModel.find().sort({ name: 1 }).lean();
-      return categories.map(toCategory);
+      const result = categories.map(toCategory);
+
+      await cache.set(cacheKey, result, categoryCache.ttl.list);
+
+      return result;
     },
+
     create: async ({ data }) => {
       const category = await categoryModel.create(data);
+
+      await cache.delete(categoryCache.keys.all());
+
       return toCategory(category.toObject());
     },
+
     deleteById: async (categoryId) => {
       const recipeCount = await recipeModel.countDocuments({
         category: categoryId,
@@ -42,6 +61,8 @@ export function createCategoryService(
       if (!result) {
         throw new NotFoundError("Category not found");
       }
+
+      await cache.delete(categoryCache.keys.all());
     },
   };
 }

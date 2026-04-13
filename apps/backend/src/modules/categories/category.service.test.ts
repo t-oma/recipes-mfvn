@@ -1,12 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCategoryDoc,
+  createMockCache,
   createMockCategoryModel,
   createMockRecipeModel,
   createObjectId,
   initiator,
 } from "@/__tests__/helpers.js";
 import { ConflictError, NotFoundError } from "@/common/errors.js";
+import { categoryCache } from "@/modules/categories/category.cache.js";
 import type { CategoryModelType } from "@/modules/categories/category.model.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
 import type { RecipeModelType } from "@/modules/recipes/index.js";
@@ -14,20 +16,23 @@ import type { RecipeModelType } from "@/modules/recipes/index.js";
 describe("categoryService", () => {
   const categoryModel = createMockCategoryModel();
   const recipeModel = createMockRecipeModel();
+  const cache = createMockCache();
   const service = createCategoryService(
     categoryModel as unknown as CategoryModelType,
     recipeModel as unknown as RecipeModelType,
+    cache,
   );
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    await cache.flush();
   });
 
   describe("findAll", () => {
     it("should return all categories sorted by name", async () => {
       const docs = [
         createCategoryDoc({ name: "Desserts", slug: "desserts" }),
-        createCategoryDoc({ name: "Soups", slug: "soups" }),
+        createCategoryDoc({ name: "Soups", slug: "oups" }),
       ];
       categoryModel.find.mockReturnValue({
         sort: vi.fn().mockReturnValue({
@@ -40,6 +45,7 @@ describe("categoryService", () => {
       expect(categoryModel.find).toHaveBeenCalled();
       expect(result).toHaveLength(2);
       expect(result[0]?.name).toBe("Desserts");
+      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
     });
 
     it("should return empty array when no categories exist", async () => {
@@ -52,6 +58,25 @@ describe("categoryService", () => {
       const result = await service.findAll();
 
       expect(result).toEqual([]);
+    });
+
+    it("should return cached result on second call", async () => {
+      const docs = [createCategoryDoc({ name: "Desserts", slug: "desserts" })];
+      categoryModel.find.mockReturnValue({
+        sort: vi.fn().mockReturnValue({
+          lean: vi.fn().mockResolvedValue(docs),
+        }),
+      });
+
+      await service.findAll();
+      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
+      vi.clearAllMocks();
+
+      const result = await service.findAll();
+
+      expect(categoryModel.find).not.toHaveBeenCalled();
+      expect(result).toHaveLength(1);
+      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
     });
   });
 
@@ -73,6 +98,7 @@ describe("categoryService", () => {
       });
       expect(result.name).toBe("New Category");
       expect(result.slug).toBe("new-category");
+      expect(cache.delete).toHaveBeenCalledWith(categoryCache.keys.all());
     });
   });
 
@@ -86,6 +112,7 @@ describe("categoryService", () => {
 
       expect(recipeModel.countDocuments).toHaveBeenCalledWith({ category: id });
       expect(categoryModel.findByIdAndDelete).toHaveBeenCalledWith(id);
+      expect(cache.delete).toHaveBeenCalledWith(categoryCache.keys.all());
     });
 
     it("should throw ConflictError when recipes exist", async () => {

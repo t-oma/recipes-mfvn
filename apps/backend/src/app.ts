@@ -9,6 +9,8 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
+import type { CacheService } from "@/common/cache/cache.service.js";
+import { createCacheService } from "@/common/cache/create-cache.service.js";
 import { errorHandler } from "@/common/middleware/errorHandler.js";
 import { env } from "@/config/env.js";
 import { createRateLimitOptions } from "@/config/rate-limit.js";
@@ -38,7 +40,13 @@ import {
   userRoutes,
 } from "@/modules/users/index.js";
 
-export function buildApp() {
+declare module "fastify" {
+  interface FastifyInstance {
+    cache: CacheService;
+  }
+}
+
+export async function buildApp() {
   const app = Fastify({
     logger: {
       level: env.NODE_ENV === "production" ? "info" : "debug",
@@ -48,6 +56,13 @@ export function buildApp() {
           : undefined,
     },
   });
+
+  const cache = await createCacheService({
+    backend: env.CACHE_BACKEND,
+    redis: env.REDIS_URL ? { url: env.REDIS_URL } : undefined,
+  });
+
+  app.decorate("cache", cache);
 
   // Validation & serialization
   app.setValidatorCompiler(validatorCompiler);
@@ -93,6 +108,7 @@ export function buildApp() {
       UserModel,
       FavoriteModel,
       CategoryModel,
+      cache,
     ),
     favoriteService: createFavoriteService(
       FavoriteModel,
@@ -103,8 +119,12 @@ export function buildApp() {
     prefix: "/api/recipes",
   });
   app.register(categoryRoutes, {
-    service: createCategoryService(CategoryModel, RecipeModel),
+    service: createCategoryService(CategoryModel, RecipeModel, cache),
     prefix: "/api/categories",
+  });
+
+  app.addHook("onClose", async () => {
+    await cache.flush();
   });
 
   return app;

@@ -7,7 +7,7 @@ async function start() {
   await connectDatabase();
   await ensureRootAdmin();
 
-  const app = buildApp();
+  const app = await buildApp();
 
   try {
     await app.listen({ port: env.PORT, host: env.HOST });

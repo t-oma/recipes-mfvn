@@ -1,6 +1,7 @@
 import type { Minutes } from "@recipes/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  createMockCache,
   createMockCategoryModel,
   createMockFavoriteModel,
   createMockRecipeModel,
@@ -18,6 +19,7 @@ import {
 } from "@/common/errors.js";
 import type { CategoryModelType } from "@/modules/categories/category.model.js";
 import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
+import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import { createRecipeService } from "@/modules/recipes/recipe.service.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
@@ -27,15 +29,18 @@ describe("recipeService", () => {
   const userModel = createMockUserModel();
   const favoriteModel = createMockFavoriteModel();
   const categoryModel = createMockCategoryModel();
+  const cache = createMockCache();
   const service = createRecipeService(
     recipeModel as unknown as RecipeModelType,
     userModel as unknown as UserModelType,
     favoriteModel as unknown as FavoriteModelType,
     categoryModel as unknown as CategoryModelType,
+    cache,
   );
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    await cache.flush();
   });
 
   describe("findAll", () => {
@@ -43,35 +48,46 @@ describe("recipeService", () => {
       const populated = populateRecipeDoc(createRecipeDoc());
       recipeModel.searchFull.mockResolvedValue([[populated], 1]);
 
+      const query = { page: 1, limit: 10, sort: "-createdAt" };
       const result = await service.findAll({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query,
         initiator: noInitiator(),
       });
 
       expect(result.items).toHaveLength(1);
       expect(result.items[0]?.title).toBe("Test Recipe");
       expect(result.pagination.total).toBe(1);
+      expect(cache.get).toHaveBeenCalledWith(recipeCache.keys.list(query));
     });
 
     it("should return empty when searchFull returns null", async () => {
       recipeModel.searchFull.mockResolvedValue([null, 0]);
 
+      const query = { page: 1, limit: 10, sort: "-createdAt" };
       const result = await service.findAll({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query,
         initiator: noInitiator(),
       });
 
       expect(result.items).toEqual([]);
+      expect(cache.get).toHaveBeenCalledWith(recipeCache.keys.list(query));
     });
 
     it("should return empty when isFavorited filter is set but no initiator", async () => {
+      const query = {
+        page: 1,
+        limit: 10,
+        sort: "-createdAt",
+        isFavorited: true,
+      };
       const result = await service.findAll({
-        query: { page: 1, limit: 10, sort: "-createdAt", isFavorited: true },
+        query,
         initiator: noInitiator(),
       });
 
       expect(result.items).toEqual([]);
       expect(recipeModel.searchFull).not.toHaveBeenCalled();
+      expect(cache.get).not.toHaveBeenCalled();
     });
   });
 
@@ -80,11 +96,31 @@ describe("recipeService", () => {
       const populated = populateRecipeDoc(createRecipeDoc());
       recipeModel.findByIdFull.mockResolvedValue(populated);
 
-      const result = await service.findById(createObjectId().toString(), {
+      const id = createObjectId().toString();
+      const result = await service.findById(id, {
         initiator: noInitiator(),
       });
 
       expect(result.title).toBe("Test Recipe");
+      expect(cache.get).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+    });
+
+    it("should return cached recipe on second call for unauthenticated user", async () => {
+      const populated = populateRecipeDoc(createRecipeDoc());
+      recipeModel.findByIdFull.mockResolvedValue(populated);
+
+      const id = createObjectId().toString();
+      await service.findById(id, { initiator: noInitiator() });
+
+      vi.clearAllMocks();
+
+      const result = await service.findById(id, {
+        initiator: noInitiator(),
+      });
+
+      expect(recipeModel.findByIdFull).not.toHaveBeenCalled();
+      expect(result.title).toBe("Test Recipe");
+      expect(cache.get).toHaveBeenCalledWith(recipeCache.keys.byId(id));
     });
 
     it("should throw BadRequestError for invalid ID", async () => {
@@ -98,11 +134,13 @@ describe("recipeService", () => {
     it("should throw NotFoundError when recipe not found", async () => {
       recipeModel.findByIdFull.mockResolvedValue(null);
 
+      const id = createObjectId().toString();
       await expect(
-        service.findById(createObjectId().toString(), {
+        service.findById(id, {
           initiator: noInitiator(),
         }),
       ).rejects.toThrow(NotFoundError);
+      expect(cache.get).toHaveBeenCalledWith(recipeCache.keys.byId(id));
     });
   });
 
@@ -144,6 +182,9 @@ describe("recipeService", () => {
 
       expect(recipeModel.create).toHaveBeenCalled();
       expect(result.title).toBe("New Recipe");
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        recipeCache.keys.allPattern(),
+      );
     });
 
     it("should throw BadRequestError for invalid author ID", async () => {
@@ -204,13 +245,18 @@ describe("recipeService", () => {
         lean: vi.fn().mockResolvedValue(null),
       });
 
-      const result = await service.update(createObjectId().toString(), {
+      const id = createObjectId().toString();
+      const result = await service.update(id, {
         data: { title: "Updated" },
         initiator: initiator(authorId.toString()),
       });
 
       expect(recipe.save).toHaveBeenCalled();
       expect(result.title).toBe("Updated");
+      expect(cache.delete).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        recipeCache.keys.allPattern(),
+      );
     });
 
     it("should update recipe when user is admin", async () => {
@@ -228,12 +274,17 @@ describe("recipeService", () => {
         lean: vi.fn().mockResolvedValue(null),
       });
 
+      const id = createObjectId().toString();
       await expect(
-        service.update(createObjectId().toString(), {
+        service.update(id, {
           data: { title: "Updated" },
           initiator: initiator(createObjectId().toString(), "admin"),
         }),
       ).resolves.toBeDefined();
+      expect(cache.delete).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        recipeCache.keys.allPattern(),
+      );
     });
 
     it("should throw BadRequestError for invalid ID", async () => {
@@ -279,11 +330,16 @@ describe("recipeService", () => {
         }),
       });
 
+      const id = createObjectId().toString();
       await expect(
-        service.delete(createObjectId().toString(), {
+        service.delete(id, {
           initiator: initiator(authorId.toString()),
         }),
       ).resolves.toBeUndefined();
+      expect(cache.delete).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        recipeCache.keys.allPattern(),
+      );
     });
 
     it("should delete recipe when user is admin", async () => {
@@ -294,11 +350,16 @@ describe("recipeService", () => {
         }),
       });
 
+      const id = createObjectId().toString();
       await expect(
-        service.delete(createObjectId().toString(), {
+        service.delete(id, {
           initiator: initiator(createObjectId().toString(), "admin"),
         }),
       ).resolves.toBeUndefined();
+      expect(cache.delete).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        recipeCache.keys.allPattern(),
+      );
     });
 
     it("should throw BadRequestError for invalid ID", async () => {

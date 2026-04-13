@@ -3,6 +3,8 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { Types } from "mongoose";
 import type { Mock } from "vitest";
 import { vi } from "vitest";
+import type { CacheService } from "@/common/cache/cache.service.js";
+import { createMemoryCache } from "@/common/cache/memory-cache.service.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type {
@@ -201,6 +203,35 @@ export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
     exists: viFn(),
     findOne: viFn(),
     ...overrides,
+  };
+}
+
+// ── Cache mock ──
+
+export interface MockCache extends CacheService {
+  spies: {
+    get: Mock;
+    set: Mock;
+    delete: Mock;
+    deletePattern: Mock;
+    flush: Mock;
+  };
+}
+
+export function createMockCache(): MockCache {
+  const memoryCache = createMemoryCache();
+
+  const spies = {
+    get: vi.spyOn(memoryCache, "get"),
+    set: vi.spyOn(memoryCache, "set"),
+    delete: vi.spyOn(memoryCache, "delete"),
+    deletePattern: vi.spyOn(memoryCache, "deletePattern"),
+    flush: vi.spyOn(memoryCache, "flush"),
+  };
+
+  return {
+    ...memoryCache,
+    spies,
   };
 }
 
