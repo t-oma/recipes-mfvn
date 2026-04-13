@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 import type { Mock } from "vitest";
 import { vi } from "vitest";
 import type { CacheService } from "@/common/cache/cache.service.js";
+import { createMemoryCache } from "@/common/cache/memory-cache.service.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type {
@@ -207,30 +208,30 @@ export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
 
 // ── Cache mock ──
 
-export function createMockCache(): CacheService {
-  const store = new Map<string, unknown>();
+export interface MockCache extends CacheService {
+  spies: {
+    get: Mock;
+    set: Mock;
+    delete: Mock;
+    deletePattern: Mock;
+    flush: Mock;
+  };
+}
+
+export function createMockCache(): MockCache {
+  const memoryCache = createMemoryCache();
+
+  const spies = {
+    get: vi.spyOn(memoryCache, "get"),
+    set: vi.spyOn(memoryCache, "set"),
+    delete: vi.spyOn(memoryCache, "delete"),
+    deletePattern: vi.spyOn(memoryCache, "deletePattern"),
+    flush: vi.spyOn(memoryCache, "flush"),
+  };
 
   return {
-    async get<T extends {}>(key: string) {
-      return store.get(key) as T | undefined;
-    },
-    async set<T extends {}>(key: string, value: T) {
-      store.set(key, value);
-    },
-    async delete(key: string) {
-      store.delete(key);
-    },
-    async deletePattern(pattern: string) {
-      const regex = new RegExp(`^${pattern.replace(/\*/g, ".*")}$`);
-      for (const key of store.keys()) {
-        if (regex.test(key)) {
-          store.delete(key);
-        }
-      }
-    },
-    async flush() {
-      store.clear();
-    },
+    ...memoryCache,
+    spies,
   };
 }
 
