@@ -3,6 +3,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { Types } from "mongoose";
 import type { Mock } from "vitest";
 import { vi } from "vitest";
+import type { CacheService } from "@/common/cache/cache.service.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type {
@@ -201,6 +202,35 @@ export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
     exists: viFn(),
     findOne: viFn(),
     ...overrides,
+  };
+}
+
+// ── Cache mock ──
+
+export function createMockCache(): CacheService {
+  const store = new Map<string, unknown>();
+
+  return {
+    async get<T extends {}>(key: string) {
+      return store.get(key) as T | undefined;
+    },
+    async set<T extends {}>(key: string, value: T) {
+      store.set(key, value);
+    },
+    async delete(key: string) {
+      store.delete(key);
+    },
+    async deletePattern(pattern: string) {
+      const regex = new RegExp(`^${pattern.replace(/\*/g, ".*")}$`);
+      for (const key of store.keys()) {
+        if (regex.test(key)) {
+          store.delete(key);
+        }
+      }
+    },
+    async flush() {
+      store.clear();
+    },
   };
 }
 
