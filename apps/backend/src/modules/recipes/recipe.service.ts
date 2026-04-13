@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import type { Paginated, Recipe } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import { isValidObjectId } from "mongoose";
@@ -30,20 +29,6 @@ import type {
 } from "@/modules/recipes/index.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { UserDocument, UserModelType } from "@/modules/users/index.js";
-
-function hashFilters(query: SearchRecipeQuery): string {
-  const stable = {
-    search: query.search,
-    categoryId: query.categoryId,
-    difficulty: query.difficulty,
-    sort: query.sort,
-  };
-  return crypto
-    .createHash("md5")
-    .update(JSON.stringify(stable))
-    .digest("hex")
-    .slice(0, 8);
-}
 
 export interface RecipeService {
   findAll(
@@ -79,10 +64,7 @@ export function createRecipeService(
       const isAuthenticated = !!initiator.id;
 
       if (!isAuthenticated) {
-        const filtersHash = hashFilters(query);
-        const cacheKey = recipeCache.keys.list(
-          `${filtersHash}:${page}:${limit}`,
-        );
+        const cacheKey = recipeCache.keys.list(query);
 
         const cached = await cache.get<Paginated<Recipe>>(cacheKey);
         if (cached !== undefined) {
@@ -106,10 +88,7 @@ export function createRecipeService(
       );
 
       if (!isAuthenticated) {
-        const filtersHash = hashFilters(query);
-        const cacheKey = recipeCache.keys.list(
-          `${filtersHash}:${page}:${limit}`,
-        );
+        const cacheKey = recipeCache.keys.list(query);
         await cache.set(cacheKey, result, recipeCache.ttl.list);
       }
 
