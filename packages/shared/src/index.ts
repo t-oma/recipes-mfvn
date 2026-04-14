@@ -1,4 +1,5 @@
-export * from "./auth.schema.js";
+export * from "./auth/auth.schema.js";
+export * from "./auth/auth.types.js";
 export * from "./category.schema.js";
 export * from "./comment.schema.js";
 export * from "./pagination.js";

@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import type { CategorySummary } from "./category.schema.js";
 import type { createCommentSchema } from "./comment.schema.js";
 import type {
   createRecipeSchema,
@@ -7,6 +8,7 @@ import type {
   secondsSchema,
   updateRecipeSchema,
 } from "./recipe.schema.js";
+import type { UserSummary } from "./user.schema.js";
 
 export type Minutes = z.infer<typeof minutesSchema>;
 export type Seconds = z.infer<typeof secondsSchema>;
@@ -22,18 +24,6 @@ export interface Ingredient {
   name: string;
   quantity: number;
   unit: string;
-}
-
-export interface CategorySummary {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-export interface UserSummary {
-  id: string;
-  email: string;
-  name: string;
 }
 
 export interface RecipeSummary {
@@ -65,19 +55,6 @@ export interface Category {
   description?: string;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
 }
 
 export interface Comment {
