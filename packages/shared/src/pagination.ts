@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export interface Paginated<T> {
   items: T[];
   pagination: {
@@ -31,4 +33,18 @@ export function withPagination<T>(
       hasPrev,
     },
   };
+}
+
+export function paginatedSchema<T extends z.ZodType>(itemSchema: T) {
+  return z.object({
+    items: z.array(itemSchema),
+    pagination: z.object({
+      page: z.number(),
+      limit: z.number(),
+      total: z.number(),
+      totalPages: z.number(),
+      hasNext: z.boolean(),
+      hasPrev: z.boolean(),
+    }),
+  });
 }
