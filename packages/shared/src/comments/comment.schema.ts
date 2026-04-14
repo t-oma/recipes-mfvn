@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { recipeSummarySchema } from "./recipe.schema.js";
-import { userSummarySchema } from "./users/user.schema.js";
+import { recipeSummarySchema } from "../recipe.schema.js";
+import { userSummarySchema } from "../users/user.schema.js";
 
 export const createCommentSchema = z.object({
   text: z.string().trim().min(1).max(2000),

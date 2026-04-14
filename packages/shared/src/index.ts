@@ -9,7 +9,9 @@ export type * from "./categories/category.types.js";
 export * from "./users/user.schema.js";
 export type * from "./users/user.types.js";
 
-export * from "./comment.schema.js";
+export * from "./comments/comment.schema.js";
+export type * from "./comments/comment.types.js";
+
 export * from "./pagination.js";
 export * from "./recipe.schema.js";
 export * from "./types.js";
