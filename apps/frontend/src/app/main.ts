@@ -1,4 +1,4 @@
-import "./assets/main.css";
+import "@/assets/main.css";
 
 import Aura from "@primeuix/themes/aura";
 import { createPinia } from "pinia";
