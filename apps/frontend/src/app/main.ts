@@ -1,6 +1,7 @@
 import "@/assets/main.css";
 
 import Aura from "@primeuix/themes/aura";
+import { VueQueryPlugin } from "@tanstack/vue-query";
 import { createPinia } from "pinia";
 import PrimeVue from "primevue/config";
 import { createApp } from "vue";
@@ -17,6 +18,7 @@ app.use(PrimeVue, {
     },
   },
 });
+app.use(VueQueryPlugin);
 app.use(createPinia());
 app.use(router);
 
