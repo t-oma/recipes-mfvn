@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { CategorySummary } from "./category.schema.js";
+import type { CategorySummary } from "./categories/category.types.js";
 import type { createCommentSchema } from "./comment.schema.js";
 import type {
   createRecipeSchema,
@@ -44,15 +44,6 @@ export interface Recipe {
   servings: number;
   isPublic: boolean;
   isFavorited: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
   createdAt: string;
   updatedAt: string;
 }
