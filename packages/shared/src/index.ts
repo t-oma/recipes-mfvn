@@ -5,5 +5,6 @@ export * from "./comment.schema.js";
 export * from "./pagination.js";
 export * from "./recipe.schema.js";
 export * from "./types.js";
-export * from "./user.schema.js";
+export * from "./users/user.schema.js";
+export * from "./users/user.types.js";
 export * from "./utils.js";

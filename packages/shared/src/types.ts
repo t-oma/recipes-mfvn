@@ -8,7 +8,7 @@ import type {
   secondsSchema,
   updateRecipeSchema,
 } from "./recipe.schema.js";
-import type { UserSummary } from "./user.schema.js";
+import type { UserSummary } from "./users/user.types.js";
 
 export type Minutes = z.infer<typeof minutesSchema>;
 export type Seconds = z.infer<typeof secondsSchema>;

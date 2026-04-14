@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { categorySummarySchema } from "./category.schema.js";
-import { userSummarySchema } from "./user.schema.js";
+import { userSummarySchema } from "./users/user.schema.js";
 
 export const minutesSchema = z.number().int().min(1).brand<"Minutes">();
 export const secondsSchema = z.number().int().min(1).brand<"Seconds">();

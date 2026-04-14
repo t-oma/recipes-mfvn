@@ -13,6 +13,3 @@ export const userSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
 });
-
-export type UserSummary = z.infer<typeof userSummarySchema>;
-export type User = z.infer<typeof userSchema>;

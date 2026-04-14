@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { userSchema } from "../user.schema.js";
+import { userSchema } from "../users/user.schema.js";
 
 export const registerSchema = z.object({
   email: z.email().trim(),
