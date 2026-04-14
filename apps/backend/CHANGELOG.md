@@ -1,3 +1,32 @@
+## [0.6.0] - 2026-04-14
+
+### 🚀 Features
+
+- Role-based authorization and admin user management (#36)
+- *(cache)* Add cache service infrastructure (#39)
+- *(cache)* Integrate cache into category and recipe modules (#40)
+- Graceful shutdown for Fastify, MongoDB, and Redis (#42)
+- *(swagger)* Add response schemas for all endpoints (#45)
+
+### 🚜 Refactor
+
+- Add typed error classes replacing raw AppError usage (#29)
+- Merge comment static methods into findFull (#31)
+- Unify service interfaces with object parameters (#33)
+- Prepare types for role-based authorization (#34)
+- *(cache)* Remove hardcoded TTL defaults and add JSDoc (#43)
+- Replace console with pino logger and add critical logging (#44)
+
+### 🧪 Testing
+
+- Unit tests for common layer (utils, middleware, bootstrap) (#37)
+- Unit tests for service layer (6 services) (#38)
+
+### ⚙️ Miscellaneous Tasks
+
+- Add env example (#41)
+
+
 ## [0.5.0] - 2026-04-06
 
 ### 🚀 Features
@@ -17,6 +46,10 @@
 - Move recipe retrieval to aggregation pipeline (#26)
 - Move user favorites retrieval to aggregation pipeline (#27)
 - Move comment retrieval to aggregation pipeline with visibility filter (#28)
+
+### 📚 Documentation
+
+- Updated changelog for 0.5.0
 
 ### ⚙️ Miscellaneous Tasks
 

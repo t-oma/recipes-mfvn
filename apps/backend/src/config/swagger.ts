@@ -7,7 +7,7 @@ export const swaggerOptions: FastifyDynamicSwaggerOptions = {
     info: {
       title: "Recipes API",
       description: "API for managing recipes",
-      version: "0.1.0",
+      version: "0.6.0",
     },
     servers: [{ url: "http://localhost:3000", description: "Development" }],
     components: {
