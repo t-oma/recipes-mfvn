@@ -4,6 +4,8 @@
   "scripts": {
     "dev:backend": "pnpm --filter @recipes/backend dev",
     "build:backend": "pnpm --filter @recipes/backend build",
+    "dev:frontend": "pnpm --filter @recipes/frontend dev",
+    "build:frontend": "pnpm --filter @recipes/frontend build",
     "lint": "pnpm -r typecheck && pnpm check",
     "typecheck": "pnpm -r typecheck",
     "check": "biome check apps/ packages/",

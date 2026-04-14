@@ -64,6 +64,9 @@
       "trailingCommas": "all"
     }
   },
+  "html": {
+    "experimentalFullSupportEnabled": true
+  },
   "assist": {
     "enabled": true,
     "actions": {
