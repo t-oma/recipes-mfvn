@@ -1,5 +1,7 @@
+import { categorySchema } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import { z } from "zod";
 import {
   assertAuthenticated,
   authGuard,
@@ -25,6 +27,9 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
       "/",
       {
         schema: {
+          response: {
+            200: z.array(categorySchema),
+          },
           tags: ["Categories"],
           summary: "Get all categories",
         },
@@ -39,6 +44,9 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
       {
         schema: {
           body: createCategorySchema,
+          response: {
+            201: categorySchema,
+          },
           tags: ["Categories"],
           summary: "Create a category",
           security: [{ bearerAuth: [] }],

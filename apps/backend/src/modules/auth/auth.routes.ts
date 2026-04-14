@@ -1,4 +1,8 @@
-import { loginSchema, registerSchema } from "@recipes/shared";
+import {
+  authResponseSchema,
+  loginSchema,
+  registerSchema,
+} from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { env } from "@/config/env.js";
@@ -19,6 +23,9 @@ export const authRoutes: FastifyPluginAsync<AuthModuleOptions> = async (
       {
         schema: {
           body: registerSchema,
+          response: {
+            201: authResponseSchema,
+          },
           tags: ["Auth"],
           summary: "Register a new user",
         },
@@ -39,6 +46,9 @@ export const authRoutes: FastifyPluginAsync<AuthModuleOptions> = async (
       {
         schema: {
           body: loginSchema,
+          response: {
+            200: authResponseSchema,
+          },
           tags: ["Auth"],
           summary: "Login user",
         },

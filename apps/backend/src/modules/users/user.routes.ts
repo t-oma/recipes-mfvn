@@ -1,3 +1,9 @@
+import {
+  commentForRecipeSchema,
+  paginatedSchema,
+  recipeSchema,
+  userSchema,
+} from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
@@ -22,6 +28,9 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
       "/me",
       {
         schema: {
+          response: {
+            200: userSchema,
+          },
           tags: ["Users"],
           summary: "Get current user",
           security: [{ bearerAuth: [] }],
@@ -40,6 +49,9 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
       {
         schema: {
           querystring: favoriteQuerySchema,
+          response: {
+            200: paginatedSchema(recipeSchema),
+          },
           tags: ["Users"],
           summary: "Get current user's favorite recipes",
           security: [{ bearerAuth: [] }],
@@ -61,6 +73,9 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
       {
         schema: {
           querystring: commentQuerySchema,
+          response: {
+            200: paginatedSchema(commentForRecipeSchema),
+          },
           tags: ["Users"],
           summary: "Get current user's comments",
           security: [{ bearerAuth: [] }],

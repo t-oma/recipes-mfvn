@@ -1,5 +1,11 @@
+import {
+  commentForRecipeSchema,
+  paginatedSchema,
+  recipeSchema,
+} from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import { z } from "zod";
 import {
   assertAuthenticated,
   authGuard,
@@ -37,6 +43,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       {
         schema: {
           querystring: recipeQuerySchema,
+          response: {
+            200: paginatedSchema(recipeSchema),
+          },
           tags: ["Recipes"],
           summary: "Get all recipes with pagination",
         },
@@ -55,6 +64,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       {
         schema: {
           params: recipeParamsSchema,
+          response: {
+            200: recipeSchema,
+          },
           tags: ["Recipes"],
           summary: "Get recipe by ID",
         },
@@ -72,6 +84,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       {
         schema: {
           body: createRecipeSchema,
+          response: {
+            201: recipeSchema,
+          },
           tags: ["Recipes"],
           summary: "Create a recipe",
           security: [{ bearerAuth: [] }],
@@ -94,6 +109,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           params: recipeParamsSchema,
           body: updateRecipeSchema,
+          response: {
+            200: recipeSchema,
+          },
           tags: ["Recipes"],
           summary: "Update a recipe",
           security: [{ bearerAuth: [] }],
@@ -135,6 +153,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       {
         schema: {
           params: recipeParamsSchema,
+          response: {
+            200: z.object({ favorited: z.literal(true) }),
+          },
           tags: ["Recipes"],
           summary: "Add recipe to favorites",
           security: [{ bearerAuth: [] }],
@@ -155,6 +176,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       {
         schema: {
           params: recipeParamsSchema,
+          response: {
+            200: z.object({ favorited: z.literal(false) }),
+          },
           tags: ["Recipes"],
           summary: "Remove recipe from favorites",
           security: [{ bearerAuth: [] }],
@@ -175,6 +199,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       {
         schema: {
           params: recipeParamsSchema,
+          response: {
+            200: z.object({ favorited: z.boolean() }),
+          },
           tags: ["Recipes"],
           summary: "Check if recipe is favorited",
         },
@@ -195,6 +222,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           params: recipeParamsSchema,
           querystring: commentQuerySchema,
+          response: {
+            200: paginatedSchema(commentForRecipeSchema),
+          },
           tags: ["Recipes"],
           summary: "Get comments for a recipe",
         },
@@ -214,6 +244,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           params: recipeParamsSchema,
           body: createCommentSchema,
+          response: {
+            201: commentForRecipeSchema,
+          },
           tags: ["Recipes"],
           summary: "Create a comment",
           security: [{ bearerAuth: [] }],
