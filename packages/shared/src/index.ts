@@ -12,7 +12,11 @@ export type * from "./users/user.types.js";
 export * from "./comments/comment.schema.js";
 export type * from "./comments/comment.types.js";
 
+export * from "./recipes/recipe.schema.js";
+export type * from "./recipes/recipe.types.js";
+
+export * from "./recipes/ingredient.schema.js";
+export type * from "./recipes/ingredient.types.js";
+
 export * from "./pagination.js";
-export * from "./recipe.schema.js";
-export * from "./types.js";
 export * from "./utils.js";

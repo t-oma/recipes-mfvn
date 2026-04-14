@@ -1,17 +1,12 @@
 import { z } from "zod";
-import { categorySummarySchema } from "./categories/category.schema.js";
-import { userSummarySchema } from "./users/user.schema.js";
+import { categorySummarySchema } from "../categories/category.schema.js";
+import { userSummarySchema } from "../users/user.schema.js";
+import { ingredientSchema } from "./ingredient.schema.js";
 
 export const minutesSchema = z.number().int().min(1).brand<"Minutes">();
 export const secondsSchema = z.number().int().min(1).brand<"Seconds">();
 
 export const difficultySchema = z.enum(["easy", "medium", "hard"]);
-
-export const ingredientSchema = z.object({
-  name: z.string().trim().min(1),
-  quantity: z.number().int().positive(),
-  unit: z.string().trim().min(1),
-});
 
 export const createRecipeSchema = z.object({
   title: z.string().trim().min(3).max(200),

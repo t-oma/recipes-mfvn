@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { recipeSummarySchema } from "../recipe.schema.js";
+import { recipeSummarySchema } from "../recipes/recipe.schema.js";
 import { userSummarySchema } from "../users/user.schema.js";
 
 export const createCommentSchema = z.object({
