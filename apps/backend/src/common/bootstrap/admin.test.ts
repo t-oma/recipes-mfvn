@@ -45,7 +45,7 @@ describe("ensureRootAdmin", () => {
     await ensureRootAdmin(log);
 
     expect(UserModel.findOne).toHaveBeenCalledWith({ role: "admin" });
+    expect(log.info).toHaveBeenCalled();
     expect(UserModel.create).not.toHaveBeenCalled();
-    expect(log.info).not.toHaveBeenCalled();
   });
 });
