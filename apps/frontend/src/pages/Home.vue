@@ -1,379 +1,752 @@
 <script setup lang="ts">
-import Button from "primevue/button";
-import Card from "primevue/card";
-import InputText from "primevue/inputtext";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
-const searchQuery = ref("");
+const isLoaded = ref(false);
 
-const categories = [
-  { name: "Breakfast", icon: "🍳", count: 24 },
-  { name: "Lunch", icon: "🍲", count: 42 },
-  { name: "Dinner", icon: "🍝", count: 38 },
-  { name: "Desserts", icon: "🍰", count: 56 },
-  { name: "Salads", icon: "🥗", count: 31 },
-  { name: "Drinks", icon: "🍹", count: 19 },
+onMounted(() => {
+  requestAnimationFrame(() => {
+    isLoaded.value = true;
+  });
+});
+
+interface CategoryItem {
+  name: string;
+  icon: string;
+  count: number;
+  gradient: string;
+}
+
+const categories: CategoryItem[] = [
+  {
+    name: "Breakfast",
+    icon: "pi pi-sun",
+    count: 42,
+    gradient: "from-amber-100 to-orange-100",
+  },
+  {
+    name: "Lunch",
+    icon: "pi pi-bolt",
+    count: 78,
+    gradient: "from-emerald-50 to-teal-100",
+  },
+  {
+    name: "Dinner",
+    icon: "pi pi-moon",
+    count: 63,
+    gradient: "from-violet-50 to-indigo-100",
+  },
+  {
+    name: "Desserts",
+    icon: "pi pi-heart",
+    count: 51,
+    gradient: "from-pink-50 to-rose-100",
+  },
+  {
+    name: "Soups",
+    icon: "pi pi-box",
+    count: 34,
+    gradient: "from-yellow-50 to-amber-100",
+  },
+  {
+    name: "Salads",
+    icon: "pi pi-verified",
+    count: 29,
+    gradient: "from-lime-50 to-green-100",
+  },
 ];
 
-const popularRecipes = [
+interface FeaturedRecipe {
+  id: number;
+  title: string;
+  time: string;
+  difficulty: string;
+  rating: number;
+  image: string;
+  tag: string;
+}
+
+const featuredRecipes: FeaturedRecipe[] = [
   {
     id: 1,
-    title: "Ukrainian Borscht",
-    description: "Classic borscht recipe with garlic pampushky",
-    time: "2 hrs",
+    title: "Classic Beef Bourguignon",
+    time: "2 hr",
     difficulty: "Medium",
-    image: "🍲",
+    rating: 4.9,
+    image:
+      "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=600&h=400&fit=crop",
+    tag: "Classic",
   },
   {
     id: 2,
-    title: "Syrnyky",
-    description: "Delicate cheese pancakes with sour cream and jam",
-    time: "30 min",
+    title: "Cherry Dumplings",
+    time: "1.5 hr",
     difficulty: "Easy",
-    image: "🥞",
+    rating: 4.8,
+    image:
+      "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&h=400&fit=crop",
+    tag: "Popular",
   },
   {
     id: 3,
-    title: "Charlotte Cake",
-    description: "Apple pie with tender dough",
-    time: "1 hr",
+    title: "Lemon Ricotta Pancakes",
+    time: "30 min",
     difficulty: "Easy",
-    image: "🍰",
+    rating: 4.7,
+    image:
+      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&h=400&fit=crop",
+    tag: "Quick",
   },
   {
     id: 4,
-    title: "Stuffed Cabbage Rolls",
-    description: "Cabbage rolls with meat and rice in tomato sauce",
-    time: "1.5 hrs",
+    title: "Stuffed Bell Peppers",
+    time: "2.5 hr",
     difficulty: "Medium",
-    image: "🥬",
+    rating: 4.6,
+    image:
+      "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=400&fit=crop",
+    tag: "Hearty",
   },
 ];
 
-const latestRecipes = [
+interface Testimonial {
+  text: string;
+  author: string;
+  role: string;
+}
+
+const testimonials: Testimonial[] = [
   {
-    id: 5,
-    title: "Carbonara Pasta",
-    description: "Italian pasta with bacon and creamy sauce",
-    time: "25 min",
-    difficulty: "Easy",
-    image: "🍝",
+    text: "Best recipe site ever! The beef stew turned out even better than my grandmother's.",
+    author: "Elena K.",
+    role: "Home Cook",
   },
   {
-    id: 6,
-    title: "Chicken Soup",
-    description: "Light chicken soup with noodles and vegetables",
-    time: "45 min",
-    difficulty: "Easy",
-    image: "🍜",
+    text: "So easy to find recipes here. Step-by-step instructions are a real find for beginners.",
+    author: "Andrew M.",
+    role: "Beginner Chef",
   },
   {
-    id: 7,
-    title: "Tiramisu",
-    description: "Classic Italian dessert with mascarpone",
-    time: "40 min",
-    difficulty: "Medium",
-    image: "🍰",
-  },
-  {
-    id: 8,
-    title: "Olivier Salad",
-    description: "Festive salad with sausage and mayonnaise",
-    time: "30 min",
-    difficulty: "Easy",
-    image: "🥗",
+    text: "Dumplings, buns, fritters — everything in one place. Thanks for such a collection!",
+    author: "Maria S.",
+    role: "Food Enthusiast",
   },
 ];
 </script>
 
 <template>
-  <div class="min-h-screen bg-amber-50">
-    <!-- Hero Section -->
-    <section
-      class="relative overflow-hidden bg-linear-to-br from-amber-100 via-orange-50 to-yellow-100 py-20"
+  <div
+    class="font-body min-h-screen bg-stone-50 text-stone-800"
+    :class="{ 'opacity-0': !isLoaded, 'opacity-100': isLoaded }"
+    style="transition: opacity 0.6s ease-out"
+  >
+    <!-- Decorative grain overlay -->
+    <div class="pointer-events-none fixed inset-0 z-50 opacity-[0.03]">
+      <div
+        class="h-full w-full"
+        style="
+          background-image: url('&quot;data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E&quot');
+        "
+      />
+    </div>
+
+    <!-- Navigation -->
+    <nav
+      class="sticky top-0 z-40 border-b border-stone-200/60 bg-stone-50/80 backdrop-blur-xl"
     >
-      <div class="absolute inset-0 opacity-30">
-        <div
-          class="bg-size[20px_20px] h-full w-full bg-[radial-gradient(circle_at_1px_1px,#d97706_1px,transparent_0)]"
-        ></div>
+      <div class="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div
+              class="from-terracotta to-terracotta-dark shadow-terracotta/20 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br shadow-lg"
+            >
+              <span class="text-lg text-white">🍳</span>
+            </div>
+            <span
+              class="font-display text-2xl font-semibold tracking-tight text-stone-900"
+            >
+              Savory
+            </span>
+          </div>
+
+          <div class="hidden items-center gap-8 md:flex">
+            <a
+              href="#recipes"
+              class="hover:text-terracotta text-sm font-medium text-stone-600 transition-colors"
+            >
+              Recipes
+            </a>
+            <a
+              href="#categories"
+              class="hover:text-terracotta text-sm font-medium text-stone-600 transition-colors"
+            >
+              Categories
+            </a>
+            <a
+              href="#about"
+              class="hover:text-terracotta text-sm font-medium text-stone-600 transition-colors"
+            >
+              About
+            </a>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button
+              type="button"
+              class="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-stone-300 hover:shadow-md"
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              class="bg-terracotta shadow-terracotta/25 hover:bg-terracotta-dark hover:shadow-terracotta/30 rounded-xl px-4 py-2 text-sm font-medium text-white shadow-lg transition-all hover:shadow-xl"
+            >
+              Add Recipe
+            </button>
+          </div>
+        </div>
       </div>
+    </nav>
 
-      <div class="relative mx-auto max-w-6xl px-6">
-        <div class="flex flex-col items-center text-center">
-          <h1
-            class="font-display text-6xl font-bold tracking-tight text-amber-900 md:text-7xl lg:text-8xl"
-          >
-            Delicious Recipes
-          </h1>
-          <p
-            class="mt-6 max-w-2xl font-body text-xl text-amber-800 md:text-2xl"
-          >
-            Discover the best recipes of Ukrainian and world cuisine. Cook with
-            love and inspiration!
-          </p>
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden">
+      <div class="mx-auto max-w-7xl px-6 pt-16 pb-20 lg:px-8 lg:pt-24 lg:pb-32">
+        <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+          <!-- Left: Text -->
+          <div>
+            <div
+              class="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800"
+            >
+              <span class="relative flex h-2 w-2">
+                <span
+                  class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"
+                />
+                <span
+                  class="relative inline-flex h-2 w-2 rounded-full bg-amber-500"
+                />
+              </span>
+              Over 300+ tested recipes
+            </div>
 
-          <!-- Search Bar -->
-          <IconField class="mt-8 w-full max-w-xl">
-            <InputIcon class="pi pi-search" />
-            <InputText
-              v-model="searchQuery"
-              placeholder="Search recipes..."
-              class="w-full rounded-full border-2 border-amber-300 bg-white/80 px-6 py-4 pl-12 font-body text-lg text-amber-900 shadow-lg backdrop-blur-sm transition-all duration-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-200"
-            />
-          </IconField>
+            <h1
+              class="font-display text-5xl leading-[1.1] font-bold tracking-tight text-stone-900 lg:text-7xl"
+            >
+              Cook with
+              <span class="relative inline-block">
+                <span class="relative z-10">passion</span>
+                <span
+                  class="bg-terracotta/20 absolute -bottom-1 left-0 z-0 h-3 w-full lg:h-4"
+                />
+              </span>
+              <br />
+              every day
+            </h1>
 
-          <div class="mt-8 flex gap-4">
-            <Button
-              label="Browse Recipes"
-              class="rounded-full bg-amber-600 px-8 py-3 font-body text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-amber-700 hover:shadow-xl"
-            />
-            <Button
-              label="Add Recipe"
-              outlined
-              class="rounded-full border-2 border-amber-600 px-8 py-3 font-body text-lg font-semibold text-amber-700 transition-all duration-300 hover:bg-amber-600 hover:text-white"
-            />
+            <p
+              class="mt-6 max-w-lg text-lg leading-relaxed text-stone-600 lg:text-xl"
+            >
+              Classic dishes and modern twists. Step-by-step recipes, helpful
+              tips, and inspiration for your kitchen.
+            </p>
+
+            <div class="mt-10 flex flex-wrap items-center gap-4">
+              <button
+                type="button"
+                class="group flex items-center gap-3 rounded-2xl bg-stone-900 px-7 py-4 text-base font-semibold text-white shadow-xl shadow-stone-900/20 transition-all hover:bg-stone-800 hover:shadow-2xl hover:shadow-stone-900/30"
+              >
+                Start Cooking
+                <i
+                  class="pi pi-arrow-right text-sm transition-transform group-hover:translate-x-1"
+                />
+              </button>
+              <button
+                type="button"
+                class="flex items-center gap-2 rounded-2xl border-2 border-stone-200 bg-white px-7 py-4 text-base font-semibold text-stone-700 transition-all hover:border-stone-300 hover:bg-stone-50"
+              >
+                <i class="pi pi-play-circle text-terracotta text-lg" />
+                Watch Tour
+              </button>
+            </div>
+
+            <!-- Social proof -->
+            <div class="mt-12 flex items-center gap-6">
+              <div class="flex -space-x-3">
+                <div
+                  v-for="i in 4"
+                  :key="i"
+                  class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-linear-to-br from-stone-200 to-stone-300 text-xs font-bold text-stone-600"
+                >
+                  {{ ["EK", "AM", "MS", "JP"][i - 1] }}
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center gap-1">
+                  <i
+                    v-for="i in 5"
+                    :key="i"
+                    class="pi pi-star-fill text-xs text-amber-400"
+                  />
+                </div>
+                <p class="mt-0.5 text-sm text-stone-500">
+                  <span class="font-semibold text-stone-700">12,400+</span>
+                  happy cooks
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Hero image collage -->
+          <div class="relative">
+            <div class="relative mx-auto max-w-lg lg:max-w-none">
+              <!-- Main image -->
+              <div
+                class="relative overflow-hidden rounded-3xl shadow-2xl shadow-stone-900/15"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&h=800&fit=crop"
+                  alt="Delicious dish"
+                  class="h-105 w-full object-cover lg:h-130"
+                />
+                <div
+                  class="absolute inset-0 bg-linear-to-t from-stone-900/30 to-transparent"
+                />
+                <div class="absolute right-6 bottom-6 left-6">
+                  <div
+                    class="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 backdrop-blur-md"
+                  >
+                    <i class="pi pi-star-fill text-sm text-amber-400" />
+                    <span class="text-sm font-semibold text-stone-800"
+                      >Recipe of the Day</span
+                    >
+                  </div>
+                  <h3
+                    class="font-display mt-2 text-2xl font-bold text-white drop-shadow-lg"
+                  >
+                    Braised Potatoes with Mushrooms
+                  </h3>
+                </div>
+              </div>
+
+              <!-- Floating card 1 -->
+              <div
+                class="absolute top-8 -left-6 hidden w-48 rounded-2xl border border-stone-100 bg-white p-4 shadow-xl shadow-stone-900/8 lg:block"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50"
+                  >
+                    <i class="pi pi-clock text-emerald-600" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-stone-500">Cook Time</p>
+                    <p class="text-sm font-bold text-stone-800">45 minutes</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Floating card 2 -->
+              <div
+                class="absolute -right-4 bottom-16 hidden w-52 rounded-2xl border border-stone-100 bg-white p-4 shadow-xl shadow-stone-900/8 lg:block"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50"
+                  >
+                    <i class="pi pi-heart-fill text-rose-500" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-stone-500">Saved by</p>
+                    <p class="text-sm font-bold text-stone-800">2,847 people</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Decorative elements -->
+              <div
+                class="bg-terracotta/8 absolute -top-8 -right-8 -z-10 h-72 w-72 rounded-full blur-3xl"
+              />
+              <div
+                class="absolute -bottom-8 -left-8 -z-10 h-64 w-64 rounded-full bg-amber-200/20 blur-3xl"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Decorative elements -->
-      <div
-        class="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-amber-200/30 blur-3xl"
-      ></div>
-      <div
-        class="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-orange-200/30 blur-3xl"
-      ></div>
+      <!-- Wavy divider -->
+      <div class="absolute right-0 bottom-0 left-0">
+        <svg
+          viewBox="0 0 1440 60"
+          fill="none"
+          class="h-15 w-full"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M0 60V30C240 0 480 0 720 30C960 60 1200 60 1440 30V60H0Z"
+            fill="white"
+          />
+        </svg>
+      </div>
     </section>
 
     <!-- Categories Section -->
-    <section class="py-16">
-      <div class="mx-auto max-w-6xl px-6">
-        <h2 class="font-display text-4xl font-bold text-amber-900">
-          Categories
-        </h2>
-        <p class="mt-2 font-body text-lg text-amber-700">
-          Choose a category and find the perfect recipe
-        </p>
+    <section id="categories" class="bg-white py-20 lg:py-28">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mb-14 flex items-end justify-between">
+          <div>
+            <p
+              class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
+            >
+              Pick a direction
+            </p>
+            <h2
+              class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
+            >
+              Recipe Categories
+            </h2>
+          </div>
+          <a
+            href="#"
+            class="text-terracotta hover:text-terracotta-dark hidden items-center gap-2 text-sm font-semibold transition-colors sm:flex"
+          >
+            All categories
+            <i class="pi pi-arrow-right text-xs" />
+          </a>
+        </div>
 
-        <div class="mt-10 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
-          <div
-            v-for="category in categories"
-            :key="category.name"
-            class="group cursor-pointer rounded-2xl border-2 border-amber-200 bg-white p-6 text-center shadow-md transition-all duration-300 hover:-translate-y-2 hover:border-amber-400 hover:shadow-xl"
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          <button
+            v-for="(cat, index) in categories"
+            :key="cat.name"
+            type="button"
+            class="group relative overflow-hidden rounded-2xl border border-stone-100 bg-linear-to-br p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-stone-200 hover:shadow-xl hover:shadow-stone-900/5"
+            :class="cat.gradient"
+            :style="{ animationDelay: `${index * 100}ms` }"
           >
             <div
-              class="text-4xl transition-transform duration-300 group-hover:scale-110"
+              class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/80 shadow-sm"
             >
-              {{ category.icon }}
+              <i :class="[cat.icon, 'text-xl text-stone-700']" />
             </div>
-            <h3
-              class="mt-3 font-display text-lg font-semibold text-amber-900"
-            >
-              {{ category.name }}
+            <h3 class="text-base font-bold text-stone-800">
+              {{ cat.name }}
             </h3>
-            <p class="mt-1 font-body text-sm text-amber-600">
-              {{ category.count }} recipes
-            </p>
-          </div>
+            <p class="mt-1 text-sm text-stone-500">{{ cat.count }} recipes</p>
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- Popular Recipes Section -->
-    <section class="bg-amber-100/50 py-16">
-      <div class="mx-auto max-w-6xl px-6">
-        <div class="flex items-center justify-between">
+    <!-- Featured Recipes -->
+    <section id="recipes" class="bg-stone-50 py-20 lg:py-28">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mb-14 flex items-end justify-between">
           <div>
-            <h2
-              class="font-display text-4xl font-bold text-amber-900"
+            <p
+              class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
             >
-              Popular Recipes
-            </h2>
-            <p class="mt-2 font-body text-lg text-amber-700">
-              Most loved dishes by our users
+              Popular dishes
             </p>
+            <h2
+              class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
+            >
+              Featured Recipes
+            </h2>
           </div>
-          <Button
-            label="All Recipes"
-            text
-            class="font-body text-amber-700 hover:text-amber-900"
-          />
+          <a
+            href="#"
+            class="text-terracotta hover:text-terracotta-dark hidden items-center gap-2 text-sm font-semibold transition-colors sm:flex"
+          >
+            All recipes
+            <i class="pi pi-arrow-right text-xs" />
+          </a>
         </div>
 
-        <div class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          <Card
-            v-for="recipe in popularRecipes"
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <article
+            v-for="recipe in featuredRecipes"
             :key="recipe.id"
-            class="group overflow-hidden rounded-2xl border-2 border-amber-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:border-amber-400 hover:shadow-xl"
+            class="group cursor-pointer overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-stone-200 hover:shadow-xl hover:shadow-stone-900/8"
           >
-            <template #header>
+            <div class="relative overflow-hidden">
+              <img
+                :src="recipe.image"
+                :alt="recipe.title"
+                class="aspect-4/3 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
               <div
-                class="flex h-48 items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100 text-6xl transition-transform duration-300 group-hover:scale-110"
+                class="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-stone-700 backdrop-blur-md"
               >
-                {{ recipe.image }}
+                {{ recipe.tag }}
               </div>
-            </template>
-            <template #title>
+              <button
+                type="button"
+                class="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-stone-400 backdrop-blur-md transition-colors hover:text-rose-500"
+              >
+                <i class="pi pi-heart text-sm" />
+              </button>
+            </div>
+
+            <div class="p-5">
               <h3
-                class="font-display text-xl font-semibold text-amber-900"
+                class="font-display group-hover:text-terracotta text-lg font-bold text-stone-900 transition-colors"
               >
                 {{ recipe.title }}
               </h3>
-            </template>
-            <template #content>
-              <p class="font-body text-amber-700">
-                {{ recipe.description }}
-              </p>
-              <div class="mt-4 flex items-center gap-4">
-                <span
-                  class="flex items-center gap-1 font-body text-sm text-amber-600"
-                >
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-label="Time"
-                  >
-                    <title>Time</title>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+
+              <div class="mt-3 flex items-center gap-4 text-sm text-stone-500">
+                <span class="flex items-center gap-1.5">
+                  <i class="pi pi-clock text-xs" />
                   {{ recipe.time }}
                 </span>
-                <span
-                  class="rounded-full bg-amber-100 px-3 py-1 font-body text-sm font-medium text-amber-700"
-                >
+                <span class="flex items-center gap-1.5">
+                  <i class="pi pi-chart-bar text-xs" />
                   {{ recipe.difficulty }}
                 </span>
               </div>
-            </template>
-            <template #footer>
-              <Button
-                label="View Recipe"
-                class="w-full rounded-xl bg-amber-600 font-body font-semibold text-white transition-all duration-300 hover:bg-amber-700"
-              />
-            </template>
-          </Card>
+
+              <div
+                class="mt-4 flex items-center justify-between border-t border-stone-100 pt-4"
+              >
+                <div class="flex items-center gap-1">
+                  <i class="pi pi-star-fill text-xs text-amber-400" />
+                  <span class="text-sm font-semibold text-stone-700">
+                    {{ recipe.rating }}
+                  </span>
+                </div>
+                <span
+                  class="text-terracotta flex items-center gap-1 text-xs font-semibold opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  View
+                  <i class="pi pi-arrow-right text-[10px]" />
+                </span>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- Latest Recipes Section -->
-    <section class="py-16">
-      <div class="mx-auto max-w-6xl px-6">
-        <div class="flex items-center justify-between">
-          <div>
+    <!-- Today's Pick / Highlight -->
+    <section class="bg-white py-20 lg:py-28">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div
+          class="relative overflow-hidden rounded-3xl bg-linear-to-br from-stone-900 via-stone-800 to-stone-900 p-8 lg:p-16"
+        >
+          <!-- Decorative background -->
+          <div
+            class="absolute top-0 right-0 z-0 h-full w-1/2 opacity-20"
+            style="
+              background: radial-gradient(
+                ellipse at 70% 30%,
+                rgba(194, 122, 84, 0.4),
+                transparent 70%
+              );
+            "
+          />
+          <div
+            class="bg-terracotta/10 absolute -top-20 -left-20 -z-0 h-80 w-80 rounded-full blur-3xl"
+          />
+
+          <div class="relative z-10 grid items-center gap-12 lg:grid-cols-2">
+            <div>
+              <p
+                class="text-terracotta mb-3 text-sm font-semibold tracking-widest uppercase"
+              >
+                Today's Pick
+              </p>
+              <h2
+                class="font-display text-4xl font-bold tracking-tight text-white lg:text-5xl"
+              >
+                Culinary Calendar
+              </h2>
+              <p class="mt-6 max-w-lg text-lg leading-relaxed text-stone-300">
+                Every day we pick seasonal recipes that perfectly match the time
+                of year. Today — a silky roasted pumpkin soup with aromatic
+                spices and homemade croutons.
+              </p>
+
+              <div class="mt-10 flex flex-wrap gap-4">
+                <div
+                  class="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 backdrop-blur-sm"
+                >
+                  <p class="text-sm text-stone-400">Calories</p>
+                  <p class="text-xl font-bold text-white">245 kcal</p>
+                </div>
+                <div
+                  class="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 backdrop-blur-sm"
+                >
+                  <p class="text-sm text-stone-400">Time</p>
+                  <p class="text-xl font-bold text-white">40 min</p>
+                </div>
+                <div
+                  class="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 backdrop-blur-sm"
+                >
+                  <p class="text-sm text-stone-400">Servings</p>
+                  <p class="text-xl font-bold text-white">4</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="bg-terracotta shadow-terracotta/30 hover:bg-terracotta-dark mt-10 rounded-2xl px-8 py-4 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl"
+              >
+                View Recipe
+              </button>
+            </div>
+
+            <div class="relative">
+              <div
+                class="overflow-hidden rounded-2xl shadow-2xl shadow-black/30"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=600&h=500&fit=crop"
+                  alt="Pumpkin Soup"
+                  class="h-95 w-full object-cover lg:h-110"
+                />
+              </div>
+              <div
+                class="absolute -bottom-4 -left-4 rounded-2xl border border-stone-700 bg-stone-800/90 px-5 py-3 backdrop-blur-md"
+              >
+                <div class="flex items-center gap-2">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20"
+                  >
+                    <i class="pi pi-check text-sm text-emerald-400" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-stone-400">Difficulty</p>
+                    <p class="text-sm font-bold text-white">Easy</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="bg-stone-50 py-20 lg:py-28">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mb-14 text-center">
+          <p
+            class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
+          >
+            Reviews
+          </p>
+          <h2
+            class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
+          >
+            What Cooks Say
+          </h2>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-3">
+          <div
+            v-for="(item, index) in testimonials"
+            :key="index"
+            class="rounded-2xl border border-stone-100 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:shadow-stone-900/5"
+          >
+            <div class="mb-4 flex gap-1">
+              <i
+                v-for="s in 5"
+                :key="s"
+                class="pi pi-star-fill text-sm text-amber-400"
+              />
+            </div>
+            <p class="text-lg leading-relaxed text-stone-700 italic">
+              "{{ item.text }}"
+            </p>
+            <div class="mt-6 flex items-center gap-3">
+              <div
+                class="from-terracotta/20 text-terracotta flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br to-amber-100 text-sm font-bold"
+              >
+                {{ item.author.charAt(0) }}
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-stone-800">
+                  {{ item.author }}
+                </p>
+                <p class="text-xs text-stone-500">{{ item.role }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter CTA -->
+    <section class="bg-white py-20 lg:py-28">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div
+          class="from-terracotta to-terracotta-dark shadow-terracotta/20 relative overflow-hidden rounded-3xl bg-linear-to-br px-8 py-16 text-center shadow-2xl lg:px-16"
+        >
+          <div
+            class="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-white/10 blur-2xl"
+          />
+          <div
+            class="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-black/10 blur-2xl"
+          />
+
+          <div class="relative z-10">
+            <span class="text-5xl">📬</span>
             <h2
-              class="font-display text-4xl font-bold text-amber-900"
+              class="font-display mt-6 text-4xl font-bold tracking-tight text-white lg:text-5xl"
             >
-              Latest Recipes
+              New Recipes Every Week
             </h2>
-            <p class="mt-2 font-body text-lg text-amber-700">
-              Fresh recipes added by our users
+            <p class="mx-auto mt-4 max-w-xl text-lg text-white/80">
+              Subscribe to our newsletter and get the best seasonal recipes,
+              tips, and cooking secrets delivered straight to your inbox.
+            </p>
+
+            <div class="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                class="flex-1 rounded-xl border-0 bg-white/90 px-5 py-4 text-base text-stone-800 placeholder-stone-400 ring-0 backdrop-blur-sm transition-all outline-none focus:bg-white focus:ring-2 focus:ring-white/50"
+              />
+              <button
+                type="button"
+                class="shrink-0 rounded-xl bg-stone-900 px-8 py-4 text-base font-semibold text-white transition-all hover:bg-stone-800"
+              >
+                Subscribe
+              </button>
+            </div>
+
+            <p class="mt-4 text-sm text-white/60">
+              No spam. Unsubscribe anytime.
             </p>
           </div>
-          <Button
-            label="All Recipes"
-            text
-            class="font-body text-amber-700 hover:text-amber-900"
-          />
         </div>
-
-        <div class="mt-10 grid gap-6 md:grid-cols-2">
-          <div
-            v-for="recipe in latestRecipes"
-            :key="recipe.id"
-            class="group flex gap-6 rounded-2xl border-2 border-amber-200 bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-amber-400 hover:shadow-xl"
-          >
-            <div
-              class="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 text-4xl transition-transform duration-300 group-hover:scale-110"
-            >
-              {{ recipe.image }}
-            </div>
-            <div class="flex flex-col justify-between">
-              <div>
-                <h3
-                  class="font-display text-xl font-semibold text-amber-900"
-                >
-                  {{ recipe.title }}
-                </h3>
-                <p class="mt-1 font-body text-amber-700">
-                  {{ recipe.description }}
-                </p>
-              </div>
-              <div class="mt-3 flex items-center gap-4">
-                <span
-                  class="flex items-center gap-1 font-body text-sm text-amber-600"
-                >
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-label="Time"
-                  >
-                    <title>Time</title>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {{ recipe.time }}
-                </span>
-                <span
-                  class="rounded-full bg-amber-100 px-3 py-1 font-body text-sm font-medium text-amber-700"
-                >
-                  {{ recipe.difficulty }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="bg-linear-to-r from-amber-600 to-orange-500 py-20">
-      <div class="mx-auto max-w-4xl px-6 text-center">
-        <h2
-          class="font-display text-4xl font-bold text-white md:text-5xl"
-        >
-          Share Your Recipe
-        </h2>
-        <p class="mt-4 font-body text-xl text-amber-100">
-          Have a favorite recipe? Share it with our community!
-        </p>
-        <Button
-          label="Add Recipe"
-          class="mt-8 rounded-full bg-white px-10 py-4 font-body text-lg font-semibold text-amber-700 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-xl"
-        />
       </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-amber-900 py-12 text-amber-100">
-      <div class="mx-auto max-w-6xl px-6">
-        <div class="grid gap-8 md:grid-cols-4">
-          <div>
-            <h3 class="font-display text-2xl font-bold text-white">
-              Recipes
-            </h3>
-            <p class="mt-2 font-body text-amber-200">
-              Delicious dishes for every day
+    <footer class="border-t border-stone-200 bg-stone-900 py-16 text-stone-400">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="grid gap-12 md:grid-cols-4">
+          <div class="md:col-span-1">
+            <div class="flex items-center gap-2">
+              <div
+                class="bg-terracotta flex h-10 w-10 items-center justify-center rounded-xl"
+              >
+                <span class="text-lg text-white">🍳</span>
+              </div>
+              <span class="font-display text-2xl font-semibold text-white">
+                Savory
+              </span>
+            </div>
+            <p class="mt-4 max-w-xs text-sm leading-relaxed text-stone-400">
+              Your trusted companion on culinary adventures. Delicious recipes
+              for every day.
             </p>
           </div>
+
           <div>
-            <h4 class="font-body text-lg font-semibold text-white">
-              Categories
-            </h4>
-            <ul class="mt-3 space-y-2 font-body text-amber-200">
+            <h4 class="mb-4 text-sm font-semibold text-white">Recipes</h4>
+            <ul class="space-y-3 text-sm">
               <li>
                 <a href="#" class="transition-colors hover:text-white">
                   Breakfast
@@ -396,11 +769,10 @@ const latestRecipes = [
               </li>
             </ul>
           </div>
+
           <div>
-            <h4 class="font-body text-lg font-semibold text-white">
-              Information
-            </h4>
-            <ul class="mt-3 space-y-2 font-body text-amber-200">
+            <h4 class="mb-4 text-sm font-semibold text-white">Company</h4>
+            <ul class="space-y-3 text-sm">
               <li>
                 <a href="#" class="transition-colors hover:text-white">
                   About Us
@@ -413,71 +785,57 @@ const latestRecipes = [
               </li>
               <li>
                 <a href="#" class="transition-colors hover:text-white">
-                  Privacy Policy
+                  Partnerships
+                </a>
+              </li>
+              <li>
+                <a href="#" class="transition-colors hover:text-white">
+                  Blog
                 </a>
               </li>
             </ul>
           </div>
+
           <div>
-            <h4 class="font-body text-lg font-semibold text-white">
-              Social Media
-            </h4>
-            <div class="mt-3 flex gap-4">
+            <h4 class="mb-4 text-sm font-semibold text-white">Social</h4>
+            <div class="flex gap-3">
               <a
                 href="#"
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-800 text-amber-200 transition-colors hover:bg-amber-700 hover:text-white"
-                aria-label="Twitter"
-              >
-                <svg
-                  class="h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"
-                  />
-                </svg>
-              </a>
-              <a
-                href="#"
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-800 text-amber-200 transition-colors hover:bg-amber-700 hover:text-white"
                 aria-label="Instagram"
+                class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors hover:bg-white/10"
               >
-                <svg
-                  class="h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
-                  />
-                </svg>
+                <i class="pi pi-instagram text-sm" />
               </a>
               <a
                 href="#"
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-800 text-amber-200 transition-colors hover:bg-amber-700 hover:text-white"
                 aria-label="YouTube"
+                class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors hover:bg-white/10"
               >
-                <svg
-                  class="h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"
-                  />
-                </svg>
+                <i class="pi pi-youtube text-sm" />
+              </a>
+              <a
+                href="#"
+                aria-label="Telegram"
+                class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors hover:bg-white/10"
+              >
+                <i class="pi pi-telegram text-sm" />
               </a>
             </div>
           </div>
         </div>
-        <div class="mt-10 border-t border-amber-800 pt-8 text-center">
-          <p class="font-body text-amber-300">
-            © 2026 Recipes. All rights reserved.
-          </p>
+
+        <div
+          class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-stone-800 pt-8 text-sm md:flex-row"
+        >
+          <p>&copy; 2026 Savory. All rights reserved.</p>
+          <div class="flex gap-6">
+            <a href="#" class="transition-colors hover:text-white">
+              Privacy Policy
+            </a>
+            <a href="#" class="transition-colors hover:text-white">
+              Terms of Service
+            </a>
+          </div>
         </div>
       </div>
     </footer>

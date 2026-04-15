@@ -1,5 +1,6 @@
 import "@/assets/main.css";
 
+import { definePreset } from "@primeuix/themes";
 import Aura from "@primeuix/themes/aura";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 import { createPinia } from "pinia";
@@ -10,9 +11,11 @@ import router from "./router";
 
 const app = createApp(App);
 
+const preset = definePreset(Aura);
+
 app.use(PrimeVue, {
   theme: {
-    preset: Aura,
+    preset,
     options: {
       darkModeSelector: "html.dark",
     },
