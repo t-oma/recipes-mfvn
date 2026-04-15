@@ -101,52 +101,36 @@ const latestRecipes = [
       <div class="relative mx-auto max-w-6xl px-6">
         <div class="flex flex-col items-center text-center">
           <h1
-            class="font-['Playfair_Display'] text-6xl font-bold tracking-tight text-amber-900 md:text-7xl lg:text-8xl"
+            class="font-display text-6xl font-bold tracking-tight text-amber-900 md:text-7xl lg:text-8xl"
           >
             Delicious Recipes
           </h1>
           <p
-            class="mt-6 max-w-2xl font-['Lora'] text-xl text-amber-800 md:text-2xl"
+            class="mt-6 max-w-2xl font-body text-xl text-amber-800 md:text-2xl"
           >
             Discover the best recipes of Ukrainian and world cuisine. Cook with
             love and inspiration!
           </p>
 
           <!-- Search Bar -->
-          <div class="mt-10 w-full max-w-xl">
-            <div class="relative">
-              <InputText
-                v-model="searchQuery"
-                placeholder="Search recipes..."
-                class="w-full rounded-full border-2 border-amber-300 bg-white/80 px-6 py-4 pl-12 font-['Lora'] text-lg text-amber-900 shadow-lg backdrop-blur-sm transition-all duration-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-200"
-              />
-              <svg
-                class="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-amber-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-label="Search"
-              >
-                <title>Search</title>
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          </div>
+          <IconField class="mt-8 w-full max-w-xl">
+            <InputIcon class="pi pi-search" />
+            <InputText
+              v-model="searchQuery"
+              placeholder="Search recipes..."
+              class="w-full rounded-full border-2 border-amber-300 bg-white/80 px-6 py-4 pl-12 font-body text-lg text-amber-900 shadow-lg backdrop-blur-sm transition-all duration-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-200"
+            />
+          </IconField>
 
           <div class="mt-8 flex gap-4">
             <Button
               label="Browse Recipes"
-              class="rounded-full bg-amber-600 px-8 py-3 font-['Lora'] text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-amber-700 hover:shadow-xl"
+              class="rounded-full bg-amber-600 px-8 py-3 font-body text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-amber-700 hover:shadow-xl"
             />
             <Button
               label="Add Recipe"
               outlined
-              class="rounded-full border-2 border-amber-600 px-8 py-3 font-['Lora'] text-lg font-semibold text-amber-700 transition-all duration-300 hover:bg-amber-600 hover:text-white"
+              class="rounded-full border-2 border-amber-600 px-8 py-3 font-body text-lg font-semibold text-amber-700 transition-all duration-300 hover:bg-amber-600 hover:text-white"
             />
           </div>
         </div>
@@ -164,10 +148,10 @@ const latestRecipes = [
     <!-- Categories Section -->
     <section class="py-16">
       <div class="mx-auto max-w-6xl px-6">
-        <h2 class="font-['Playfair_Display'] text-4xl font-bold text-amber-900">
+        <h2 class="font-display text-4xl font-bold text-amber-900">
           Categories
         </h2>
-        <p class="mt-2 font-['Lora'] text-lg text-amber-700">
+        <p class="mt-2 font-body text-lg text-amber-700">
           Choose a category and find the perfect recipe
         </p>
 
@@ -183,11 +167,11 @@ const latestRecipes = [
               {{ category.icon }}
             </div>
             <h3
-              class="mt-3 font-['Playfair_Display'] text-lg font-semibold text-amber-900"
+              class="mt-3 font-display text-lg font-semibold text-amber-900"
             >
               {{ category.name }}
             </h3>
-            <p class="mt-1 font-['Lora'] text-sm text-amber-600">
+            <p class="mt-1 font-body text-sm text-amber-600">
               {{ category.count }} recipes
             </p>
           </div>
@@ -201,18 +185,18 @@ const latestRecipes = [
         <div class="flex items-center justify-between">
           <div>
             <h2
-              class="font-['Playfair_Display'] text-4xl font-bold text-amber-900"
+              class="font-display text-4xl font-bold text-amber-900"
             >
               Popular Recipes
             </h2>
-            <p class="mt-2 font-['Lora'] text-lg text-amber-700">
+            <p class="mt-2 font-body text-lg text-amber-700">
               Most loved dishes by our users
             </p>
           </div>
           <Button
             label="All Recipes"
             text
-            class="font-['Lora'] text-amber-700 hover:text-amber-900"
+            class="font-body text-amber-700 hover:text-amber-900"
           />
         </div>
 
@@ -231,18 +215,18 @@ const latestRecipes = [
             </template>
             <template #title>
               <h3
-                class="font-['Playfair_Display'] text-xl font-semibold text-amber-900"
+                class="font-display text-xl font-semibold text-amber-900"
               >
                 {{ recipe.title }}
               </h3>
             </template>
             <template #content>
-              <p class="font-['Lora'] text-amber-700">
+              <p class="font-body text-amber-700">
                 {{ recipe.description }}
               </p>
               <div class="mt-4 flex items-center gap-4">
                 <span
-                  class="flex items-center gap-1 font-['Lora'] text-sm text-amber-600"
+                  class="flex items-center gap-1 font-body text-sm text-amber-600"
                 >
                   <svg
                     class="h-4 w-4"
@@ -262,7 +246,7 @@ const latestRecipes = [
                   {{ recipe.time }}
                 </span>
                 <span
-                  class="rounded-full bg-amber-100 px-3 py-1 font-['Lora'] text-sm font-medium text-amber-700"
+                  class="rounded-full bg-amber-100 px-3 py-1 font-body text-sm font-medium text-amber-700"
                 >
                   {{ recipe.difficulty }}
                 </span>
@@ -271,7 +255,7 @@ const latestRecipes = [
             <template #footer>
               <Button
                 label="View Recipe"
-                class="w-full rounded-xl bg-amber-600 font-['Lora'] font-semibold text-white transition-all duration-300 hover:bg-amber-700"
+                class="w-full rounded-xl bg-amber-600 font-body font-semibold text-white transition-all duration-300 hover:bg-amber-700"
               />
             </template>
           </Card>
@@ -285,18 +269,18 @@ const latestRecipes = [
         <div class="flex items-center justify-between">
           <div>
             <h2
-              class="font-['Playfair_Display'] text-4xl font-bold text-amber-900"
+              class="font-display text-4xl font-bold text-amber-900"
             >
               Latest Recipes
             </h2>
-            <p class="mt-2 font-['Lora'] text-lg text-amber-700">
+            <p class="mt-2 font-body text-lg text-amber-700">
               Fresh recipes added by our users
             </p>
           </div>
           <Button
             label="All Recipes"
             text
-            class="font-['Lora'] text-amber-700 hover:text-amber-900"
+            class="font-body text-amber-700 hover:text-amber-900"
           />
         </div>
 
@@ -314,17 +298,17 @@ const latestRecipes = [
             <div class="flex flex-col justify-between">
               <div>
                 <h3
-                  class="font-['Playfair_Display'] text-xl font-semibold text-amber-900"
+                  class="font-display text-xl font-semibold text-amber-900"
                 >
                   {{ recipe.title }}
                 </h3>
-                <p class="mt-1 font-['Lora'] text-amber-700">
+                <p class="mt-1 font-body text-amber-700">
                   {{ recipe.description }}
                 </p>
               </div>
               <div class="mt-3 flex items-center gap-4">
                 <span
-                  class="flex items-center gap-1 font-['Lora'] text-sm text-amber-600"
+                  class="flex items-center gap-1 font-body text-sm text-amber-600"
                 >
                   <svg
                     class="h-4 w-4"
@@ -344,7 +328,7 @@ const latestRecipes = [
                   {{ recipe.time }}
                 </span>
                 <span
-                  class="rounded-full bg-amber-100 px-3 py-1 font-['Lora'] text-sm font-medium text-amber-700"
+                  class="rounded-full bg-amber-100 px-3 py-1 font-body text-sm font-medium text-amber-700"
                 >
                   {{ recipe.difficulty }}
                 </span>
@@ -359,16 +343,16 @@ const latestRecipes = [
     <section class="bg-linear-to-r from-amber-600 to-orange-500 py-20">
       <div class="mx-auto max-w-4xl px-6 text-center">
         <h2
-          class="font-['Playfair_Display'] text-4xl font-bold text-white md:text-5xl"
+          class="font-display text-4xl font-bold text-white md:text-5xl"
         >
           Share Your Recipe
         </h2>
-        <p class="mt-4 font-['Lora'] text-xl text-amber-100">
+        <p class="mt-4 font-body text-xl text-amber-100">
           Have a favorite recipe? Share it with our community!
         </p>
         <Button
           label="Add Recipe"
-          class="mt-8 rounded-full bg-white px-10 py-4 font-['Lora'] text-lg font-semibold text-amber-700 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-xl"
+          class="mt-8 rounded-full bg-white px-10 py-4 font-body text-lg font-semibold text-amber-700 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-xl"
         />
       </div>
     </section>
@@ -378,18 +362,18 @@ const latestRecipes = [
       <div class="mx-auto max-w-6xl px-6">
         <div class="grid gap-8 md:grid-cols-4">
           <div>
-            <h3 class="font-['Playfair_Display'] text-2xl font-bold text-white">
+            <h3 class="font-display text-2xl font-bold text-white">
               Recipes
             </h3>
-            <p class="mt-2 font-['Lora'] text-amber-200">
+            <p class="mt-2 font-body text-amber-200">
               Delicious dishes for every day
             </p>
           </div>
           <div>
-            <h4 class="font-['Lora'] text-lg font-semibold text-white">
+            <h4 class="font-body text-lg font-semibold text-white">
               Categories
             </h4>
-            <ul class="mt-3 space-y-2 font-['Lora'] text-amber-200">
+            <ul class="mt-3 space-y-2 font-body text-amber-200">
               <li>
                 <a href="#" class="transition-colors hover:text-white">
                   Breakfast
@@ -413,10 +397,10 @@ const latestRecipes = [
             </ul>
           </div>
           <div>
-            <h4 class="font-['Lora'] text-lg font-semibold text-white">
+            <h4 class="font-body text-lg font-semibold text-white">
               Information
             </h4>
-            <ul class="mt-3 space-y-2 font-['Lora'] text-amber-200">
+            <ul class="mt-3 space-y-2 font-body text-amber-200">
               <li>
                 <a href="#" class="transition-colors hover:text-white">
                   About Us
@@ -435,7 +419,7 @@ const latestRecipes = [
             </ul>
           </div>
           <div>
-            <h4 class="font-['Lora'] text-lg font-semibold text-white">
+            <h4 class="font-body text-lg font-semibold text-white">
               Social Media
             </h4>
             <div class="mt-3 flex gap-4">
@@ -491,7 +475,7 @@ const latestRecipes = [
           </div>
         </div>
         <div class="mt-10 border-t border-amber-800 pt-8 text-center">
-          <p class="font-['Lora'] text-amber-300">
+          <p class="font-body text-amber-300">
             © 2026 Recipes. All rights reserved.
           </p>
         </div>
