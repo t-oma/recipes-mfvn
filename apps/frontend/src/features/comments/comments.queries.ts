@@ -43,6 +43,13 @@ export function useRecipeComments(
   });
 }
 
+/**
+ * Create a new comment for the recipe with the given id.
+ *
+ * @param id - recipe id.
+ * @param body - comment data.
+ * @returns Created comment.
+ */
 export function useCreateRecipeComment() {
   const queryClient = useQueryClient();
 
@@ -63,6 +70,11 @@ export function useCreateRecipeComment() {
   });
 }
 
+/**
+ * Delete a comment with the given id.
+ *
+ * @param id - comment id.
+ */
 export function useDeleteRecipeComment() {
   const queryClient = useQueryClient();
 

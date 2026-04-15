@@ -25,6 +25,12 @@ export const recipeKeys = {
     [...recipeKeys.list(query), "infinite"] as const,
 } as const;
 
+/**
+ * Get recipes with the given filters.
+ *
+ * @param filters - filters for the query.
+ * @returns Paginated list of recipes.
+ */
 export function useRecipes(filters: MaybeRef<RecipeFilters>) {
   return useQuery({
     queryKey: recipeKeys.list(toValue(filters)),
@@ -32,6 +38,12 @@ export function useRecipes(filters: MaybeRef<RecipeFilters>) {
   });
 }
 
+/**
+ * Get recipes with the given filters using @tanstack/vue-query's infinite query.
+ *
+ * @param filters - filters for the query.
+ * @returns Paginated list of recipes.
+ */
 export function useInfiniteRecipes(
   filters: MaybeRef<Omit<RecipeFilters, "page">>,
 ) {
@@ -45,6 +57,12 @@ export function useInfiniteRecipes(
   });
 }
 
+/**
+ * Get recipe by ID.
+ *
+ * @param id - recipe id.
+ * @returns Recipe.
+ */
 export function useRecipe(id: MaybeRef<string>) {
   return useQuery({
     queryKey: recipeKeys.detail(toValue(id)),
@@ -53,6 +71,12 @@ export function useRecipe(id: MaybeRef<string>) {
   });
 }
 
+/**
+ * Create a new recipe.
+ *
+ * @param body - recipe data.
+ * @returns Created recipe.
+ */
 export function useCreateRecipe() {
   const queryClient = useQueryClient();
 
@@ -65,6 +89,13 @@ export function useCreateRecipe() {
   });
 }
 
+/**
+ * Update a recipe with the given id.
+ *
+ * @param id - recipe id.
+ * @param body - recipe data.
+ * @returns Updated recipe.
+ */
 export function useUpdateRecipe() {
   const queryClient = useQueryClient();
 
@@ -79,6 +110,11 @@ export function useUpdateRecipe() {
   });
 }
 
+/**
+ * Delete a recipe with the given id.
+ *
+ * @param id - recipe id.
+ */
 export function useDeleteRecipe() {
   const queryClient = useQueryClient();
 

@@ -12,6 +12,11 @@ const authQueryKeys = {
   me: () => [...authQueryKeys.all, "me"] as const,
 };
 
+/**
+ * Get current user.
+ *
+ * @returns Current user.
+ */
 export function useCurrentUser() {
   return useQuery({
     queryKey: authQueryKeys.me(),
@@ -21,6 +26,12 @@ export function useCurrentUser() {
   });
 }
 
+/**
+ * Login user.
+ *
+ * @param body - login body.
+ * @returns Login response.
+ */
 export function useLogin() {
   const queryClient = useQueryClient();
 
@@ -33,6 +44,12 @@ export function useLogin() {
   });
 }
 
+/**
+ * Register user.
+ *
+ * @param body - register body.
+ * @returns Register response.
+ */
 export function useRegister() {
   const queryClient = useQueryClient();
 
@@ -45,6 +62,11 @@ export function useRegister() {
   });
 }
 
+/**
+ * Logout user.
+ *
+ * Removes the token from the local storage and clears the query client cache.
+ */
 export function useLogout() {
   const queryClient = useQueryClient();
 
@@ -55,6 +77,11 @@ export function useLogout() {
   };
 }
 
+/**
+ * Check if the user is authenticated.
+ *
+ * @returns true if the user is authenticated, false otherwise.
+ */
 export function useIsAuthenticated() {
   return computed(() => !!getToken());
 }

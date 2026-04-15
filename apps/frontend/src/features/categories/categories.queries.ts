@@ -5,6 +5,11 @@ const categoryKeys = {
   all: ["categories"] as const,
 };
 
+/**
+ * Get all categories.
+ *
+ * @returns Paginated list of categories.
+ */
 export function useCategories() {
   return useQuery({
     queryKey: categoryKeys.all,

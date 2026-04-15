@@ -16,6 +16,12 @@ export type ToggleFavoriteParams = {
   favorited: boolean;
 };
 
+/**
+ * Add a recipe with the given id to the current user's favorites.
+ *
+ * @param id - recipe id.
+ * @returns \{favorited: true\} if the recipe was added to the user's favorites.
+ */
 export function useToggleFavorite() {
   const queryClient = useQueryClient();
 
