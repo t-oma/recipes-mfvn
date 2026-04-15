@@ -1,13 +1,40 @@
-import type { PaginationQuery } from "@recipes/shared";
+import type { PaginationQuery, Recipe } from "@recipes/shared";
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
-import { getUserFavorites } from "./favorites.api";
+import { recipeKeys } from "@/features/recipes/recipes.queries";
+import { addFavorite, getUserFavorites, removeFavorite } from "./favorites.api";
 
 const favoritesKeys = {
   all: ["favorites"] as const,
   byUser: (user: string, query: PaginationQuery) =>
     [...favoritesKeys.all, user, query] as const,
 };
+
+export type ToggleFavoriteParams = {
+  id: string;
+  favorited: boolean;
+};
+
+export function useToggleFavorite() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      favorited,
+    }: ToggleFavoriteParams): Promise<{ favorited: boolean }> =>
+      favorited ? removeFavorite(id) : addFavorite(id),
+
+    onSuccess: (_, { id, favorited }) => {
+      queryClient.setQueryData<Recipe>(recipeKeys.detail(id), (old) =>
+        old ? { ...old, isFavorited: !favorited } : old,
+      );
+      queryClient.invalidateQueries({ queryKey: recipeKeys.all });
+    },
+  });
+}
+
 /**
  * @todo Implement retriving favorites for the user other than the current one.
  *
