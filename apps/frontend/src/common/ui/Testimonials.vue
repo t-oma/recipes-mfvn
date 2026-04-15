@@ -1,11 +1,13 @@
 <script setup lang="ts">
-interface Testimonial {
+import Testimonial from "./Testimonial.vue";
+
+interface ITestimonial {
   text: string;
   author: string;
   role: string;
 }
 
-const testimonials: Testimonial[] = [
+const testimonials: ITestimonial[] = [
   {
     text: "Best recipe site ever! The beef stew turned out even better than my grandmother's.",
     author: "Elena K.",
@@ -41,35 +43,13 @@ const testimonials: Testimonial[] = [
       </div>
 
       <div class="grid gap-6 md:grid-cols-3">
-        <div
+        <Testimonial
           v-for="(item, index) in testimonials"
           :key="index"
-          class="rounded-2xl border border-stone-100 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:shadow-stone-900/5"
-        >
-          <div class="mb-4 flex gap-1">
-            <i
-              v-for="s in 5"
-              :key="s"
-              class="pi pi-star-fill text-sm text-amber-400"
-            />
-          </div>
-          <p class="text-lg leading-relaxed text-stone-700 italic">
-            "{{ item.text }}"
-          </p>
-          <div class="mt-6 flex items-center gap-3">
-            <div
-              class="from-terracotta/20 text-terracotta flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br to-amber-100 text-sm font-bold"
-            >
-              {{ item.author.charAt(0) }}
-            </div>
-            <div>
-              <p class="text-sm font-semibold text-stone-800">
-                {{ item.author }}
-              </p>
-              <p class="text-xs text-stone-500">{{ item.role }}</p>
-            </div>
-          </div>
-        </div>
+          :text="item.text"
+          :author="item.author"
+          :role="item.role"
+        />
       </div>
     </div>
   </section>
