@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import FeaturedRecipeFooter from "./FeaturedRecipeFooter.vue";
 import FeaturedRecipeHeader from "./FeaturedRecipeHeader.vue";
-import type { IFeaturedRecipe } from "./FeaturedRecipes.vue";
+import type { FeaturedRecipeData } from "./FeaturedRecipes.vue";
 
 const props = defineProps<{
-  recipe: IFeaturedRecipe;
+  recipe: FeaturedRecipeData;
 }>();
 </script>
 

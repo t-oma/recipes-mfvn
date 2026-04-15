@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import type { Difficulty } from "@recipes/shared";
 import { capitalize } from "vue";
 import TodaysPickHeader from "./TodaysPickHeader.vue";
 
-const props = defineProps<{
-  title: string;
-  image: string;
-  calories: number;
-  time: number;
-  servings: number;
-  difficulty: Difficulty;
-}>();
+const recipe = {
+  calories: 245,
+  time: 40,
+  servings: 4,
+  difficulty: "easy" as const,
+};
 </script>
 
 <template>
@@ -43,19 +40,25 @@ const props = defineProps<{
                 class="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-sm"
               >
                 <p class="text-sm text-stone-400">Calories</p>
-                <p class="text-xl font-bold text-white">{{ calories }} kcal</p>
+                <p class="text-xl font-bold text-white">
+                  {{ recipe.calories }} kcal
+                </p>
               </div>
               <div
                 class="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-sm"
               >
                 <p class="text-sm text-stone-400">Time</p>
-                <p class="text-xl font-bold text-white">{{ time }} min</p>
+                <p class="text-xl font-bold text-white">
+                  {{ recipe.time }} min
+                </p>
               </div>
               <div
                 class="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-sm"
               >
                 <p class="text-sm text-stone-400">Servings</p>
-                <p class="text-xl font-bold text-white">{{ servings }}</p>
+                <p class="text-xl font-bold text-white">
+                  {{ recipe.servings }}
+                </p>
               </div>
             </div>
 
@@ -88,7 +91,7 @@ const props = defineProps<{
                 <div>
                   <p class="text-xs text-stone-400">Difficulty</p>
                   <p class="text-sm font-bold text-white">
-                    {{ capitalize(difficulty) }}
+                    {{ capitalize(recipe.difficulty) }}
                   </p>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FeaturedRecipe from "./FeaturedRecipe.vue";
 
-export interface IFeaturedRecipe {
+export interface FeaturedRecipeData {
   id: number;
   title: string;
   time: string;
@@ -11,7 +11,7 @@ export interface IFeaturedRecipe {
   tag: string;
 }
 
-const featuredRecipes: IFeaturedRecipe[] = [
+const featuredRecipes: FeaturedRecipeData[] = [
   {
     id: 1,
     title: "Classic Beef Bourguignon",

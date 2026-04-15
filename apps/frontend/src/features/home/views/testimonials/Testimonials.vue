@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import Testimonial from "./Testimonial.vue";
+import Testimonial from "@/common/ui/Testimonial.vue";
 
-interface ITestimonial {
+interface TestimonialData {
   text: string;
   author: string;
   role: string;
 }
 
-const testimonials: ITestimonial[] = [
+const testimonials: TestimonialData[] = [
   {
     text: "Best recipe site ever! The beef stew turned out even better than my grandmother's.",
     author: "Elena K.",
