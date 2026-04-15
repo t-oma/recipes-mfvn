@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
+    "@recipes/shared": "workspace:*",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/vue-query": "^5.99.0",
     "pinia": "^3.0.4",
