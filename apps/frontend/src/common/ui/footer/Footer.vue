@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import AppLogo from "../AppLogo.vue";
-import Copyright from "./Copyright.vue";
+import FooterCopyright from "./FooterCopyright.vue";
 import FooterNav from "./FooterNav.vue";
-import Socials from "./Socials.vue";
+import FooterSocials from "./FooterSocials.vue";
 </script>
 
 <template>
@@ -19,10 +19,10 @@ import Socials from "./Socials.vue";
         </div>
 
         <FooterNav />
-        <Socials />
+        <FooterSocials />
       </div>
 
-      <Copyright />
+      <FooterCopyright />
     </div>
   </footer>
 </template>
