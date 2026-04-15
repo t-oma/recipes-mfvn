@@ -23,11 +23,9 @@ export function useCurrentUserFavorites(
   page: MaybeRef<number> = 1,
   limit = 20,
 ) {
-  const query = { page: toValue(page), limit };
-
   return useQuery({
-    queryKey: userKeys.favorites(query),
-    queryFn: () => getCurrentUserFavorites(query),
+    queryKey: userKeys.favorites({ page: toValue(page), limit }),
+    queryFn: () => getCurrentUserFavorites({ page: toValue(page), limit }),
   });
 }
 
@@ -39,10 +37,8 @@ export function useCurrentUserFavorites(
  * @returns Paginated list of comments.
  */
 export function useCurrentUserComments(page: MaybeRef<number> = 1, limit = 20) {
-  const query = { page: toValue(page), limit };
-
   return useQuery({
-    queryKey: userKeys.comments(query),
-    queryFn: () => getCurrentUserComments(query),
+    queryKey: userKeys.comments({ page: toValue(page), limit }),
+    queryFn: () => getCurrentUserComments({ page: toValue(page), limit }),
   });
 }

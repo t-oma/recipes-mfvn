@@ -81,7 +81,7 @@ export function useCreateRecipe() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (body: CreateRecipeBody) => createRecipe(body),
+    mutationFn: createRecipe,
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recipeKeys.lists() });

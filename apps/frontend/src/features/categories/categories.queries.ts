@@ -8,7 +8,7 @@ const categoryKeys = {
 /**
  * Get all categories.
  *
- * @returns Paginated list of categories.
+ * @returns List of categories.
  */
 export function useCategories() {
   return useQuery({

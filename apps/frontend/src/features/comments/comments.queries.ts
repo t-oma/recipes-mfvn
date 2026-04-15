@@ -13,7 +13,7 @@ import {
 const commentKeys = {
   all: ["comments"] as const,
   byAuthor: (author: string, query: PaginationQuery) =>
-    [...recipeKeys.all, ...commentKeys.all, author, query] as const,
+    [...commentKeys.all, author, query] as const,
   lists: (id: string) =>
     [...recipeKeys.detail(id), ...commentKeys.all] as const,
   list: (id: string, query: PaginationQuery) =>
@@ -33,13 +33,11 @@ export function useRecipeComments(
   page: MaybeRef<number> = 1,
   limit = 20,
 ) {
-  const recipeId = toValue(id);
-  const query = { page: toValue(page), limit };
-
   return useQuery({
-    queryKey: commentKeys.list(recipeId, query),
-    queryFn: () => getRecipeComments(recipeId, query),
-    enabled: () => !!recipeId,
+    queryKey: commentKeys.list(toValue(id), { page: toValue(page), limit }),
+    queryFn: () =>
+      getRecipeComments(toValue(id), { page: toValue(page), limit }),
+    enabled: () => !!toValue(id),
   });
 }
 
@@ -79,11 +77,12 @@ export function useDeleteRecipeComment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteRecipeComment,
+    mutationFn: ({ commentId }: { recipeId: string; commentId: string }) =>
+      deleteRecipeComment(commentId),
 
-    onSuccess: () => {
+    onSuccess: (_, { recipeId }) => {
       queryClient.invalidateQueries({
-        queryKey: [...recipeKeys.all, ...commentKeys.all],
+        queryKey: commentKeys.lists(recipeId),
       });
     },
   });
@@ -104,11 +103,8 @@ export function useUserComments(
   page: MaybeRef<number> = 1,
   limit = 20,
 ) {
-  const query = { page: toValue(page), limit };
-  user = "me";
-
   return useQuery({
-    queryKey: commentKeys.byAuthor(user, query),
-    queryFn: () => getUserComments(user, query),
+    queryKey: commentKeys.byAuthor(user, { page: toValue(page), limit }),
+    queryFn: () => getUserComments(user, { page: toValue(page), limit }),
   });
 }

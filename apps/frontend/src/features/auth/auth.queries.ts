@@ -39,7 +39,7 @@ export function useLogin() {
     mutationFn: loginApi,
     onSuccess: ({ token, user }) => {
       setToken(token);
-      queryClient.setQueryData(authQueryKeys.all, user);
+      queryClient.setQueryData(authQueryKeys.me(), user);
     },
   });
 }
@@ -57,7 +57,7 @@ export function useRegister() {
     mutationFn: registerApi,
     onSuccess: ({ token, user }) => {
       setToken(token);
-      queryClient.setQueryData(authQueryKeys.all, user);
+      queryClient.setQueryData(authQueryKeys.me(), user);
     },
   });
 }
@@ -72,7 +72,7 @@ export function useLogout() {
 
   return () => {
     removeToken();
-    queryClient.setQueryData(authQueryKeys.all, null);
+    queryClient.setQueryData(authQueryKeys.me(), null);
     queryClient.clear();
   };
 }
