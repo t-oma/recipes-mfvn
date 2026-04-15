@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import Footer from "@/common/ui/footer/Footer.vue";
-import Header from "@/common/ui/header/Header.vue";
+import DefaultLayout from "@/common/ui/DefaultLayout.vue";
 import Categories from "@/features/home/views/categories/Categories.vue";
 import FeaturedRecipes from "@/features/home/views/featured-recipes/FeaturedRecipes.vue";
 import Hero from "@/features/home/views/hero/Hero.vue";
@@ -24,20 +23,18 @@ onMounted(() => {
     :class="{ 'opacity-0': !isLoaded, 'opacity-100': isLoaded }"
     style="transition: opacity 0.6s ease-out"
   >
-    <Header />
+    <DefaultLayout>
+      <Hero />
 
-    <Hero />
+      <Categories />
 
-    <Categories />
+      <FeaturedRecipes />
 
-    <FeaturedRecipes />
+      <TodaysPick />
 
-    <TodaysPick />
+      <Testimonials />
 
-    <Testimonials />
-
-    <NewsletterCTA />
-
-    <Footer />
+      <NewsletterCTA />
+    </DefaultLayout>
   </div>
 </template>
