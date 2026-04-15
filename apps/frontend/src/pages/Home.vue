@@ -7,6 +7,8 @@ import Testimonials from "@/common/ui/Testimonials.vue";
 import TodaysPick from "@/common/ui/todays-pick/TodaysPick.vue";
 import Categories from "@/features/home/views/categories/Categories.vue";
 import FeaturedRecipes from "@/features/home/views/featured-recipes/FeaturedRecipes.vue";
+import SocialProof from "@/features/home/views/Hero/SocialProof.vue";
+import WavyDivider from "@/features/home/views/Hero/WavyDivider.vue";
 
 const isLoaded = ref(false);
 
@@ -95,31 +97,7 @@ onMounted(() => {
               </button>
             </div>
 
-            <!-- Social proof -->
-            <div class="mt-12 flex items-center gap-6">
-              <div class="flex -space-x-3">
-                <div
-                  v-for="i in 4"
-                  :key="i"
-                  class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-linear-to-br from-stone-200 to-stone-300 text-xs font-bold text-stone-600"
-                >
-                  {{ ["EK", "AM", "MS", "JP"][i - 1] }}
-                </div>
-              </div>
-              <div>
-                <div class="flex items-center gap-1">
-                  <i
-                    v-for="i in 5"
-                    :key="i"
-                    class="pi pi-star-fill text-xs text-amber-400"
-                  />
-                </div>
-                <p class="mt-0.5 text-sm text-stone-500">
-                  <span class="font-semibold text-stone-700">12,400+</span>
-                  happy cooks
-                </p>
-              </div>
-            </div>
+            <SocialProof />
           </div>
 
           <!-- Right: Hero image collage -->
@@ -200,21 +178,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Wavy divider -->
-      <div class="absolute right-0 bottom-0 left-0">
-        <svg
-          viewBox="0 0 1440 60"
-          fill="none"
-          class="h-15 w-full"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M0 60V30C240 0 480 0 720 30C960 60 1200 60 1440 30V60H0Z"
-            fill="white"
-          />
-        </svg>
-      </div>
+      <WavyDivider />
     </section>
 
     <Categories />
