@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import DefaultLayout from "@/common/ui/DefaultLayout.vue";
 import Categories from "@/features/home/views/categories/Categories.vue";
 import FeaturedRecipes from "@/features/home/views/featured-recipes/FeaturedRecipes.vue";
+import HomeSection from "@/features/home/views/HomeSection.vue";
 import Hero from "@/features/home/views/hero/Hero.vue";
 import NewsletterCTA from "@/features/home/views/newsletter/NewsletterCTA.vue";
 import Testimonials from "@/features/home/views/testimonials/Testimonials.vue";
@@ -26,15 +27,25 @@ onMounted(() => {
     <DefaultLayout>
       <Hero />
 
-      <Categories />
+      <HomeSection id="categories" bg="bg-white">
+        <Categories />
+      </HomeSection>
 
-      <FeaturedRecipes />
+      <HomeSection id="featured-recipes" bg="bg-stone-50">
+        <FeaturedRecipes />
+      </HomeSection>
 
-      <TodaysPick />
+      <HomeSection id="todays-pick" bg="bg-white">
+        <TodaysPick />
+      </HomeSection>
 
-      <Testimonials />
+      <HomeSection id="testimonials" bg="bg-stone-50">
+        <Testimonials />
+      </HomeSection>
 
-      <NewsletterCTA />
+      <HomeSection id="newsletter" bg="bg-white">
+        <NewsletterCTA />
+      </HomeSection>
     </DefaultLayout>
   </div>
 </template>

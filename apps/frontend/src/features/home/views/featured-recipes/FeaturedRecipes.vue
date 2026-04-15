@@ -56,37 +56,33 @@ const featuredRecipes: FeaturedRecipeData[] = [
 </script>
 
 <template>
-  <section id="recipes" class="bg-stone-50 py-20 lg:py-28">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mb-14 flex items-end justify-between">
-        <div>
-          <p
-            class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
-          >
-            Popular dishes
-          </p>
-          <h2
-            class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
-          >
-            Featured Recipes
-          </h2>
-        </div>
-        <a
-          href="#"
-          class="text-terracotta hover:text-terracotta-dark hidden items-center gap-2 text-sm font-semibold transition-colors sm:flex"
-        >
-          All recipes
-          <i class="pi pi-arrow-right text-xs" />
-        </a>
-      </div>
-
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <FeaturedRecipe
-          v-for="recipe in featuredRecipes"
-          :key="recipe.id"
-          :recipe="recipe"
-        />
-      </div>
+  <div class="mb-14 flex items-end justify-between">
+    <div>
+      <p
+        class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
+      >
+        Popular dishes
+      </p>
+      <h2
+        class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
+      >
+        Featured Recipes
+      </h2>
     </div>
-  </section>
+    <a
+      href="#"
+      class="text-terracotta hover:text-terracotta-dark hidden items-center gap-2 text-sm font-semibold transition-colors sm:flex"
+    >
+      All recipes
+      <i class="pi pi-arrow-right text-xs" />
+    </a>
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <FeaturedRecipe
+      v-for="recipe in featuredRecipes"
+      :key="recipe.id"
+      :recipe="recipe"
+    />
+  </div>
 </template>

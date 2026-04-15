@@ -27,30 +27,26 @@ const testimonials: TestimonialData[] = [
 </script>
 
 <template>
-  <section class="bg-stone-50 py-20 lg:py-28">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mb-14 text-center">
-        <p
-          class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
-        >
-          Reviews
-        </p>
-        <h2
-          class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
-        >
-          What Cooks Say
-        </h2>
-      </div>
+  <div class="mb-14 text-center">
+    <p
+      class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
+    >
+      Reviews
+    </p>
+    <h2
+      class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
+    >
+      What Cooks Say
+    </h2>
+  </div>
 
-      <div class="grid gap-6 md:grid-cols-3">
-        <Testimonial
-          v-for="(item, index) in testimonials"
-          :key="index"
-          :text="item.text"
-          :author="item.author"
-          :role="item.role"
-        />
-      </div>
-    </div>
-  </section>
+  <div class="grid gap-6 md:grid-cols-3">
+    <Testimonial
+      v-for="(item, index) in testimonials"
+      :key="index"
+      :text="item.text"
+      :author="item.author"
+      :role="item.role"
+    />
+  </div>
 </template>

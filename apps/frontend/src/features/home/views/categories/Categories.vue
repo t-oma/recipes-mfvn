@@ -47,50 +47,46 @@ const categories: CategoryItem[] = [
 </script>
 
 <template>
-  <section id="categories" class="bg-white py-20 lg:py-28">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mb-14 flex items-end justify-between">
-        <div>
-          <p
-            class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
-          >
-            Pick a direction
-          </p>
-          <h2
-            class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
-          >
-            Recipe Categories
-          </h2>
-        </div>
-        <a
-          href="#"
-          class="text-terracotta hover:text-terracotta-dark hidden items-center gap-2 text-sm font-semibold transition-colors sm:flex"
-        >
-          All categories
-          <i class="pi pi-arrow-right text-xs" />
-        </a>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-        <button
-          v-for="(cat, index) in categories"
-          :key="cat.name"
-          type="button"
-          class="group relative overflow-hidden rounded-2xl border border-stone-100 bg-linear-to-br p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-stone-200 hover:shadow-xl hover:shadow-stone-900/5"
-          :class="cat.gradient"
-          :style="{ animationDelay: `${index * 100}ms` }"
-        >
-          <div
-            class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/80 shadow-sm"
-          >
-            <i :class="[cat.icon, 'text-xl text-stone-700']" />
-          </div>
-          <h3 class="text-base font-bold text-stone-800">
-            {{ cat.name }}
-          </h3>
-          <p class="mt-1 text-sm text-stone-500">{{ cat.count }} recipes</p>
-        </button>
-      </div>
+  <div class="mb-14 flex items-end justify-between">
+    <div>
+      <p
+        class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
+      >
+        Pick a direction
+      </p>
+      <h2
+        class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
+      >
+        Recipe Categories
+      </h2>
     </div>
-  </section>
+    <a
+      href="#"
+      class="text-terracotta hover:text-terracotta-dark hidden items-center gap-2 text-sm font-semibold transition-colors sm:flex"
+    >
+      All categories
+      <i class="pi pi-arrow-right text-xs" />
+    </a>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+    <button
+      v-for="(cat, index) in categories"
+      :key="cat.name"
+      type="button"
+      class="group relative overflow-hidden rounded-2xl border border-stone-100 bg-linear-to-br p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-stone-200 hover:shadow-xl hover:shadow-stone-900/5"
+      :class="cat.gradient"
+      :style="{ animationDelay: `${index * 100}ms` }"
+    >
+      <div
+        class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/80 shadow-sm"
+      >
+        <i :class="[cat.icon, 'text-xl text-stone-700']" />
+      </div>
+      <h3 class="text-base font-bold text-stone-800">
+        {{ cat.name }}
+      </h3>
+      <p class="mt-1 text-sm text-stone-500">{{ cat.count }} recipes</p>
+    </button>
+  </div>
 </template>

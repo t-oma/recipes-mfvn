@@ -4,8 +4,8 @@ import WavyDivider from "./WavyDivider.vue";
 </script>
 
 <template>
-  <section class="relative overflow-hidden">
-    <div class="mx-auto max-w-7xl px-6 pt-16 pb-20 lg:px-8 lg:pt-24 lg:pb-32">
+  <section class="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
         <!-- Left: Text -->
         <div>
@@ -40,8 +40,8 @@ import WavyDivider from "./WavyDivider.vue";
           <p
             class="mt-6 max-w-lg text-lg leading-relaxed text-stone-600 lg:text-xl"
           >
-            Classic dishes and modern twists. Step-by-step recipes, helpful tips,
-            and inspiration for your kitchen.
+            Classic dishes and modern twists. Step-by-step recipes, helpful
+            tips, and inspiration for your kitchen.
           </p>
 
           <div class="mt-10 flex flex-wrap items-center gap-4">
