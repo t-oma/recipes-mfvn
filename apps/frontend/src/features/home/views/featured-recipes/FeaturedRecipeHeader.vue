@@ -22,7 +22,7 @@ const props = defineProps<{
       type="button"
       class="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-stone-400 backdrop-blur-md transition-colors hover:text-rose-500"
     >
-      <i class="pi pi-heart text-sm" />
+      <i class="pi pi-heart-fill text-sm" />
     </button>
   </div>
 </template>
