@@ -1,4 +1,4 @@
-import type { CreateRecipeBody, UpdateRecipeBody } from "@recipes/shared";
+import type { UpdateRecipeBody } from "@recipes/shared";
 import {
   useInfiniteQuery,
   useMutation,
