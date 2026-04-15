@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import Footer from "@/common/ui/footer/Footer.vue";
 
 const isLoaded = ref(false);
 
@@ -545,7 +546,7 @@ const testimonials: Testimonial[] = [
             "
           />
           <div
-            class="bg-terracotta/10 absolute -top-20 -left-20 -z-0 h-80 w-80 rounded-full blur-3xl"
+            class="bg-terracotta/10 absolute -top-20 -left-20 z-0 h-80 w-80 rounded-full blur-3xl"
           />
 
           <div class="relative z-10 grid items-center gap-12 lg:grid-cols-2">
@@ -723,121 +724,6 @@ const testimonials: Testimonial[] = [
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="border-t border-stone-200 bg-stone-900 py-16 text-stone-400">
-      <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="grid gap-12 md:grid-cols-4">
-          <div class="md:col-span-1">
-            <div class="flex items-center gap-2">
-              <div
-                class="bg-terracotta flex h-10 w-10 items-center justify-center rounded-xl"
-              >
-                <span class="text-lg text-white">🍳</span>
-              </div>
-              <span class="font-display text-2xl font-semibold text-white">
-                Savory
-              </span>
-            </div>
-            <p class="mt-4 max-w-xs text-sm leading-relaxed text-stone-400">
-              Your trusted companion on culinary adventures. Delicious recipes
-              for every day.
-            </p>
-          </div>
-
-          <div>
-            <h4 class="mb-4 text-sm font-semibold text-white">Recipes</h4>
-            <ul class="space-y-3 text-sm">
-              <li>
-                <a href="#" class="transition-colors hover:text-white">
-                  Breakfast
-                </a>
-              </li>
-              <li>
-                <a href="#" class="transition-colors hover:text-white">
-                  Lunch
-                </a>
-              </li>
-              <li>
-                <a href="#" class="transition-colors hover:text-white">
-                  Dinner
-                </a>
-              </li>
-              <li>
-                <a href="#" class="transition-colors hover:text-white">
-                  Desserts
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 class="mb-4 text-sm font-semibold text-white">Company</h4>
-            <ul class="space-y-3 text-sm">
-              <li>
-                <a href="#" class="transition-colors hover:text-white">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" class="transition-colors hover:text-white">
-                  Contact
-                </a>
-              </li>
-              <li>
-                <a href="#" class="transition-colors hover:text-white">
-                  Partnerships
-                </a>
-              </li>
-              <li>
-                <a href="#" class="transition-colors hover:text-white">
-                  Blog
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 class="mb-4 text-sm font-semibold text-white">Social</h4>
-            <div class="flex gap-3">
-              <a
-                href="#"
-                aria-label="Instagram"
-                class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors hover:bg-white/10"
-              >
-                <i class="pi pi-instagram text-sm" />
-              </a>
-              <a
-                href="#"
-                aria-label="YouTube"
-                class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors hover:bg-white/10"
-              >
-                <i class="pi pi-youtube text-sm" />
-              </a>
-              <a
-                href="#"
-                aria-label="Telegram"
-                class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors hover:bg-white/10"
-              >
-                <i class="pi pi-telegram text-sm" />
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-stone-800 pt-8 text-sm md:flex-row"
-        >
-          <p>&copy; 2026 Savory. All rights reserved.</p>
-          <div class="flex gap-6">
-            <a href="#" class="transition-colors hover:text-white">
-              Privacy Policy
-            </a>
-            <a href="#" class="transition-colors hover:text-white">
-              Terms of Service
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <Footer />
   </div>
 </template>
