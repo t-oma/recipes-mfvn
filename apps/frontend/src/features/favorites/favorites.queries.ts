@@ -11,30 +11,42 @@ const favoritesKeys = {
     [...favoritesKeys.all, user, query] as const,
 };
 
-export type ToggleFavoriteParams = {
-  id: string;
-  favorited: boolean;
-};
-
 /**
- * Add a recipe with the given id to the current user's favorites.
+ * Add recipe to favorites.
  *
  * @param id - recipe id.
  * @returns \{favorited: true\} if the recipe was added to the user's favorites.
  */
-export function useToggleFavorite() {
+export function useAddFavorite() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      favorited,
-    }: ToggleFavoriteParams): Promise<{ favorited: boolean }> =>
-      favorited ? removeFavorite(id) : addFavorite(id),
+    mutationFn: addFavorite,
 
-    onSuccess: (_, { id, favorited }) => {
+    onSuccess: (_, id) => {
       queryClient.setQueryData<Recipe>(recipeKeys.detail(id), (old) =>
-        old ? { ...old, isFavorited: !favorited } : old,
+        old ? { ...old, isFavorited: true } : old,
+      );
+      queryClient.invalidateQueries({ queryKey: recipeKeys.all });
+    },
+  });
+}
+
+/**
+ * Remove recipe from favorites.
+ *
+ * @param id - recipe id.
+ * @returns \{favorited: false\} if the recipe was removed from the user's favorites.
+ */
+export function useRemoveFavorite() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: removeFavorite,
+
+    onSuccess: (_, id) => {
+      queryClient.setQueryData<Recipe>(recipeKeys.detail(id), (old) =>
+        old ? { ...old, isFavorited: false } : old,
       );
       queryClient.invalidateQueries({ queryKey: recipeKeys.all });
     },
