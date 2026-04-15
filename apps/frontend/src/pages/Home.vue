@@ -5,6 +5,7 @@ import Header from "@/common/ui/header/Header.vue";
 import NewsletterCTA from "@/common/ui/NewsletterCTA.vue";
 import Testimonials from "@/common/ui/Testimonials.vue";
 import TodaysPick from "@/common/ui/todays-pick/TodaysPick.vue";
+import FeaturedRecipes from "@/features/home/views/featured-recipes/FeaturedRecipes.vue";
 
 const isLoaded = ref(false);
 
@@ -57,83 +58,6 @@ const categories: CategoryItem[] = [
     icon: "pi pi-verified",
     count: 29,
     gradient: "from-lime-50 to-green-100",
-  },
-];
-
-interface FeaturedRecipe {
-  id: number;
-  title: string;
-  time: string;
-  difficulty: string;
-  rating: number;
-  image: string;
-  tag: string;
-}
-
-const featuredRecipes: FeaturedRecipe[] = [
-  {
-    id: 1,
-    title: "Classic Beef Bourguignon",
-    time: "2 hr",
-    difficulty: "Medium",
-    rating: 4.9,
-    image:
-      "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=600&h=400&fit=crop",
-    tag: "Classic",
-  },
-  {
-    id: 2,
-    title: "Cherry Dumplings",
-    time: "1.5 hr",
-    difficulty: "Easy",
-    rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&h=400&fit=crop",
-    tag: "Popular",
-  },
-  {
-    id: 3,
-    title: "Lemon Ricotta Pancakes",
-    time: "30 min",
-    difficulty: "Easy",
-    rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&h=400&fit=crop",
-    tag: "Quick",
-  },
-  {
-    id: 4,
-    title: "Stuffed Bell Peppers",
-    time: "2.5 hr",
-    difficulty: "Medium",
-    rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=400&fit=crop",
-    tag: "Hearty",
-  },
-];
-
-interface Testimonial {
-  text: string;
-  author: string;
-  role: string;
-}
-
-const testimonials: Testimonial[] = [
-  {
-    text: "Best recipe site ever! The beef stew turned out even better than my grandmother's.",
-    author: "Elena K.",
-    role: "Home Cook",
-  },
-  {
-    text: "So easy to find recipes here. Step-by-step instructions are a real find for beginners.",
-    author: "Andrew M.",
-    role: "Beginner Chef",
-  },
-  {
-    text: "Dumplings, buns, fritters — everything in one place. Thanks for such a collection!",
-    author: "Maria S.",
-    role: "Food Enthusiast",
   },
 ];
 </script>
@@ -386,95 +310,7 @@ const testimonials: Testimonial[] = [
       </div>
     </section>
 
-    <!-- Featured Recipes -->
-    <section id="recipes" class="bg-stone-50 py-20 lg:py-28">
-      <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="mb-14 flex items-end justify-between">
-          <div>
-            <p
-              class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
-            >
-              Popular dishes
-            </p>
-            <h2
-              class="font-display text-4xl font-bold tracking-tight text-stone-900 lg:text-5xl"
-            >
-              Featured Recipes
-            </h2>
-          </div>
-          <a
-            href="#"
-            class="text-terracotta hover:text-terracotta-dark hidden items-center gap-2 text-sm font-semibold transition-colors sm:flex"
-          >
-            All recipes
-            <i class="pi pi-arrow-right text-xs" />
-          </a>
-        </div>
-
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <article
-            v-for="recipe in featuredRecipes"
-            :key="recipe.id"
-            class="group cursor-pointer overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-stone-200 hover:shadow-xl hover:shadow-stone-900/8"
-          >
-            <div class="relative overflow-hidden">
-              <img
-                :src="recipe.image"
-                :alt="recipe.title"
-                class="aspect-4/3 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div
-                class="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-stone-700 backdrop-blur-md"
-              >
-                {{ recipe.tag }}
-              </div>
-              <button
-                type="button"
-                class="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-stone-400 backdrop-blur-md transition-colors hover:text-rose-500"
-              >
-                <i class="pi pi-heart text-sm" />
-              </button>
-            </div>
-
-            <div class="p-5">
-              <h3
-                class="font-display group-hover:text-terracotta text-lg font-bold text-stone-900 transition-colors"
-              >
-                {{ recipe.title }}
-              </h3>
-
-              <div class="mt-3 flex items-center gap-4 text-sm text-stone-500">
-                <span class="flex items-center gap-1.5">
-                  <i class="pi pi-clock text-xs" />
-                  {{ recipe.time }}
-                </span>
-                <span class="flex items-center gap-1.5">
-                  <i class="pi pi-chart-bar text-xs" />
-                  {{ recipe.difficulty }}
-                </span>
-              </div>
-
-              <div
-                class="mt-4 flex items-center justify-between border-t border-stone-100 pt-4"
-              >
-                <div class="flex items-center gap-1">
-                  <i class="pi pi-star-fill text-xs text-amber-400" />
-                  <span class="text-sm font-semibold text-stone-700">
-                    {{ recipe.rating }}
-                  </span>
-                </div>
-                <span
-                  class="text-terracotta flex items-center gap-1 text-xs font-semibold opacity-0 transition-opacity group-hover:opacity-100"
-                >
-                  View
-                  <i class="pi pi-arrow-right text-[10px]" />
-                </span>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
+    <FeaturedRecipes />
 
     <TodaysPick
       title="TODO"
