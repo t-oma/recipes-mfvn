@@ -116,7 +116,9 @@ describe("categoryService", () => {
       });
       expect(result.name).toBe("New Category");
       expect(result.slug).toBe("new-category");
-      expect(cache.delete).toHaveBeenCalledWith(categoryCache.keys.all());
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        categoryCache.keys.allPattern(),
+      );
     });
   });
 
@@ -130,7 +132,9 @@ describe("categoryService", () => {
 
       expect(recipeModel.countDocuments).toHaveBeenCalledWith({ category: id });
       expect(categoryModel.findByIdAndDelete).toHaveBeenCalledWith(id);
-      expect(cache.delete).toHaveBeenCalledWith(categoryCache.keys.all());
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        categoryCache.keys.allPattern(),
+      );
     });
 
     it("should throw ConflictError when recipes exist", async () => {
