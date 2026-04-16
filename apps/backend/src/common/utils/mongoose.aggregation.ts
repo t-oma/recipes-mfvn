@@ -1,5 +1,5 @@
+import { getSortObject } from "@recipes/shared";
 import type { PipelineStage } from "mongoose";
-import { getSortObject } from "./query.js";
 
 export function withSort(
   sort: string = "-createdAt",
