@@ -46,7 +46,7 @@ export function createCategoryService(
     create: async ({ data }) => {
       const category = await categoryModel.create(data);
 
-      await cache.delete(categoryCache.keys.all());
+      await cache.delete(categoryCache.keys.allPattern());
 
       return toCategory(category.toObject());
     },
@@ -64,7 +64,7 @@ export function createCategoryService(
         throw new NotFoundError("Category not found");
       }
 
-      await cache.delete(categoryCache.keys.all());
+      await cache.delete(categoryCache.keys.allPattern());
     },
   };
 }
