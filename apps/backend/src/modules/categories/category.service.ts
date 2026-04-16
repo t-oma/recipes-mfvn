@@ -1,4 +1,4 @@
-import type { Category } from "@recipes/shared";
+import type { Category, SearchCategoryQuery } from "@recipes/shared";
 import type { CacheService } from "@/common/cache/cache.service.js";
 import { ConflictError, NotFoundError } from "@/common/errors.js";
 import type {
@@ -11,7 +11,6 @@ import { categoryCache } from "@/modules/categories/category.cache.js";
 import type {
   CategoryModelType,
   CreateCategoryBody,
-  SearchCategoryQuery,
 } from "@/modules/categories/index.js";
 import type { RecipeModelType } from "@/modules/recipes/index.js";
 

@@ -1,5 +1,5 @@
+import type { SearchCategoryQuery } from "@recipes/shared";
 import { hashFilters } from "@/common/utils/cache.js";
-import type { SearchCategoryQuery } from "./category.schema.js";
 
 export const categoryCache = {
   keys: {

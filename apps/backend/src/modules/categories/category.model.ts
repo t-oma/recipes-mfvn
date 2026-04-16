@@ -1,8 +1,8 @@
+import type { SearchCategoryQuery } from "@recipes/shared";
 import type { Model } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 import { withSort } from "@/common/utils/mongoose.aggregation.js";
-import type { SearchCategoryQuery } from "./category.schema.js";
 
 export interface CategoryDocument extends BaseDocument {
   name: string;

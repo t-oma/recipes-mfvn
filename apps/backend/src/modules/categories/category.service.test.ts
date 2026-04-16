@@ -1,3 +1,4 @@
+import type { SearchCategoryQuery } from "@recipes/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCategoryDoc,
@@ -13,7 +14,6 @@ import { categoryCache } from "@/modules/categories/category.cache.js";
 import type { CategoryModelType } from "@/modules/categories/category.model.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
 import type { RecipeModelType } from "@/modules/recipes/index.js";
-import type { SearchCategoryQuery } from "./category.schema.js";
 
 describe("categoryService", () => {
   const categoryModel = createMockCategoryModel();
