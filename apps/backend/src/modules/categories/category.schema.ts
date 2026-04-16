@@ -6,3 +6,16 @@ export { type CreateCategoryBody, createCategorySchema } from "@recipes/shared";
 export const categoryParamsSchema = z.object({
   id: idParamSchema,
 });
+
+export const categorySortSchema = z.enum([
+  "name",
+  "-name",
+  "recipeCount",
+  "-recipeCount",
+]);
+export type CategorySort = z.infer<typeof categorySortSchema>;
+
+export const categoryQuerySchema = z.object({
+  sort: categorySortSchema.default("name"),
+});
+export type SearchCategoryQuery = z.infer<typeof categoryQuerySchema>;

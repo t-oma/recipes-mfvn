@@ -4,17 +4,19 @@ import { ConflictError, NotFoundError } from "@/common/errors.js";
 import type {
   CreateMethodParams,
   DeleteMethodParams,
+  QueryMethodParams,
 } from "@/common/types/methods.js";
 import { toCategory } from "@/common/utils/mongo.js";
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import type {
   CategoryModelType,
   CreateCategoryBody,
+  SearchCategoryQuery,
 } from "@/modules/categories/index.js";
 import type { RecipeModelType } from "@/modules/recipes/index.js";
 
 export interface CategoryService {
-  findAll(): Promise<Category[]>;
+  findAll(params: QueryMethodParams<SearchCategoryQuery>): Promise<Category[]>;
   create(params: CreateMethodParams<CreateCategoryBody>): Promise<Category>;
   deleteById(categoryId: string, params: DeleteMethodParams): Promise<void>;
 }
@@ -25,15 +27,15 @@ export function createCategoryService(
   cache: CacheService,
 ): CategoryService {
   return {
-    findAll: async () => {
-      const cacheKey = categoryCache.keys.all();
+    findAll: async ({ query }) => {
+      const cacheKey = categoryCache.keys.list(query);
 
       const cached = await cache.get<Category[]>(cacheKey);
       if (cached !== undefined) {
         return cached;
       }
 
-      const categories = await categoryModel.searchFull();
+      const categories = await categoryModel.searchFull(query);
       const result = categories.map(toCategory);
 
       await cache.set(cacheKey, result, categoryCache.ttl.list);

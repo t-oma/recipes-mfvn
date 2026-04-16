@@ -9,6 +9,7 @@ import {
 import { rolesGuard } from "@/common/middleware/role.guard.js";
 import {
   categoryParamsSchema,
+  categoryQuerySchema,
   createCategorySchema,
 } from "@/modules/categories/category.schema.js";
 import type { CategoryService } from "@/modules/categories/category.service.js";
@@ -27,6 +28,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
       "/",
       {
         schema: {
+          querystring: categoryQuerySchema,
           response: {
             200: z.array(categorySchema),
           },
@@ -34,8 +36,11 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
           summary: "Get all categories",
         },
       },
-      async (_request, reply) => {
-        const categories = await service.findAll();
+      async (request, reply) => {
+        const categories = await service.findAll({
+          query: request.query,
+          initiator: { id: request.user?.userId, role: request.user?.role },
+        });
         return reply.send(categories);
       },
     )

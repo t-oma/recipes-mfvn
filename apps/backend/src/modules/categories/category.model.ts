@@ -1,6 +1,8 @@
 import type { Model } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
+import { withSort } from "@/common/utils/mongoose.aggregation.js";
+import type { SearchCategoryQuery } from "./category.schema.js";
 
 export interface CategoryDocument extends BaseDocument {
   name: string;
@@ -13,7 +15,10 @@ export interface CategoryDocumentWithCount extends CategoryDocument {
 }
 
 export interface CategoryModelType extends Model<CategoryDocument> {
-  searchFull(withCount?: boolean): Promise<CategoryDocumentWithCount[]>;
+  searchFull(
+    query: SearchCategoryQuery,
+    withCount?: boolean,
+  ): Promise<CategoryDocumentWithCount[]>;
 }
 
 const categorySchema = new Schema<CategoryDocument, CategoryModelType>(
@@ -38,10 +43,10 @@ categorySchema.pre("validate", function () {
 });
 
 categorySchema.statics.searchFull = async function (
+  query: SearchCategoryQuery,
   withCount: boolean = true,
 ): Promise<CategoryDocumentWithCount[]> {
   const result = await this.aggregate<CategoryDocumentWithCount>([
-    { $sort: { name: 1 } },
     ...(withCount
       ? [
           {
@@ -56,6 +61,7 @@ categorySchema.statics.searchFull = async function (
           { $project: { recipes: 0 } },
         ]
       : []),
+    ...withSort(query.sort),
   ]);
 
   return result;

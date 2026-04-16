@@ -6,12 +6,14 @@ import {
   createMockRecipeModel,
   createObjectId,
   initiator,
+  noInitiator,
 } from "@/__tests__/helpers.js";
 import { ConflictError, NotFoundError } from "@/common/errors.js";
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import type { CategoryModelType } from "@/modules/categories/category.model.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
 import type { RecipeModelType } from "@/modules/recipes/index.js";
+import type { SearchCategoryQuery } from "./category.schema.js";
 
 describe("categoryService", () => {
   const categoryModel = createMockCategoryModel();
@@ -42,20 +44,28 @@ describe("categoryService", () => {
       ];
       categoryModel.searchFull.mockResolvedValue(docs);
 
-      const result = await service.findAll();
+      const query = { sort: "name" } satisfies SearchCategoryQuery;
+      const result = await service.findAll({
+        query,
+        initiator: noInitiator(),
+      });
 
       expect(categoryModel.searchFull).toHaveBeenCalled();
       expect(result).toHaveLength(2);
       expect(result[0]?.name).toBe("Desserts");
       expect(result[0]?.recipeCount).toBe(5);
       expect(result[1]?.recipeCount).toBe(0);
-      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
+      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.list(query));
     });
 
     it("should return empty array when no categories exist", async () => {
       categoryModel.searchFull.mockResolvedValue([]);
 
-      const result = await service.findAll();
+      const query = { sort: "name" } satisfies SearchCategoryQuery;
+      const result = await service.findAll({
+        query,
+        initiator: noInitiator(),
+      });
 
       expect(result).toEqual([]);
     });
@@ -69,15 +79,22 @@ describe("categoryService", () => {
       ];
       categoryModel.searchFull.mockResolvedValue(docs);
 
-      await service.findAll();
-      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
+      const query = { sort: "name" } satisfies SearchCategoryQuery;
+      await service.findAll({
+        query,
+        initiator: noInitiator(),
+      });
+      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.list(query));
       vi.clearAllMocks();
 
-      const result = await service.findAll();
+      const result = await service.findAll({
+        query,
+        initiator: noInitiator(),
+      });
 
       expect(categoryModel.searchFull).not.toHaveBeenCalled();
       expect(result).toHaveLength(1);
-      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
+      expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.list(query));
     });
   });
 
