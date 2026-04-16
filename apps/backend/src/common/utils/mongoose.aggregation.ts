@@ -1,15 +1,12 @@
 import type { PipelineStage } from "mongoose";
+import { getSortObject } from "./query.js";
 
 export function withSort(
   sort: string = "-createdAt",
 ): PipelineStage.FacetPipelineStage[] {
-  const desc = sort.startsWith("-");
-  const sortName = desc ? sort.slice(1) : sort;
-  const sortOrder = desc ? -1 : 1;
-
   return [
     {
-      $sort: { [sortName]: sortOrder },
+      $sort: getSortObject(sort),
     },
   ];
 }
