@@ -29,31 +29,31 @@ describe("categoryService", () => {
   });
 
   describe("findAll", () => {
-    it("should return all categories sorted by name", async () => {
+    it("should return all categories sorted by name with recipe count", async () => {
       const docs = [
-        createCategoryDoc({ name: "Desserts", slug: "desserts" }),
-        createCategoryDoc({ name: "Soups", slug: "oups" }),
+        {
+          ...createCategoryDoc({ name: "Desserts", slug: "desserts" }),
+          recipeCount: 5,
+        },
+        {
+          ...createCategoryDoc({ name: "Soups", slug: "soups" }),
+          recipeCount: 0,
+        },
       ];
-      categoryModel.find.mockReturnValue({
-        sort: vi.fn().mockReturnValue({
-          lean: vi.fn().mockResolvedValue(docs),
-        }),
-      });
+      categoryModel.searchFull.mockResolvedValue(docs);
 
       const result = await service.findAll();
 
-      expect(categoryModel.find).toHaveBeenCalled();
+      expect(categoryModel.searchFull).toHaveBeenCalled();
       expect(result).toHaveLength(2);
       expect(result[0]?.name).toBe("Desserts");
+      expect(result[0]?.recipeCount).toBe(5);
+      expect(result[1]?.recipeCount).toBe(0);
       expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
     });
 
     it("should return empty array when no categories exist", async () => {
-      categoryModel.find.mockReturnValue({
-        sort: vi.fn().mockReturnValue({
-          lean: vi.fn().mockResolvedValue([]),
-        }),
-      });
+      categoryModel.searchFull.mockResolvedValue([]);
 
       const result = await service.findAll();
 
@@ -61,12 +61,13 @@ describe("categoryService", () => {
     });
 
     it("should return cached result on second call", async () => {
-      const docs = [createCategoryDoc({ name: "Desserts", slug: "desserts" })];
-      categoryModel.find.mockReturnValue({
-        sort: vi.fn().mockReturnValue({
-          lean: vi.fn().mockResolvedValue(docs),
-        }),
-      });
+      const docs = [
+        {
+          ...createCategoryDoc({ name: "Desserts", slug: "desserts" }),
+          recipeCount: 3,
+        },
+      ];
+      categoryModel.searchFull.mockResolvedValue(docs);
 
       await service.findAll();
       expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
@@ -74,7 +75,7 @@ describe("categoryService", () => {
 
       const result = await service.findAll();
 
-      expect(categoryModel.find).not.toHaveBeenCalled();
+      expect(categoryModel.searchFull).not.toHaveBeenCalled();
       expect(result).toHaveLength(1);
       expect(cache.get).toHaveBeenCalledWith(categoryCache.keys.all());
     });
