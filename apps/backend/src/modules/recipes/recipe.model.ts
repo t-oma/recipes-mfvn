@@ -1,8 +1,8 @@
 import type {
   Difficulty,
   Minutes,
+  RecipeQuery,
   Replace,
-  SearchRecipeQuery,
 } from "@recipes/shared";
 import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
@@ -62,7 +62,7 @@ export interface RecipeDocumentPopulated
 
 export interface RecipeModelType extends Model<RecipeDocument> {
   searchFull(
-    params: QueryMethodParams<SearchRecipeQuery>,
+    params: QueryMethodParams<RecipeQuery>,
   ): Promise<[RecipeDocumentPopulated[], number] | [null, 0]>;
   findByIdFull(
     id: string,
@@ -126,7 +126,7 @@ const recipeSchema = new Schema<RecipeDocument, RecipeModelType>(
 recipeSchema.statics.searchFull = async function ({
   query,
   initiator,
-}: QueryMethodParams<SearchRecipeQuery>) {
+}: QueryMethodParams<RecipeQuery>) {
   const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
     query;
 

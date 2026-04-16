@@ -1,10 +1,10 @@
-import type { SearchRecipeQuery } from "@recipes/shared";
+import type { RecipeQuery } from "@recipes/shared";
 import { hashFilters } from "@/common/utils/cache.js";
 
 export const recipeCache = {
   keys: {
     byId: (id: string) => `recipes:id:${id}`,
-    list: (filters: SearchRecipeQuery) =>
+    list: (filters: RecipeQuery) =>
       `recipes:list:${filters.page}:${filters.limit}:${hashFilters({
         categoryId: filters.categoryId,
         difficulty: filters.difficulty,

@@ -2,7 +2,7 @@ import type {
   CreateRecipeBody,
   Paginated,
   Recipe,
-  SearchRecipeQuery,
+  RecipeQuery,
   UpdateRecipeBody,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
@@ -32,9 +32,7 @@ import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { UserDocument, UserModelType } from "@/modules/users/index.js";
 
 export interface RecipeService {
-  findAll(
-    params: QueryMethodParams<SearchRecipeQuery>,
-  ): Promise<Paginated<Recipe>>;
+  findAll(params: QueryMethodParams<RecipeQuery>): Promise<Paginated<Recipe>>;
   findById(
     id: string,
     params: InitiatedMethodParams<OptionalInitiator>,

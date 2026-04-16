@@ -1,4 +1,4 @@
-import type { Minutes, SearchRecipeQuery } from "@recipes/shared";
+import type { Minutes, RecipeQuery } from "@recipes/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockCache,
@@ -52,7 +52,7 @@ describe("recipeService", () => {
         page: 1,
         limit: 10,
         sort: "-createdAt",
-      } satisfies SearchRecipeQuery;
+      } satisfies RecipeQuery;
       const result = await service.findAll({
         query,
         initiator: noInitiator(),
@@ -71,7 +71,7 @@ describe("recipeService", () => {
         page: 1,
         limit: 10,
         sort: "-createdAt",
-      } satisfies SearchRecipeQuery;
+      } satisfies RecipeQuery;
       const result = await service.findAll({
         query,
         initiator: noInitiator(),
@@ -87,7 +87,7 @@ describe("recipeService", () => {
         limit: 10,
         sort: "-createdAt",
         isFavorited: true,
-      } satisfies SearchRecipeQuery;
+      } satisfies RecipeQuery;
       const result = await service.findAll({
         query,
         initiator: noInitiator(),

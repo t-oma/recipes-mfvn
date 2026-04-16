@@ -59,4 +59,4 @@ export const recipeQuerySchema = z
   .extend(paginationQuerySchema.shape)
   .extend(searchQuerySchema.shape);
 
-export type SearchRecipeQuery = z.infer<typeof recipeQuerySchema>;
+export type RecipeQuery = z.infer<typeof recipeQuerySchema>;
