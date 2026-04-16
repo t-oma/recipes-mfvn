@@ -1,3 +1,4 @@
+import { createSortSchema } from "@recipes/shared";
 import { z } from "zod";
 import { idParamSchema } from "@/common/schemas.js";
 
@@ -7,12 +8,8 @@ export const categoryParamsSchema = z.object({
   id: idParamSchema,
 });
 
-export const categorySortSchema = z.enum([
-  "name",
-  "-name",
-  "recipeCount",
-  "-recipeCount",
-]);
+export const categorySortSchema = createSortSchema(["name", "recipeCount"]);
+
 export type CategorySort = z.infer<typeof categorySortSchema>;
 
 export const categoryQuerySchema = z.object({
