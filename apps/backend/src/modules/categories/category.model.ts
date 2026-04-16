@@ -8,7 +8,13 @@ export interface CategoryDocument extends BaseDocument {
   description?: string;
 }
 
-export interface CategoryModelType extends Model<CategoryDocument> {}
+export interface CategoryDocumentWithCount extends CategoryDocument {
+  recipeCount: number;
+}
+
+export interface CategoryModelType extends Model<CategoryDocument> {
+  searchFull(withCount?: boolean): Promise<CategoryDocumentWithCount[]>;
+}
 
 const categorySchema = new Schema<CategoryDocument, CategoryModelType>(
   {
@@ -30,6 +36,30 @@ categorySchema.pre("validate", function () {
       .trim();
   }
 });
+
+categorySchema.statics.searchFull = async function (
+  withCount: boolean = true,
+): Promise<CategoryDocumentWithCount[]> {
+  const result = await this.aggregate<CategoryDocumentWithCount>([
+    { $sort: { name: 1 } },
+    ...(withCount
+      ? [
+          {
+            $lookup: {
+              from: "recipes",
+              localField: "_id",
+              foreignField: "category",
+              as: "recipes",
+            },
+          },
+          { $addFields: { recipeCount: { $size: "$recipes" } } },
+          { $project: { recipes: 0 } },
+        ]
+      : []),
+  ]);
+
+  return result;
+};
 
 export const CATEGORY_MODEL_NAME = "Category";
 export const CategoryModel = model<CategoryDocument, CategoryModelType>(

@@ -11,6 +11,7 @@ export const categorySchema = z.object({
   name: z.string(),
   slug: z.string(),
   description: z.string().optional(),
+  recipeCount: z.number().int().nonnegative(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

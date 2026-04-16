@@ -33,7 +33,7 @@ export function createCategoryService(
         return cached;
       }
 
-      const categories = await categoryModel.find().sort({ name: 1 }).lean();
+      const categories = await categoryModel.searchFull();
       const result = categories.map(toCategory);
 
       await cache.set(cacheKey, result, categoryCache.ttl.list);
