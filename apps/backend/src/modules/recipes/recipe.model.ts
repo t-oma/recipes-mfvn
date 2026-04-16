@@ -1,4 +1,9 @@
-import type { Difficulty, Minutes, Replace } from "@recipes/shared";
+import type {
+  Difficulty,
+  Minutes,
+  Replace,
+  SearchRecipeQuery,
+} from "@recipes/shared";
 import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
 import type {
@@ -16,7 +21,6 @@ import {
 } from "@/common/utils/mongoose.aggregation.js";
 import type { CategoryDocument } from "@/modules/categories/index.js";
 import { CATEGORY_MODEL_NAME } from "@/modules/categories/index.js";
-import type { SearchRecipeQuery } from "@/modules/recipes/index.js";
 import type { UserDocument } from "@/modules/users/index.js";
 import { USER_MODEL_NAME } from "@/modules/users/index.js";
 import {
