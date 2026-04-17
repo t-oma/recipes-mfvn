@@ -3,6 +3,7 @@ import type { Model } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 import { withSort } from "@/common/utils/mongoose.aggregation.js";
+import { recipesCollectionName } from "../recipes/recipe.model.js";
 
 export interface CategoryDocument extends BaseDocument {
   name: string;
@@ -51,7 +52,7 @@ categorySchema.statics.searchFull = async function (
       ? [
           {
             $lookup: {
-              from: "recipes",
+              from: recipesCollectionName,
               localField: "_id",
               foreignField: "category",
               as: "recipes",

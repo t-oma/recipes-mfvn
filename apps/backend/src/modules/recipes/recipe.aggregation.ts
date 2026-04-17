@@ -1,6 +1,10 @@
 import type { PipelineStage } from "mongoose";
 import type { OptionalInitiator } from "@/common/types/methods.js";
 import { toObjectId } from "@/common/utils/mongo.js";
+import { categoriesCollectionName } from "@/modules/categories/category.model.js";
+import { favoritesCollectionName } from "@/modules/favorites/favorite.model.js";
+import { recipeRatingsCollectionName } from "@/modules/recipe-ratings/recipe-rating.model.js";
+import { usersCollectionName } from "@/modules/users/user.model.js";
 
 export function byVisibility({ id, role }: OptionalInitiator) {
   if (role === "admin") {
@@ -20,7 +24,7 @@ export function withCategories() {
   return [
     {
       $lookup: {
-        from: "categories",
+        from: categoriesCollectionName,
         localField: "category",
         foreignField: "_id",
         pipeline: [
@@ -43,7 +47,7 @@ export function withAuthor() {
   return [
     {
       $lookup: {
-        from: "users",
+        from: usersCollectionName,
         localField: "author",
         foreignField: "_id",
         pipeline: [
@@ -77,7 +81,7 @@ export function withFavorited(userId?: string) {
   return [
     {
       $lookup: {
-        from: "favorites",
+        from: favoritesCollectionName,
         localField: "_id",
         foreignField: "recipe",
         pipeline: [
@@ -123,7 +127,7 @@ export function withUserRating(userId?: string) {
   return [
     {
       $lookup: {
-        from: "recipeRatings",
+        from: recipeRatingsCollectionName,
         localField: "_id",
         foreignField: "recipe",
         pipeline: [
@@ -156,7 +160,7 @@ export function withAverageRating() {
   return [
     {
       $lookup: {
-        from: "recipeRatings",
+        from: recipeRatingsCollectionName,
         localField: "_id",
         foreignField: "recipe",
         pipeline: [

@@ -1,6 +1,9 @@
 import type { PipelineStage } from "mongoose";
 import type { OptionalInitiator } from "@/common/types/methods.js";
-import { byVisibility } from "@/modules/recipes/index.js";
+import {
+  byVisibility,
+  recipesCollectionName,
+} from "@/modules/recipes/index.js";
 
 export function withRecipe(
   initiator: OptionalInitiator,
@@ -8,7 +11,7 @@ export function withRecipe(
   return [
     {
       $lookup: {
-        from: "recipes",
+        from: recipesCollectionName,
         localField: "recipe",
         foreignField: "_id",
         pipeline: [
