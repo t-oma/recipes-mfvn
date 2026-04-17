@@ -206,3 +206,5 @@ export const RecipeModel = model<RecipeDocument, RecipeModelType>(
   RECIPE_MODEL_NAME,
   recipeSchema,
 );
+
+export const recipesCollectionName = RecipeModel.collection.name;

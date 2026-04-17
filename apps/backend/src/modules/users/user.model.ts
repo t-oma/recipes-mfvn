@@ -53,3 +53,5 @@ export const UserModel = model<UserDocument, UserModelType>(
   USER_MODEL_NAME,
   userSchema,
 );
+
+export const usersCollectionName = UserModel.collection.name;

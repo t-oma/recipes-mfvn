@@ -4,7 +4,8 @@ import {
   byVisibility,
   withAuthor,
   withCategories,
-} from "@/modules/recipes/index.js";
+} from "@/modules/recipes/recipe.aggregation.js";
+import { recipesCollectionName } from "@/modules/recipes/recipe.model.js";
 
 export function withRecipe(
   initiator: OptionalInitiator,
@@ -12,7 +13,7 @@ export function withRecipe(
   return [
     {
       $lookup: {
-        from: "recipes",
+        from: recipesCollectionName,
         localField: "recipe",
         foreignField: "_id",
         pipeline: [

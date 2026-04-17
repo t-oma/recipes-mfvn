@@ -38,3 +38,5 @@ export const RecipeRatingModel = model<
   RecipeRatingDocument,
   RecipeRatingModelType
 >(RECIPE_RATING_MODEL_NAME, recipeRatingSchema);
+
+export const recipeRatingsCollectionName = RecipeRatingModel.collection.name;
