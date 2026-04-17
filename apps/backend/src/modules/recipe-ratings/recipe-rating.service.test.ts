@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  createMockCache,
   createMockRatingModel,
   createMockRecipeModel,
   createMockUserModel,
@@ -7,6 +8,7 @@ import {
   initiator,
 } from "@/__tests__/helpers.js";
 import { BadRequestError, NotFoundError } from "@/common/errors.js";
+import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
 import type { RecipeRatingModelType } from "./recipe-rating.model.js";
@@ -16,11 +18,13 @@ describe("recipeRatingService", () => {
   const ratingModel = createMockRatingModel();
   const recipeModel = createMockRecipeModel();
   const userModel = createMockUserModel();
+  const cache = createMockCache();
 
   const service = createRecipeRatingService(
     ratingModel as unknown as RecipeRatingModelType,
     recipeModel as unknown as RecipeModelType,
     userModel as unknown as UserModelType,
+    cache,
   );
 
   beforeEach(() => {
@@ -47,6 +51,9 @@ describe("recipeRatingService", () => {
         { user: init.id, recipe: recipeId },
         { value: 4 },
         { upsert: true, returnDocument: "after" },
+      );
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        recipeCache.keys.allPattern(),
       );
     });
 
@@ -128,6 +135,9 @@ describe("recipeRatingService", () => {
         user: init.id,
         recipe: recipeId,
       });
+      expect(cache.deletePattern).toHaveBeenCalledWith(
+        recipeCache.keys.allPattern(),
+      );
     });
 
     it("should throw NotFoundError when rating does not exist", async () => {

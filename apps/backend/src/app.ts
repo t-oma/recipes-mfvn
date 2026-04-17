@@ -126,6 +126,7 @@ export async function buildApp(log: Logger) {
       RecipeRatingModel,
       RecipeModel,
       UserModel,
+      cache,
     ),
     prefix: "/api/recipes",
   });

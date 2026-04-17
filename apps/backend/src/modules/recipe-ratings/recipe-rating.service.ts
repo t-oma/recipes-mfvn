@@ -1,10 +1,12 @@
 import type { RecipeRatingBody } from "@recipes/shared";
 import { isObjectIdOrHexString } from "mongoose";
+import type { CacheService } from "@/common/cache/cache.service.js";
 import { BadRequestError, NotFoundError } from "@/common/errors.js";
 import type {
   CreateMethodParams,
   DeleteMethodParams,
 } from "@/common/types/methods.js";
+import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
 import type { RecipeRatingModelType } from "./recipe-rating.model.js";
@@ -21,6 +23,7 @@ export function createRecipeRatingService(
   ratingModel: RecipeRatingModelType,
   recipeModel: RecipeModelType,
   userModel: UserModelType,
+  cache: CacheService,
 ): RecipeRatingService {
   async function validateUser(userId: string): Promise<void> {
     if (!isObjectIdOrHexString(userId)) {
@@ -55,6 +58,8 @@ export function createRecipeRatingService(
         { upsert: true, returnDocument: "after" },
       );
 
+      await cache.deletePattern(recipeCache.keys.allPattern());
+
       return { value: rating.value };
     },
 
@@ -72,6 +77,8 @@ export function createRecipeRatingService(
           `Rating for ${recipeId} by ${initiator.id} not found`,
         );
       }
+
+      await cache.deletePattern(recipeCache.keys.allPattern());
     },
   };
 }
