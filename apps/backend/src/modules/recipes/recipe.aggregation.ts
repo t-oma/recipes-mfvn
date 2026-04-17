@@ -107,3 +107,84 @@ export function withFavorited(userId?: string) {
     { $unset: "favoritedBy" },
   ] satisfies PipelineStage[];
 }
+
+export function withUserRating(userId?: string) {
+  if (!userId) {
+    return [
+      {
+        $addFields: {
+          userRating: null,
+        },
+      },
+    ] satisfies PipelineStage[];
+  }
+  const userOid = toObjectId(userId);
+
+  return [
+    {
+      $lookup: {
+        from: "recipeRatings",
+        localField: "_id",
+        foreignField: "recipe",
+        pipeline: [
+          {
+            $match: {
+              user: userOid,
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              value: 1,
+            },
+          },
+        ],
+        as: "userRatingDoc",
+      },
+    },
+    { $unwind: { path: "$userRatingDoc", preserveNullAndEmptyArrays: true } },
+    {
+      $addFields: {
+        userRating: "$userRatingDoc.value",
+      },
+    },
+    { $unset: "userRatingDoc" },
+  ] satisfies PipelineStage[];
+}
+
+export function withAverageRating() {
+  return [
+    {
+      $lookup: {
+        from: "recipeRatings",
+        localField: "_id",
+        foreignField: "recipe",
+        pipeline: [
+          {
+            $group: {
+              _id: null,
+              avg: { $avg: "$value" },
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              avg: { $round: ["$avg", 1] },
+              count: 1,
+            },
+          },
+        ],
+        as: "ratingStats",
+      },
+    },
+    { $unwind: { path: "$ratingStats", preserveNullAndEmptyArrays: true } },
+    {
+      $addFields: {
+        averageRating: "$ratingStats.avg",
+        ratingCount: { $ifNull: ["$ratingStats.count", 0] },
+      },
+    },
+    { $unset: "ratingStats" },
+  ] satisfies PipelineStage[];
+}

@@ -26,8 +26,10 @@ import { USER_MODEL_NAME } from "@/modules/users/index.js";
 import {
   byVisibility,
   withAuthor,
+  withAverageRating,
   withCategories,
   withFavorited,
+  withUserRating,
 } from "./recipe.aggregation.js";
 
 export interface IngredientDocument {
@@ -58,6 +60,9 @@ export interface RecipeDocumentPopulated
     }
   > {
   isFavorited: boolean;
+  userRating: number | null;
+  averageRating: number | null;
+  ratingCount: number;
 }
 
 export interface RecipeModelType extends Model<RecipeDocument> {
@@ -144,6 +149,8 @@ recipeSchema.statics.searchFull = async function ({
     { $unset: "__v" },
 
     ...withFavorited(initiator.id),
+    ...withUserRating(initiator.id),
+    ...withAverageRating(),
     {
       $match: {
         ...(isFavorited !== undefined && { isFavorited }),
@@ -180,6 +187,8 @@ recipeSchema.statics.findByIdFull = async function (
     ...withCategories(),
     ...withAuthor(),
     ...withFavorited(initiator.id),
+    ...withUserRating(initiator.id),
+    ...withAverageRating(),
   ]);
 
   if (!recipes.length) {
