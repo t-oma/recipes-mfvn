@@ -103,3 +103,5 @@ export const CommentModel = model<CommentDocument, CommentModelType>(
   COMMENT_MODEL_NAME,
   commentSchema,
 );
+
+export const commentsCollectionName = CommentModel.collection.name;

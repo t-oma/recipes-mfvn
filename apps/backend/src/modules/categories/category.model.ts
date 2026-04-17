@@ -72,3 +72,5 @@ export const CategoryModel = model<CategoryDocument, CategoryModelType>(
   CATEGORY_MODEL_NAME,
   categorySchema,
 );
+
+export const categoriesCollectionName = CategoryModel.collection.name;

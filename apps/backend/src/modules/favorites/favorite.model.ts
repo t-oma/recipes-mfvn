@@ -83,3 +83,5 @@ export const FavoriteModel = model<FavoriteDocument, FavoriteModelType>(
   FAVORITE_MODEL_NAME,
   favoriteSchema,
 );
+
+export const favoritesCollectionName = FavoriteModel.collection.name;
