@@ -32,6 +32,11 @@ import {
   favoriteRoutes,
 } from "@/modules/favorites/index.js";
 import {
+  createRecipeRatingService,
+  RecipeRatingModel,
+  recipeRatingRoutes,
+} from "@/modules/recipe-ratings/index.js";
+import {
   createRecipeService,
   RecipeModel,
   recipeRoutes,
@@ -114,6 +119,15 @@ export async function buildApp(log: Logger) {
   });
   app.register(favoriteRoutes, {
     service: createFavoriteService(FavoriteModel, RecipeModel, UserModel),
+    prefix: "/api/recipes",
+  });
+  app.register(recipeRatingRoutes, {
+    service: createRecipeRatingService(
+      RecipeRatingModel,
+      RecipeModel,
+      UserModel,
+      cache,
+    ),
     prefix: "/api/recipes",
   });
   app.register(categoryRoutes, {

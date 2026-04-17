@@ -45,13 +45,16 @@ export const recipeSchema = z.object({
   servings: z.number(),
   isPublic: z.boolean(),
   isFavorited: z.boolean(),
+  userRating: z.number().int().min(1).max(5).nullable(),
+  averageRating: z.number().nullable(),
+  ratingCount: z.number().int().nonnegative(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 
 export const recipeQuerySchema = z
   .object({
-    sort: createSortSchema(["-createdAt", "cookingTime"]).default("-createdAt"),
+    sort: createSortSchema(["createdAt", "cookingTime"]).default("-createdAt"),
     categoryId: z.string().optional(),
     difficulty: difficultySchema.optional(),
     isFavorited: z.stringbool().optional(),

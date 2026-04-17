@@ -6,15 +6,13 @@ import {
   createObjectId,
   createRecipeDoc,
   initiator,
+  populateRecipeDoc,
   queryParams,
 } from "@/__tests__/helpers.js";
 import { BadRequestError, NotFoundError } from "@/common/errors.js";
 import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
 import { createFavoriteService } from "@/modules/favorites/favorite.service.js";
-import type {
-  RecipeDocumentPopulated,
-  RecipeModelType,
-} from "@/modules/recipes/recipe.model.js";
+import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
 
 describe("favoriteService", () => {
@@ -125,12 +123,9 @@ describe("favoriteService", () => {
   describe("findByUser", () => {
     it("should return paginated recipes from favorites", async () => {
       userModel.exists.mockResolvedValue(true);
-      const recipe = {
-        ...createRecipeDoc(),
-        category: { _id: createObjectId(), name: "Cat", slug: "cat" },
-        author: { _id: createObjectId(), name: "Author", email: "a@b.c" },
+      const recipe = populateRecipeDoc(createRecipeDoc(), {
         isFavorited: true,
-      } satisfies RecipeDocumentPopulated;
+      });
       favoriteModel.findByUser.mockResolvedValue([[{ recipe }], 1]);
 
       const result = await service.findByUser(

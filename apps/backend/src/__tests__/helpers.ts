@@ -156,6 +156,9 @@ export function populateRecipeDoc(
     category: { _id: createObjectId(), name: "Italian", slug: "italian" },
     author: { _id: createObjectId(), name: "Chef", email: "chef@test.com" },
     isFavorited: false,
+    userRating: null,
+    averageRating: null,
+    ratingCount: 0,
     ...overrides,
   };
 }
@@ -233,6 +236,15 @@ export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
     findOneAndDelete: viFn(),
     exists: viFn(),
     findOne: viFn(),
+    ...overrides,
+  };
+}
+
+export function createMockRatingModel(overrides: Record<string, Mock> = {}) {
+  return {
+    findOneAndUpdate: viFn(),
+    findOneAndDelete: viFn(),
+    exists: viFn(),
     ...overrides,
   };
 }

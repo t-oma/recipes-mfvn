@@ -114,6 +114,9 @@ describe("toRecipe", () => {
         email: "chef@test.com",
       },
       isFavorited: true,
+      userRating: 4,
+      averageRating: 4.2,
+      ratingCount: 10,
     } satisfies RecipeDocumentPopulated;
 
     const result = toRecipe(doc, doc.isFavorited);
@@ -131,6 +134,23 @@ describe("toRecipe", () => {
       email: "chef@test.com",
       name: "Chef",
     });
+    expect(result.userRating).toBe(4);
+    expect(result.averageRating).toBe(4.2);
+    expect(result.ratingCount).toBe(10);
+  });
+
+  it("should default rating fields when missing", () => {
+    const doc = {
+      ...createRecipeDoc(),
+      category: { _id: createObjectId(), name: "Cat", slug: "cat" },
+      author: { _id: createObjectId(), name: "Auth", email: "a@b.c" },
+    };
+
+    const result = toRecipe(doc, false);
+
+    expect(result.userRating).toBeNull();
+    expect(result.averageRating).toBeNull();
+    expect(result.ratingCount).toBe(0);
   });
 
   it("should map isFavorited=false", () => {

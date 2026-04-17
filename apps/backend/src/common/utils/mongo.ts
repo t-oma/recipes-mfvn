@@ -29,7 +29,11 @@ export function toRecipe<T extends RecipeDocument>(
       category: Pick<CategoryDocument, "_id" | "name" | "slug">;
       author: Pick<UserDocument, "_id" | "name" | "email">;
     }
-  >,
+  > & {
+    userRating?: number | null;
+    averageRating?: number | null;
+    ratingCount?: number;
+  },
   isFavorited: boolean,
 ): Recipe {
   return {
@@ -53,6 +57,9 @@ export function toRecipe<T extends RecipeDocument>(
     servings: doc.servings,
     isPublic: doc.isPublic,
     isFavorited,
+    userRating: doc.userRating ?? null,
+    averageRating: doc.averageRating ?? null,
+    ratingCount: doc.ratingCount ?? 0,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

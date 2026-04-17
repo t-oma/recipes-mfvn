@@ -21,6 +21,9 @@ export type * from "./recipes/ingredient.types.js";
 export * from "./favorites/favorite.schema.js";
 export type * from "./favorites/favorite.types.js";
 
+export * from "./recipe-rating/recipe-rating.schema.js";
+export type * from "./recipe-rating/recipe-rating.types.js";
+
 export * from "./pagination.js";
 export * from "./utils.js";
 export * from "./query.js";
