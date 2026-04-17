@@ -97,6 +97,48 @@ describe("recipeService", () => {
       expect(recipeModel.searchFull).not.toHaveBeenCalled();
       expect(cache.get).not.toHaveBeenCalled();
     });
+
+    it("should return rating data from aggregation", async () => {
+      const populated = populateRecipeDoc(createRecipeDoc(), {
+        userRating: 4,
+        averageRating: 4.2,
+        ratingCount: 15,
+      });
+      recipeModel.searchFull.mockResolvedValue([[populated], 1]);
+
+      const query = {
+        page: 1,
+        limit: 10,
+        sort: "-createdAt",
+      } satisfies RecipeQuery;
+      const result = await service.findAll({
+        query,
+        initiator: noInitiator(),
+      });
+
+      expect(result.items[0]?.userRating).toBe(4);
+      expect(result.items[0]?.averageRating).toBe(4.2);
+      expect(result.items[0]?.ratingCount).toBe(15);
+    });
+
+    it("should return null ratings when recipe has no ratings", async () => {
+      const populated = populateRecipeDoc(createRecipeDoc());
+      recipeModel.searchFull.mockResolvedValue([[populated], 1]);
+
+      const query = {
+        page: 1,
+        limit: 10,
+        sort: "-createdAt",
+      } satisfies RecipeQuery;
+      const result = await service.findAll({
+        query,
+        initiator: noInitiator(),
+      });
+
+      expect(result.items[0]?.userRating).toBeNull();
+      expect(result.items[0]?.averageRating).toBeNull();
+      expect(result.items[0]?.ratingCount).toBe(0);
+    });
   });
 
   describe("findById", () => {
@@ -150,6 +192,24 @@ describe("recipeService", () => {
       ).rejects.toThrow(NotFoundError);
       expect(cache.get).toHaveBeenCalledWith(recipeCache.keys.byId(id));
     });
+
+    it("should return rating data from aggregation", async () => {
+      const populated = populateRecipeDoc(createRecipeDoc(), {
+        userRating: 5,
+        averageRating: 3.8,
+        ratingCount: 42,
+      });
+      recipeModel.findByIdFull.mockResolvedValue(populated);
+
+      const id = createObjectId().toString();
+      const result = await service.findById(id, {
+        initiator: noInitiator(),
+      });
+
+      expect(result.userRating).toBe(5);
+      expect(result.averageRating).toBe(3.8);
+      expect(result.ratingCount).toBe(42);
+    });
   });
 
   describe("create", () => {
@@ -190,6 +250,9 @@ describe("recipeService", () => {
 
       expect(recipeModel.create).toHaveBeenCalled();
       expect(result.title).toBe("New Recipe");
+      expect(result.userRating).toBeNull();
+      expect(result.averageRating).toBeNull();
+      expect(result.ratingCount).toBe(0);
       expect(cache.deletePattern).toHaveBeenCalledWith(
         recipeCache.keys.allPattern(),
       );
@@ -261,6 +324,9 @@ describe("recipeService", () => {
 
       expect(recipe.save).toHaveBeenCalled();
       expect(result.title).toBe("Updated");
+      expect(result.userRating).toBeNull();
+      expect(result.averageRating).toBeNull();
+      expect(result.ratingCount).toBe(0);
       expect(cache.delete).toHaveBeenCalledWith(recipeCache.keys.byId(id));
       expect(cache.deletePattern).toHaveBeenCalledWith(
         recipeCache.keys.allPattern(),

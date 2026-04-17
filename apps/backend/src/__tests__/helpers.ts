@@ -156,6 +156,9 @@ export function populateRecipeDoc(
     category: { _id: createObjectId(), name: "Italian", slug: "italian" },
     author: { _id: createObjectId(), name: "Chef", email: "chef@test.com" },
     isFavorited: false,
+    userRating: null,
+    averageRating: null,
+    ratingCount: 0,
     ...overrides,
   };
 }
