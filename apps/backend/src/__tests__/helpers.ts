@@ -237,6 +237,15 @@ export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
   };
 }
 
+export function createMockRatingModel(overrides: Record<string, Mock> = {}) {
+  return {
+    findOneAndUpdate: viFn(),
+    findOneAndDelete: viFn(),
+    exists: viFn(),
+    ...overrides,
+  };
+}
+
 // ── Cache mock ──
 
 export interface MockCache extends CacheService {
