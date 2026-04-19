@@ -7,7 +7,7 @@ import Testimonial from "@/common/ui/Testimonial.vue";
 import { useCategories } from "@/features/categories/categories.queries";
 import CategoriesGrid from "@/features/categories/views/CategoriesGrid.vue";
 import FeaturedRecipe from "./_home/featured-recipes/FeaturedRecipe.vue";
-import Hero from "./_home/hero/Hero.vue";
+import Hero from "./_home/Hero.vue";
 import NewsletterCTA from "./_home/NewsletterCTA.vue";
 import TodaysPick from "./_home/TodaysPick.vue";
 
