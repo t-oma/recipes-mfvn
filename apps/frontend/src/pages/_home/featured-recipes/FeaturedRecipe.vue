@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import FeaturedRecipeFooter from "./FeaturedRecipeFooter.vue";
 import FeaturedRecipeHeader from "./FeaturedRecipeHeader.vue";
-import type { FeaturedRecipeData } from "./FeaturedRecipes.vue";
+
+export interface FeaturedRecipeData {
+  id: number;
+  title: string;
+  time: string;
+  difficulty: string;
+  rating: number;
+  image: string;
+  tag: string;
+}
 
 const props = defineProps<{
   recipe: FeaturedRecipeData;
