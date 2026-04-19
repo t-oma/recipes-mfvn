@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { capitalize } from "vue";
-import TodaysPickHeader from "./TodaysPickHeader.vue";
 
 const recipe = {
   calories: 245,
@@ -31,7 +30,21 @@ const recipe = {
 
     <div class="relative z-10 grid items-center gap-12 lg:grid-cols-2">
       <div>
-        <TodaysPickHeader />
+        <p
+          class="text-terracotta mb-3 text-sm font-semibold tracking-widest uppercase"
+        >
+          Today's Pick
+        </p>
+        <h2
+          class="font-display text-4xl font-bold tracking-tight text-white lg:text-5xl"
+        >
+          Culinary Calendar
+        </h2>
+        <p class="mt-6 max-w-lg text-lg leading-relaxed text-stone-300">
+          Every day we pick seasonal recipes that perfectly match the time of
+          year. Today — a silky roasted pumpkin soup with aromatic spices and
+          homemade croutons.
+        </p>
 
         <div class="mt-10 flex flex-wrap gap-4">
           <div

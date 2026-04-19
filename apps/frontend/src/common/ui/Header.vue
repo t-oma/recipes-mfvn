@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import AppLogo from "../AppLogo.vue";
-import HeaderNav from "./HeaderNav.vue";
-import HeaderUser from "./HeaderUser.vue";
+import HeaderNav from "./_header/HeaderNav.vue";
+import HeaderUser from "./_header/HeaderUser.vue";
+import AppLogo from "./AppLogo.vue";
 </script>
 
 <template>
