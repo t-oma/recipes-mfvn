@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 
-const props = defineProps<{
+const { align = "left" } = defineProps<{
   title: string;
   subtitle: string;
   link?: {
     text: string;
     to: string;
   };
+  align?: "left" | "center";
 }>();
 </script>
 
 <template>
-  <div class="mb-14 flex items-end justify-between">
+  <div
+    class="mb-14 flex items-end"
+    :class="{
+      'justify-center text-center': align === 'center',
+      'justify-between': align === 'left',
+    }"
+  >
     <div>
       <p
         class="text-terracotta mb-2 text-sm font-semibold tracking-widest uppercase"
