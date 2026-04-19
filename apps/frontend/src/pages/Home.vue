@@ -3,12 +3,12 @@ import { onMounted, ref } from "vue";
 import DefaultLayout from "@/common/ui/DefaultLayout.vue";
 import Section from "@/common/ui/Section.vue";
 import SectionHeader from "@/common/ui/SectionHeader.vue";
+import Testimonial from "@/common/ui/Testimonial.vue";
 import { useCategories } from "@/features/categories/categories.queries";
 import CategoriesGrid from "@/features/categories/views/CategoriesGrid.vue";
 import FeaturedRecipe from "./_home/featured-recipes/FeaturedRecipe.vue";
 import Hero from "./_home/hero/Hero.vue";
 import NewsletterCTA from "./_home/NewsletterCTA.vue";
-import Testimonials from "./_home/Testimonials.vue";
 import TodaysPick from "./_home/TodaysPick.vue";
 
 const isLoaded = ref(false);
@@ -67,6 +67,24 @@ const featuredRecipes = [
     tag: "Hearty",
   },
 ];
+
+const testimonials = [
+  {
+    text: "Best recipe site ever! The beef stew turned out even better than my grandmother's.",
+    author: "Elena K.",
+    role: "Home Cook",
+  },
+  {
+    text: "So easy to find recipes here. Step-by-step instructions are a real find for beginners.",
+    author: "Andrew M.",
+    role: "Beginner Chef",
+  },
+  {
+    text: "Dumplings, buns, fritters — everything in one place. Thanks for such a collection!",
+    author: "Maria S.",
+    role: "Food Enthusiast",
+  },
+];
 </script>
 
 <template>
@@ -115,7 +133,21 @@ const featuredRecipes = [
       </Section>
 
       <Section id="testimonials" bg="bg-stone-50">
-        <Testimonials />
+        <SectionHeader
+          title="Reviews"
+          subtitle="What Cooks Say"
+          align="center"
+        />
+
+        <div class="grid gap-6 md:grid-cols-3">
+          <Testimonial
+            v-for="(testimonial, index) in testimonials"
+            :key="index"
+            :text="testimonial.text"
+            :author="testimonial.author"
+            :role="testimonial.role"
+          />
+        </div>
       </Section>
 
       <Section id="newsletter" bg="bg-white">
