@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import WavyDivider from "@/common/ui/WavyDivider.vue";
 import SocialProof from "./SocialProof.vue";
-import WavyDivider from "./WavyDivider.vue";
 </script>
 
 <template>
