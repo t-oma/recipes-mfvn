@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import DefaultLayout from "@/common/ui/DefaultLayout.vue";
-import Categories from "@/features/home/views/categories/Categories.vue";
+import Section from "@/common/ui/section/Section.vue";
+import SectionHeader from "@/common/ui/section/SectionHeader.vue";
+import { useCategories } from "@/features/categories/categories.queries";
+import CategoriesGrid from "@/features/categories/views/CategoriesGrid.vue";
 import FeaturedRecipes from "@/features/home/views/featured-recipes/FeaturedRecipes.vue";
-import HomeSection from "@/features/home/views/HomeSection.vue";
 import Hero from "@/features/home/views/hero/Hero.vue";
 import NewsletterCTA from "@/features/home/views/newsletter/NewsletterCTA.vue";
 import Testimonials from "@/features/home/views/testimonials/Testimonials.vue";
@@ -16,6 +18,12 @@ onMounted(() => {
     isLoaded.value = true;
   });
 });
+
+const {
+  data: categories,
+  isLoading,
+  error,
+} = useCategories({ sort: "-recipeCount" });
 </script>
 
 <template>
@@ -27,25 +35,34 @@ onMounted(() => {
     <DefaultLayout>
       <Hero />
 
-      <HomeSection id="categories" bg="bg-white">
-        <Categories />
-      </HomeSection>
+      <Section id="categories" bg="bg-white">
+        <SectionHeader
+          title="Pick a direction"
+          subtitle="Recipe Categories"
+          :link="{
+            to: '#',
+            text: 'All categories',
+          }"
+        />
 
-      <HomeSection id="featured-recipes" bg="bg-stone-50">
+        <CategoriesGrid :categories :isLoading :error />
+      </Section>
+
+      <Section id="featured-recipes" bg="bg-stone-50">
         <FeaturedRecipes />
-      </HomeSection>
+      </Section>
 
-      <HomeSection id="todays-pick" bg="bg-white">
+      <Section id="todays-pick" bg="bg-white">
         <TodaysPick />
-      </HomeSection>
+      </Section>
 
-      <HomeSection id="testimonials" bg="bg-stone-50">
+      <Section id="testimonials" bg="bg-stone-50">
         <Testimonials />
-      </HomeSection>
+      </Section>
 
-      <HomeSection id="newsletter" bg="bg-white">
+      <Section id="newsletter" bg="bg-white">
         <NewsletterCTA />
-      </HomeSection>
+      </Section>
     </DefaultLayout>
   </div>
 </template>
