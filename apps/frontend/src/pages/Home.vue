@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import DefaultLayout from "@/common/ui/DefaultLayout.vue";
-import Section from "@/common/ui/section/Section.vue";
-import SectionHeader from "@/common/ui/section/SectionHeader.vue";
+import Section from "@/common/ui/Section.vue";
+import SectionHeader from "@/common/ui/SectionHeader.vue";
 import { useCategories } from "@/features/categories/categories.queries";
 import CategoriesGrid from "@/features/categories/views/CategoriesGrid.vue";
 import FeaturedRecipes from "@/features/home/views/featured-recipes/FeaturedRecipes.vue";
