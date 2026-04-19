@@ -5,11 +5,11 @@ import Section from "@/common/ui/Section.vue";
 import SectionHeader from "@/common/ui/SectionHeader.vue";
 import { useCategories } from "@/features/categories/categories.queries";
 import CategoriesGrid from "@/features/categories/views/CategoriesGrid.vue";
-import FeaturedRecipes from "@/features/home/views/featured-recipes/FeaturedRecipes.vue";
-import Hero from "@/features/home/views/hero/Hero.vue";
-import NewsletterCTA from "@/features/home/views/newsletter/NewsletterCTA.vue";
-import Testimonials from "@/features/home/views/testimonials/Testimonials.vue";
-import TodaysPick from "@/features/home/views/todays-pick/TodaysPick.vue";
+import FeaturedRecipes from "./_home/featured-recipes/FeaturedRecipes.vue";
+import Hero from "./_home/hero/Hero.vue";
+import NewsletterCTA from "./_home/newsletter/NewsletterCTA.vue";
+import Testimonials from "./_home/testimonials/Testimonials.vue";
+import TodaysPick from "./_home/todays-pick/TodaysPick.vue";
 
 const isLoaded = ref(false);
 
