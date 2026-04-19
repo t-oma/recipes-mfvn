@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AppLogo from "../AppLogo.vue";
-import FooterCopyright from "./FooterCopyright.vue";
-import FooterNav from "./FooterNav.vue";
-import FooterSocials from "./FooterSocials.vue";
+import FooterCopyright from "./_footer/FooterCopyright.vue";
+import FooterNav from "./_footer/FooterNav.vue";
+import FooterSocials from "./_footer/FooterSocials.vue";
+import AppLogo from "./AppLogo.vue";
 </script>
 
 <template>
