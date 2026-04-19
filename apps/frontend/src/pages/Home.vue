@@ -7,9 +7,9 @@ import { useCategories } from "@/features/categories/categories.queries";
 import CategoriesGrid from "@/features/categories/views/CategoriesGrid.vue";
 import FeaturedRecipes from "./_home/featured-recipes/FeaturedRecipes.vue";
 import Hero from "./_home/hero/Hero.vue";
-import NewsletterCTA from "./_home/newsletter/NewsletterCTA.vue";
-import Testimonials from "./_home/testimonials/Testimonials.vue";
-import TodaysPick from "./_home/todays-pick/TodaysPick.vue";
+import NewsletterCTA from "./_home/NewsletterCTA.vue";
+import Testimonials from "./_home/Testimonials.vue";
+import TodaysPick from "./_home/TodaysPick.vue";
 
 const isLoaded = ref(false);
 
