@@ -221,7 +221,7 @@ export function createMockRecipeModel(overrides: Record<string, Mock> = {}) {
 
 export function createMockCommentModel(overrides: Record<string, Mock> = {}) {
   return {
-    findFull: viFn(),
+    aggregate: viFn(),
     findById: viFn(),
     create: viFn(),
     ...overrides,
