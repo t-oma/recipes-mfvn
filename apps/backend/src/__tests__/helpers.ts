@@ -211,8 +211,7 @@ export function createMockUserModel(overrides: Record<string, Mock> = {}) {
 export function createMockRecipeModel(overrides: Record<string, Mock> = {}) {
   return {
     findById: viFn(),
-    searchFull: viFn(),
-    findByIdFull: viFn(),
+    aggregate: viFn(),
     create: viFn(),
     countDocuments: viFn().mockResolvedValue(0),
     exists: viFn(),
