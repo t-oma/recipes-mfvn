@@ -5,18 +5,14 @@ import type {
   Paginated,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
-import { isValidObjectId } from "mongoose";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "@/common/errors.js";
+import { ForbiddenError, NotFoundError } from "@/common/errors.js";
 import type {
   CreateMethodParams,
   DeleteMethodParams,
   QueryMethodParams,
 } from "@/common/types/methods.js";
 import { toComment, toCommentForRecipe } from "@/common/utils/mongo.js";
+import { assertExists, assertValidId } from "@/common/utils/validation.js";
 import type { CommentModelType } from "@/modules/comments/index.js";
 import type { RecipeModelType } from "@/modules/recipes/index.js";
 import type { UserDocument, UserModelType } from "@/modules/users/index.js";
@@ -44,13 +40,9 @@ export function createCommentService(
 ): CommentService {
   return {
     findByRecipe: async (recipeId, { query, initiator }) => {
-      if (!isValidObjectId(recipeId)) {
-        throw new BadRequestError("Invalid recipe ID");
-      }
-      const recipeExists = await recipeModel.exists({ _id: recipeId });
-      if (!recipeExists) {
-        throw new NotFoundError("Recipe not found");
-      }
+      assertValidId(recipeId, "Recipe");
+      await assertExists(recipeModel, recipeId);
+
       const { page, limit } = query;
 
       const [comments, total] = await commentModel.findFull(
@@ -70,9 +62,8 @@ export function createCommentService(
     },
 
     findByAuthor: async (authorId, { query, initiator }) => {
-      if (!isValidObjectId(authorId)) {
-        throw new BadRequestError("Invalid author ID");
-      }
+      assertValidId(authorId, "Author");
+
       const { page, limit } = query;
 
       const [comments, total] = await commentModel.findFull(
@@ -87,21 +78,11 @@ export function createCommentService(
     },
 
     create: async (recipeId, { data, initiator }) => {
-      if (!isValidObjectId(recipeId)) {
-        throw new BadRequestError("Invalid recipe ID");
-      }
-      if (!isValidObjectId(initiator.id)) {
-        throw new BadRequestError("Invalid author ID");
-      }
+      assertValidId(recipeId, "Recipe");
+      assertValidId(initiator.id, "Author");
 
-      const recipeExists = await recipeModel.exists({ _id: recipeId });
-      if (!recipeExists) {
-        throw new NotFoundError("Recipe not found");
-      }
-      const authorExists = await userModel.exists({ _id: initiator.id });
-      if (!authorExists) {
-        throw new NotFoundError("Author not found");
-      }
+      await assertExists(recipeModel, recipeId);
+      await assertExists(userModel, initiator.id);
 
       const comment = await commentModel.create({
         text: data.text,
@@ -116,9 +97,7 @@ export function createCommentService(
     },
 
     delete: async (commentId, { initiator }) => {
-      if (!isValidObjectId(commentId)) {
-        throw new BadRequestError("Invalid comment ID");
-      }
+      assertValidId(commentId, "Comment");
 
       const comment = await commentModel.findById(commentId);
       if (!comment) {

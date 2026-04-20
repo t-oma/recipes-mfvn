@@ -1,11 +1,11 @@
 import type { RecipeRatingBody } from "@recipes/shared";
-import { isObjectIdOrHexString } from "mongoose";
 import type { CacheService } from "@/common/cache/cache.service.js";
-import { BadRequestError, NotFoundError } from "@/common/errors.js";
+import { NotFoundError } from "@/common/errors.js";
 import type {
   CreateMethodParams,
   DeleteMethodParams,
 } from "@/common/types/methods.js";
+import { assertExists, assertValidId } from "@/common/utils/validation.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
@@ -26,25 +26,13 @@ export function createRecipeRatingService(
   cache: CacheService,
 ): RecipeRatingService {
   async function validateUser(userId: string): Promise<void> {
-    if (!isObjectIdOrHexString(userId)) {
-      throw new BadRequestError(`Invalid user ID: ${userId}`);
-    }
-
-    const userExists = await userModel.exists({ _id: userId });
-    if (!userExists) {
-      throw new NotFoundError(`User not found: ${userId}`);
-    }
+    assertValidId(userId, "User");
+    await assertExists(userModel, userId);
   }
 
   async function validateRecipe(recipeId: string): Promise<void> {
-    if (!isObjectIdOrHexString(recipeId)) {
-      throw new BadRequestError(`Invalid recipe ID: ${recipeId}`);
-    }
-
-    const recipeExists = await recipeModel.exists({ _id: recipeId });
-    if (!recipeExists) {
-      throw new NotFoundError(`Recipe not found: ${recipeId}`);
-    }
+    assertValidId(recipeId, "Recipe");
+    await assertExists(recipeModel, recipeId);
   }
 
   return {
