@@ -6,13 +6,8 @@ import type {
   UpdateRecipeBody,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
-import { isValidObjectId } from "mongoose";
 import type { CacheService } from "@/common/cache/cache.service.js";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "@/common/errors.js";
+import { ForbiddenError, NotFoundError } from "@/common/errors.js";
 import type {
   CreateMethodParams,
   DeleteMethodParams,
@@ -22,6 +17,7 @@ import type {
   UpdateMethodParams,
 } from "@/common/types/methods.js";
 import { toRecipe } from "@/common/utils/mongo.js";
+import { assertExists, assertValidId } from "@/common/utils/validation.js";
 import type {
   CategoryDocument,
   CategoryModelType,
@@ -95,9 +91,7 @@ export function createRecipeService(
     },
 
     findById: async (id, params) => {
-      if (!isValidObjectId(id)) {
-        throw new BadRequestError("Invalid recipe ID");
-      }
+      assertValidId(id, "Recipe");
 
       const isAuthenticated = !!params.initiator.id;
 
@@ -125,22 +119,11 @@ export function createRecipeService(
     },
 
     create: async ({ data, initiator }) => {
-      if (!isValidObjectId(initiator.id)) {
-        throw new BadRequestError("Invalid author ID");
-      }
-      if (!isValidObjectId(data.category)) {
-        throw new BadRequestError("Invalid category ID");
-      }
+      assertValidId(initiator.id, "Author");
+      assertValidId(data.category, "Category");
 
-      const categoryExists = await categoryModel.exists({ _id: data.category });
-      if (!categoryExists) {
-        throw new NotFoundError("Category not found");
-      }
-
-      const authorExists = await userModel.exists({ _id: initiator.id });
-      if (!authorExists) {
-        throw new NotFoundError("Author not found");
-      }
+      await assertExists(categoryModel, data.category);
+      await assertExists(userModel, initiator.id);
 
       const recipe = await recipeModel.create({
         ...data,
@@ -160,9 +143,7 @@ export function createRecipeService(
     },
 
     update: async (id, { data, initiator }) => {
-      if (!isValidObjectId(id)) {
-        throw new BadRequestError("Invalid recipe ID");
-      }
+      assertValidId(id, "Recipe");
       const recipe = await recipeModel.findById(id);
       if (!recipe) {
         throw new NotFoundError("Recipe not found");
@@ -198,9 +179,7 @@ export function createRecipeService(
     },
 
     delete: async (id, { initiator }) => {
-      if (!isValidObjectId(id)) {
-        throw new BadRequestError("Invalid recipe ID");
-      }
+      assertValidId(id, "Recipe");
       const recipe = await recipeModel.findById(id).select("+author");
       if (!recipe) {
         throw new NotFoundError("Recipe not found");
