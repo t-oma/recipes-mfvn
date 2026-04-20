@@ -189,7 +189,7 @@ const chainable = {
 export function createMockCategoryModel(overrides: Record<string, Mock> = {}) {
   return {
     find: viFn().mockReturnValue(chainable),
-    searchFull: viFn(),
+    aggregate: viFn(),
     create: viFn(),
     findByIdAndDelete: viFn(),
     countDocuments: viFn().mockResolvedValue(0),
