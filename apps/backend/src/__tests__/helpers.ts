@@ -230,7 +230,7 @@ export function createMockCommentModel(overrides: Record<string, Mock> = {}) {
 
 export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
   return {
-    findByUser: viFn(),
+    aggregate: viFn(),
     create: viFn(),
     findOneAndDelete: viFn(),
     exists: viFn(),
