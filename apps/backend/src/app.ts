@@ -16,24 +16,12 @@ import { env } from "@/config/env.js";
 import { createRateLimitOptions } from "@/config/rate-limit.js";
 import { swaggerOptions, swaggerUiOptions } from "@/config/swagger.js";
 import { authRoutes } from "@/modules/auth/auth.routes.js";
-import { createAuthService } from "@/modules/auth/auth.service.js";
-import { CategoryModel } from "@/modules/categories/category.model.js";
 import { categoryRoutes } from "@/modules/categories/category.routes.js";
-import { createCategoryService } from "@/modules/categories/category.service.js";
-import { CommentModel } from "@/modules/comments/comment.model.js";
-import { createCommentService } from "@/modules/comments/comment.service.js";
-import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import { favoriteRoutes } from "@/modules/favorites/favorite.routes.js";
-import { createFavoriteService } from "@/modules/favorites/favorite.service.js";
-import { RecipeRatingModel } from "@/modules/recipe-ratings/recipe-rating.model.js";
 import { recipeRatingRoutes } from "@/modules/recipe-ratings/recipe-rating.routes.js";
-import { createRecipeRatingService } from "@/modules/recipe-ratings/recipe-rating.service.js";
-import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import { recipeRoutes } from "@/modules/recipes/recipe.routes.js";
-import { createRecipeService } from "@/modules/recipes/recipe.service.js";
-import { UserModel } from "@/modules/users/user.model.js";
 import { userRoutes } from "@/modules/users/user.routes.js";
-import { createUserService } from "@/modules/users/user.service.js";
+import { createServices } from "./app.services.js";
 
 export async function buildApp(log: Logger) {
   const app = Fastify({
@@ -73,65 +61,32 @@ export async function buildApp(log: Logger) {
   // Health check
   app.get("/health", async () => ({ status: "ok" }));
 
-  const commentService = createCommentService(
-    CommentModel,
-    RecipeModel,
-    UserModel,
-  );
-  const favoriteService = createFavoriteService(
-    FavoriteModel,
-    RecipeModel,
-    UserModel,
-  );
-  const userService = createUserService(
-    commentService,
-    favoriteService,
-    UserModel,
-  );
-  const recipeRatingService = createRecipeRatingService(
-    RecipeRatingModel,
-    RecipeModel,
-    UserModel,
-    cache,
-  );
-  const categoryService = createCategoryService(
-    CategoryModel,
-    RecipeModel,
-    cache,
-  );
-  const recipeService = createRecipeService(
-    RecipeModel,
-    UserModel,
-    FavoriteModel,
-    CategoryModel,
-    cache,
-  );
-  const authService = createAuthService(UserModel, log);
+  const services = createServices(cache, log);
 
   // Routes
   app.register(authRoutes, {
-    service: authService,
+    service: services.auth,
     prefix: "/api/auth",
   });
   app.register(userRoutes, {
-    service: userService,
+    service: services.user,
     prefix: "/api/users",
   });
   app.register(recipeRoutes, {
-    service: recipeService,
-    commentService,
+    service: services.recipe,
+    commentService: services.comment,
     prefix: "/api/recipes",
   });
   app.register(favoriteRoutes, {
-    service: favoriteService,
+    service: services.favorite,
     prefix: "/api/recipes",
   });
   app.register(recipeRatingRoutes, {
-    service: recipeRatingService,
+    service: services.recipeRating,
     prefix: "/api/recipes",
   });
   app.register(categoryRoutes, {
-    service: categoryService,
+    service: services.category,
     prefix: "/api/categories",
   });
 
