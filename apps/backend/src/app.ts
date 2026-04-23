@@ -21,7 +21,7 @@ import { favoriteRoutes } from "@/modules/favorites/favorite.routes.js";
 import { recipeRatingRoutes } from "@/modules/recipe-ratings/recipe-rating.routes.js";
 import { recipeRoutes } from "@/modules/recipes/recipe.routes.js";
 import { userRoutes } from "@/modules/users/user.routes.js";
-import { createServices } from "./app.create-services.js";
+import { createServices } from "./app.services.js";
 
 export async function buildApp(log: Logger) {
   const app = Fastify({
@@ -65,28 +65,28 @@ export async function buildApp(log: Logger) {
 
   // Routes
   app.register(authRoutes, {
-    service: services.authService,
+    service: services.auth,
     prefix: "/api/auth",
   });
   app.register(userRoutes, {
-    service: services.userService,
+    service: services.user,
     prefix: "/api/users",
   });
   app.register(recipeRoutes, {
-    service: services.recipeService,
-    commentService: services.commentService,
+    service: services.recipe,
+    commentService: services.comment,
     prefix: "/api/recipes",
   });
   app.register(favoriteRoutes, {
-    service: services.favoriteService,
+    service: services.favorite,
     prefix: "/api/recipes",
   });
   app.register(recipeRatingRoutes, {
-    service: services.recipeRatingService,
+    service: services.recipeRating,
     prefix: "/api/recipes",
   });
   app.register(categoryRoutes, {
-    service: services.categoryService,
+    service: services.category,
     prefix: "/api/categories",
   });
 

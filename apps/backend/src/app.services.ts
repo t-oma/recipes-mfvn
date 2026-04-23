@@ -22,13 +22,13 @@ import type { UserService } from "@/modules/users/user.service.js";
 import { createUserService } from "@/modules/users/user.service.js";
 
 export interface Services {
-  authService: AuthService;
-  userService: UserService;
-  recipeService: RecipeService;
-  commentService: CommentService;
-  favoriteService: FavoriteService;
-  recipeRatingService: RecipeRatingService;
-  categoryService: CategoryService;
+  auth: AuthService;
+  user: UserService;
+  recipe: RecipeService;
+  comment: CommentService;
+  favorite: FavoriteService;
+  recipeRating: RecipeRatingService;
+  category: CategoryService;
 }
 
 export function createServices(cache: CacheService, log: Logger): Services {
@@ -68,12 +68,12 @@ export function createServices(cache: CacheService, log: Logger): Services {
   const authService = createAuthService(UserModel, log);
 
   return {
-    authService,
-    userService,
-    recipeService,
-    commentService,
-    favoriteService,
-    recipeRatingService,
-    categoryService,
+    auth: authService,
+    user: userService,
+    recipe: recipeService,
+    comment: commentService,
+    favorite: favoriteService,
+    recipeRating: recipeRatingService,
+    category: categoryService,
   };
 }
