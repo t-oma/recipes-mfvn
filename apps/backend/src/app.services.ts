@@ -1,4 +1,5 @@
 import type { CacheService } from "@/common/cache/cache.service.js";
+import type { TypedEmitter } from "@/common/events.js";
 import type { Logger } from "@/common/logger.js";
 import type { AuthService } from "@/modules/auth/auth.service.js";
 import { createAuthService } from "@/modules/auth/auth.service.js";
@@ -34,6 +35,7 @@ export interface Services {
 export function createServices(
   recipeCache: CacheService,
   categoryCache: CacheService,
+  bus: TypedEmitter,
   log: Logger,
 ): Services {
   const commentService = createCommentService(
@@ -55,11 +57,13 @@ export function createServices(
     RecipeRatingModel,
     RecipeModel,
     UserModel,
+    bus,
   );
   const categoryService = createCategoryService(
     CategoryModel,
     RecipeModel,
     categoryCache,
+    bus,
   );
   const recipeService = createRecipeService(
     RecipeModel,
@@ -67,6 +71,7 @@ export function createServices(
     FavoriteModel,
     CategoryModel,
     recipeCache,
+    bus,
   );
   const authService = createAuthService(UserModel, log);
 
