@@ -10,6 +10,7 @@ export const recipeCache = {
         difficulty: filters.difficulty,
         sort: filters.sort,
       })}`,
+    listPattern: () => "list:*",
     allPattern: () => "*",
   },
   ttl: {

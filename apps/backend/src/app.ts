@@ -70,7 +70,6 @@ export async function buildApp(log: Logger) {
 
   // Cross-service cache invalidation via events
   bus.on("category:changed", () => recipeCache.deletePattern("*"));
-  bus.on("recipe:changed", () => categoryCache.deletePattern("*"));
   bus.on("recipe:rated", () => recipeCache.deletePattern("*"));
 
   // Routes
