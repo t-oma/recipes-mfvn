@@ -31,7 +31,11 @@ export interface Services {
   category: CategoryService;
 }
 
-export function createServices(cache: CacheService, log: Logger): Services {
+export function createServices(
+  recipeCache: CacheService,
+  categoryCache: CacheService,
+  log: Logger,
+): Services {
   const commentService = createCommentService(
     CommentModel,
     RecipeModel,
@@ -51,19 +55,18 @@ export function createServices(cache: CacheService, log: Logger): Services {
     RecipeRatingModel,
     RecipeModel,
     UserModel,
-    cache,
   );
   const categoryService = createCategoryService(
     CategoryModel,
     RecipeModel,
-    cache,
+    categoryCache,
   );
   const recipeService = createRecipeService(
     RecipeModel,
     UserModel,
     FavoriteModel,
     CategoryModel,
-    cache,
+    recipeCache,
   );
   const authService = createAuthService(UserModel, log);
 
