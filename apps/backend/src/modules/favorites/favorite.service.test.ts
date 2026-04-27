@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  createMockFavoriteModel,
+  createMockFavoriteRepository,
   createMockRecipeModel,
   createMockUserModel,
   createObjectId,
@@ -10,18 +10,18 @@ import {
   queryParams,
 } from "@/__tests__/helpers.js";
 import { BadRequestError, NotFoundError } from "@/common/errors.js";
-import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
+import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { createFavoriteService } from "@/modules/favorites/favorite.service.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
 
 describe("favoriteService", () => {
-  const favoriteModel = createMockFavoriteModel();
+  const favoriteRepository = createMockFavoriteRepository();
   const recipeModel = createMockRecipeModel();
   const userModel = createMockUserModel();
 
   const service = createFavoriteService(
-    favoriteModel as unknown as FavoriteModelType,
+    favoriteRepository as unknown as FavoriteRepository,
     recipeModel as unknown as RecipeModelType,
     userModel as unknown as UserModelType,
   );
@@ -40,7 +40,7 @@ describe("favoriteService", () => {
       const result = await service.add(recipeId, { initiator: init });
 
       expect(result).toEqual({ favorited: true });
-      expect(favoriteModel.create).toHaveBeenCalledWith({
+      expect(favoriteRepository.create).toHaveBeenCalledWith({
         user: init.id,
         recipe: recipeId,
       });
@@ -91,16 +91,13 @@ describe("favoriteService", () => {
       const result = await service.remove(recipeId, { initiator: init });
 
       expect(result).toEqual({ favorited: false });
-      expect(favoriteModel.findOneAndDelete).toHaveBeenCalledWith({
-        user: init.id,
-        recipe: recipeId,
-      });
+      expect(favoriteRepository.delete).toHaveBeenCalledWith(init.id, recipeId);
     });
   });
 
   describe("isFavorited", () => {
     it("should return true when favorite exists", async () => {
-      favoriteModel.exists.mockResolvedValue({ _id: "some-id" });
+      favoriteRepository.exists.mockResolvedValue(true);
 
       const result = await service.isFavorited(createObjectId().toString(), {
         initiator: initiator(),
@@ -110,7 +107,7 @@ describe("favoriteService", () => {
     });
 
     it("should return false when favorite does not exist", async () => {
-      favoriteModel.exists.mockResolvedValue(null);
+      favoriteRepository.exists.mockResolvedValue(false);
 
       const result = await service.isFavorited(createObjectId().toString(), {
         initiator: initiator(),
@@ -126,9 +123,7 @@ describe("favoriteService", () => {
       const recipe = populateRecipeDoc(createRecipeDoc(), {
         isFavorited: true,
       });
-      favoriteModel.aggregate.mockResolvedValue([
-        { items: [{ recipe }], total: 1 },
-      ]);
+      favoriteRepository.findByUser.mockResolvedValue([[recipe], 1]);
 
       const result = await service.findByUser(
         createObjectId().toString(),
@@ -141,7 +136,7 @@ describe("favoriteService", () => {
 
     it("should return empty paginated result when no favorites", async () => {
       userModel.exists.mockResolvedValue(true);
-      favoriteModel.aggregate.mockResolvedValue([]);
+      favoriteRepository.findByUser.mockResolvedValue([[], 0]);
 
       const result = await service.findByUser(
         createObjectId().toString(),

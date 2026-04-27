@@ -271,6 +271,20 @@ export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
   };
 }
 
+export function createMockFavoriteRepository(
+  overrides: Record<string, Mock> = {},
+) {
+  return {
+    create: viFn(),
+    delete: viFn(),
+    exists: viFn(),
+    findByUser: viFn(),
+    findOne: viFn(),
+    aggregate: viFn(),
+    ...overrides,
+  };
+}
+
 export function createMockRatingModel(overrides: Record<string, Mock> = {}) {
   return {
     findOneAndUpdate: viFn(),
