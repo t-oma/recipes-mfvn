@@ -1,11 +1,12 @@
 import type { CategoryQuery, CreateCategoryBody } from "@recipes/shared";
 import type { PipelineStage, QueryFilter } from "mongoose";
+import { withSort } from "@/common/utils/mongoose.aggregation.js";
+import { recipesCollectionName } from "@/modules/recipes/recipe.model.js";
 import type {
   CategoryDocument,
   CategoryDocumentWithCount,
   CategoryModelType,
 } from "./category.model.js";
-import { buildSearchPipeline } from "./category.pipeline.js";
 
 export class CategoryRepository {
   private model: CategoryModelType;
@@ -15,9 +16,19 @@ export class CategoryRepository {
   }
 
   async findMany(query: CategoryQuery): Promise<CategoryDocumentWithCount[]> {
-    return this.aggregate<CategoryDocumentWithCount>(
-      buildSearchPipeline(query),
-    );
+    return this.aggregate<CategoryDocumentWithCount>([
+      {
+        $lookup: {
+          from: recipesCollectionName,
+          localField: "_id",
+          foreignField: "category",
+          as: "recipes",
+        },
+      },
+      { $addFields: { recipeCount: { $size: "$recipes" } } },
+      { $project: { recipes: 0 } },
+      ...withSort(query.sort),
+    ]);
   }
 
   async findById(id: string): Promise<CategoryDocument | null> {
