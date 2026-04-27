@@ -230,6 +230,21 @@ export function createMockCommentModel(overrides: Record<string, Mock> = {}) {
   };
 }
 
+export function createMockCommentRepository(
+  overrides: Record<string, Mock> = {},
+) {
+  return {
+    findByRecipe: viFn(),
+    findByAuthor: viFn(),
+    findById: viFn(),
+    findOne: viFn(),
+    create: viFn(),
+    delete: viFn(),
+    aggregate: viFn(),
+    ...overrides,
+  };
+}
+
 export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
   return {
     aggregate: viFn(),

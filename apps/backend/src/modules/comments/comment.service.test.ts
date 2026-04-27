@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCommentDoc,
-  createMockCommentModel,
+  createMockCommentRepository,
   createMockRecipeModel,
   createMockUserModel,
   createObjectId,
@@ -13,23 +13,27 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "@/common/errors.js";
-import type { CommentModelType } from "@/modules/comments/comment.model.js";
+import type { CommentRepository } from "@/modules/comments/comment.repository.js";
 import { createCommentService } from "@/modules/comments/comment.service.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
 
 describe("commentService", () => {
-  const commentModel = createMockCommentModel();
+  const commentRepository = createMockCommentRepository();
   const recipeModel = createMockRecipeModel();
   const userModel = createMockUserModel();
   const service = createCommentService(
-    commentModel as unknown as CommentModelType,
+    commentRepository as unknown as CommentRepository,
     recipeModel as unknown as RecipeModelType,
     userModel as unknown as UserModelType,
   );
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
   });
 
   describe("findByRecipe", () => {
@@ -45,9 +49,7 @@ describe("commentService", () => {
         createdAt: new Date("2024-01-01"),
         updatedAt: new Date("2024-01-01"),
       };
-      commentModel.aggregate.mockResolvedValue([
-        { items: [populatedComment], total: 1 },
-      ]);
+      commentRepository.findByRecipe.mockResolvedValue([[populatedComment], 1]);
 
       const result = await service.findByRecipe(
         recipeId.toString(),
@@ -75,7 +77,7 @@ describe("commentService", () => {
 
     it("should return empty result when no comments found", async () => {
       recipeModel.exists.mockResolvedValue(true);
-      commentModel.aggregate.mockResolvedValue([]);
+      commentRepository.findByRecipe.mockResolvedValue([[], 0]);
 
       const result = await service.findByRecipe(
         createObjectId().toString(),
@@ -88,6 +90,7 @@ describe("commentService", () => {
 
   describe("findByAuthor", () => {
     it("should return paginated comments by author", async () => {
+      userModel.exists.mockResolvedValue(true);
       const authorId = createObjectId();
       const populatedComment = {
         _id: createObjectId(),
@@ -97,9 +100,7 @@ describe("commentService", () => {
         createdAt: new Date("2024-01-01"),
         updatedAt: new Date("2024-01-01"),
       };
-      commentModel.aggregate.mockResolvedValue([
-        { items: [populatedComment], total: 1 },
-      ]);
+      commentRepository.findByAuthor.mockResolvedValue([[populatedComment], 1]);
 
       const result = await service.findByAuthor(
         authorId.toString(),
@@ -123,17 +124,11 @@ describe("commentService", () => {
       userModel.exists.mockResolvedValue(true);
 
       const authorId = createObjectId();
-      const commentDoc = createCommentDoc({ text: "Great recipe!" });
       const populated = {
-        ...commentDoc,
+        ...createCommentDoc({ text: "Great recipe!" }),
         author: { _id: authorId, name: "User", email: "user@test.com" },
       };
-      commentModel.create.mockResolvedValue({
-        ...commentDoc,
-        populate: vi.fn().mockResolvedValue({
-          toObject: () => populated,
-        }),
-      });
+      commentRepository.create.mockResolvedValue(populated);
 
       const recipeId = createObjectId().toString();
       const init = initiator(authorId.toString());
@@ -142,7 +137,7 @@ describe("commentService", () => {
         initiator: init,
       });
 
-      expect(commentModel.create).toHaveBeenCalledWith({
+      expect(commentRepository.create).toHaveBeenCalledWith({
         text: "Great recipe!",
         recipe: recipeId,
         author: init.id,
@@ -195,32 +190,26 @@ describe("commentService", () => {
   describe("delete", () => {
     it("should delete comment when author matches", async () => {
       const authorId = createObjectId();
-      const comment = {
-        ...createCommentDoc(),
-        author: authorId,
-        deleteOne: vi.fn().mockResolvedValue(undefined),
-      };
-      commentModel.findById.mockResolvedValue(comment);
+      const comment = createCommentDoc({ author: authorId });
+      commentRepository.findById.mockResolvedValue(comment);
 
       await service.delete(createObjectId().toString(), {
         initiator: initiator(authorId.toString()),
       });
 
-      expect(comment.deleteOne).toHaveBeenCalled();
+      expect(commentRepository.findById).toHaveBeenCalled();
+      expect(commentRepository.delete).toHaveBeenCalled();
     });
 
     it("should delete comment when user is admin", async () => {
-      const comment = {
-        ...createCommentDoc(),
-        deleteOne: vi.fn().mockResolvedValue(undefined),
-      };
-      commentModel.findById.mockResolvedValue(comment);
+      const comment = createCommentDoc();
+      commentRepository.findById.mockResolvedValue(comment);
 
       await service.delete(createObjectId().toString(), {
         initiator: initiator(createObjectId().toString(), "admin"),
       });
 
-      expect(comment.deleteOne).toHaveBeenCalled();
+      expect(commentRepository.delete).toHaveBeenCalled();
     });
 
     it("should throw BadRequestError for invalid comment ID", async () => {
@@ -230,7 +219,7 @@ describe("commentService", () => {
     });
 
     it("should throw NotFoundError when comment not found", async () => {
-      commentModel.findById.mockResolvedValue(null);
+      commentRepository.findById.mockResolvedValue(null);
 
       await expect(
         service.delete(createObjectId().toString(), {
@@ -240,11 +229,8 @@ describe("commentService", () => {
     });
 
     it("should throw ForbiddenError when not author and not admin", async () => {
-      const comment = {
-        ...createCommentDoc(),
-        deleteOne: vi.fn(),
-      };
-      commentModel.findById.mockResolvedValue(comment);
+      const comment = createCommentDoc();
+      commentRepository.findById.mockResolvedValue(comment);
 
       await expect(
         service.delete(createObjectId().toString(), {
