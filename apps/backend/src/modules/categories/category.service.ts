@@ -13,21 +13,17 @@ import type {
 } from "@/common/types/methods.js";
 import { toCategory } from "@/common/utils/mongo.js";
 import { categoryCache } from "@/modules/categories/category.cache.js";
-import type {
-  CategoryDocumentWithCount,
-  CategoryModelType,
-} from "@/modules/categories/category.model.js";
-import { buildSearchPipeline } from "@/modules/categories/category.pipeline.js";
+import type { CategoryRepository } from "@/modules/categories/category.repository.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 
 export interface CategoryService {
   findAll(params: QueryMethodParams<CategoryQuery>): Promise<Category[]>;
   create(params: CreateMethodParams<CreateCategoryBody>): Promise<Category>;
-  deleteById(categoryId: string, params: DeleteMethodParams): Promise<void>;
+  deleteById(id: string, params: DeleteMethodParams): Promise<void>;
 }
 
 export function createCategoryService(
-  categoryModel: CategoryModelType,
+  repository: CategoryRepository,
   recipeModel: RecipeModelType,
   cache: CacheService,
   bus: TypedEmitter,
@@ -41,10 +37,7 @@ export function createCategoryService(
         return cached;
       }
 
-      const categories =
-        await categoryModel.aggregate<CategoryDocumentWithCount>(
-          buildSearchPipeline(query),
-        );
+      const categories = await repository.findMany(query);
       const result = categories.map(toCategory);
 
       await cache.set(cacheKey, result, categoryCache.ttl.list);
@@ -53,23 +46,23 @@ export function createCategoryService(
     },
 
     create: async ({ data }) => {
-      const category = await categoryModel.create(data);
+      const category = await repository.create(data);
 
       await cache.deletePattern(categoryCache.keys.allPattern());
       bus.emit("category:changed");
 
-      return toCategory(category.toObject());
+      return toCategory(category);
     },
 
-    deleteById: async (categoryId) => {
+    deleteById: async (id) => {
       const recipeCount = await recipeModel.countDocuments({
-        category: categoryId,
+        category: id,
       });
       if (recipeCount > 0) {
         throw new ConflictError("Cannot delete category with existing recipes");
       }
 
-      const result = await categoryModel.findByIdAndDelete(categoryId);
+      const result = await repository.delete(id);
       if (!result) {
         throw new NotFoundError("Category not found");
       }

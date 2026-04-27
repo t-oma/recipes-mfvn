@@ -200,6 +200,21 @@ export function createMockCategoryModel(overrides: Record<string, Mock> = {}) {
   };
 }
 
+export function createMockCategoryRepository(
+  overrides: Record<string, Mock> = {},
+) {
+  return {
+    findMany: viFn(),
+    findById: viFn(),
+    findOne: viFn(),
+    exists: viFn(),
+    create: viFn(),
+    delete: viFn(),
+    aggregate: viFn(),
+    ...overrides,
+  };
+}
+
 export function createMockUserModel(overrides: Record<string, Mock> = {}) {
   return {
     findById: viFn().mockReturnValue(chainable),

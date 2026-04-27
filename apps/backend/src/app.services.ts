@@ -4,6 +4,7 @@ import type { Logger } from "@/common/logger.js";
 import type { AuthService } from "@/modules/auth/auth.service.js";
 import { createAuthService } from "@/modules/auth/auth.service.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
+import { CategoryRepository } from "@/modules/categories/category.repository.js";
 import type { CategoryService } from "@/modules/categories/category.service.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
@@ -40,6 +41,7 @@ export function createServices(
   log: Logger,
 ): Services {
   const commentRepository = new CommentRepository(CommentModel);
+  const categoryRepository = new CategoryRepository(CategoryModel);
 
   const commentService = createCommentService(
     commentRepository,
@@ -63,7 +65,7 @@ export function createServices(
     bus,
   );
   const categoryService = createCategoryService(
-    CategoryModel,
+    categoryRepository,
     RecipeModel,
     categoryCache,
     bus,
