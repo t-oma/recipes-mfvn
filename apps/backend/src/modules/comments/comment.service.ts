@@ -12,19 +12,10 @@ import type {
   QueryMethodParams,
 } from "@/common/types/methods.js";
 import { toComment, toCommentForRecipe } from "@/common/utils/mongo.js";
-import type { WithTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
-import { extractTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
-import type {
-  CommentDocumentPopulated,
-  CommentModelType,
-} from "@/modules/comments/comment.model.js";
-import { buildFindPipeline } from "@/modules/comments/comment.pipeline.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
-import type {
-  UserDocument,
-  UserModelType,
-} from "@/modules/users/user.model.js";
+import type { UserModelType } from "@/modules/users/user.model.js";
+import type { CommentRepository } from "./comment.repository.js";
 
 export interface CommentService {
   findByRecipe(
@@ -43,7 +34,7 @@ export interface CommentService {
 }
 
 export function createCommentService(
-  commentModel: CommentModelType,
+  repository: CommentRepository,
   recipeModel: RecipeModelType,
   userModel: UserModelType,
 ): CommentService {
@@ -52,34 +43,34 @@ export function createCommentService(
       assertValidId(recipeId, "Recipe");
       await assertExists(recipeModel, recipeId);
 
-      const { page, limit } = query;
-
-      const [comments, total] = extractTotalCountResult(
-        await commentModel.aggregate<
-          WithTotalCountResult<CommentDocumentPopulated>
-        >(buildFindPipeline({ by: "recipe", recipeId }, { query, initiator })),
-      );
+      const [comments, total] = await repository.findByRecipe(recipeId, {
+        query,
+        initiator,
+      });
 
       return withPagination(
         comments.map((item) => toCommentForRecipe(item)),
         total,
-        page,
-        limit,
+        query.page,
+        query.limit,
       );
     },
 
     findByAuthor: async (authorId, { query, initiator }) => {
       assertValidId(authorId, "Author");
+      await assertExists(userModel, authorId);
 
-      const { page, limit } = query;
+      const [comments, total] = await repository.findByAuthor(authorId, {
+        query,
+        initiator,
+      });
 
-      const [comments, total] = extractTotalCountResult(
-        await commentModel.aggregate<
-          WithTotalCountResult<CommentDocumentPopulated>
-        >(buildFindPipeline({ by: "author", authorId }, { query, initiator })),
+      return withPagination(
+        comments.map(toComment),
+        total,
+        query.page,
+        query.limit,
       );
-
-      return withPagination(comments.map(toComment), total, page, limit);
     },
 
     create: async (recipeId, { data, initiator }) => {
@@ -89,22 +80,19 @@ export function createCommentService(
       await assertExists(recipeModel, recipeId);
       await assertExists(userModel, initiator.id);
 
-      const comment = await commentModel.create({
+      const comment = await repository.create({
         text: data.text,
         recipe: recipeId,
         author: initiator.id,
       });
-      const populated = await comment.populate<{
-        author: Pick<UserDocument, "_id" | "name" | "email">;
-      }>("author", "name email");
 
-      return toCommentForRecipe(populated.toObject<typeof populated>());
+      return toCommentForRecipe(comment);
     },
 
-    delete: async (commentId, { initiator }) => {
-      assertValidId(commentId, "Comment");
+    delete: async (id, { initiator }) => {
+      assertValidId(id, "Comment");
 
-      const comment = await commentModel.findById(commentId);
+      const comment = await repository.findById(id);
       if (!comment) {
         throw new NotFoundError("Comment not found");
       }
@@ -113,7 +101,7 @@ export function createCommentService(
         throw new ForbiddenError("Not authorized to delete this comment");
       }
 
-      await comment.deleteOne();
+      await repository.delete(id);
     },
   };
 }

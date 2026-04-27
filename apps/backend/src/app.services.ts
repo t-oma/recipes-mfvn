@@ -8,6 +8,7 @@ import { CategoryRepository } from "@/modules/categories/category.repository.js"
 import type { CategoryService } from "@/modules/categories/category.service.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
+import { CommentRepository } from "@/modules/comments/comment.repository.js";
 import type { CommentService } from "@/modules/comments/comment.service.js";
 import { createCommentService } from "@/modules/comments/comment.service.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
@@ -39,10 +40,11 @@ export function createServices(
   bus: TypedEmitter,
   log: Logger,
 ): Services {
+  const commentRepository = new CommentRepository(CommentModel);
   const categoryRepository = new CategoryRepository(CategoryModel);
 
   const commentService = createCommentService(
-    CommentModel,
+    commentRepository,
     RecipeModel,
     UserModel,
   );
