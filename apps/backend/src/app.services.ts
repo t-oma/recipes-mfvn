@@ -12,6 +12,7 @@ import { CommentRepository } from "@/modules/comments/comment.repository.js";
 import type { CommentService } from "@/modules/comments/comment.service.js";
 import { createCommentService } from "@/modules/comments/comment.service.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
+import { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
 import { createFavoriteService } from "@/modules/favorites/favorite.service.js";
 import { RecipeRatingModel } from "@/modules/recipe-ratings/recipe-rating.model.js";
@@ -42,6 +43,7 @@ export function createServices(
 ): Services {
   const commentRepository = new CommentRepository(CommentModel);
   const categoryRepository = new CategoryRepository(CategoryModel);
+  const favoriteRepository = new FavoriteRepository(FavoriteModel);
 
   const commentService = createCommentService(
     commentRepository,
@@ -49,7 +51,7 @@ export function createServices(
     UserModel,
   );
   const favoriteService = createFavoriteService(
-    FavoriteModel,
+    favoriteRepository,
     RecipeModel,
     UserModel,
   );

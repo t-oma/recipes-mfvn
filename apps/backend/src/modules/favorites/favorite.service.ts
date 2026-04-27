@@ -6,16 +6,10 @@ import type {
   QueryMethodParams,
 } from "@/common/types/methods.js";
 import { toRecipe } from "@/common/utils/mongo.js";
-import type { WithTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
-import { extractTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
-import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
-import { buildFindByUserPipeline } from "@/modules/favorites/favorite.pipeline.js";
-import type {
-  RecipeDocumentPopulated,
-  RecipeModelType,
-} from "@/modules/recipes/recipe.model.js";
+import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
+import type { FavoriteRepository } from "./favorite.repository.js";
 
 export interface FavoriteService {
   add(
@@ -37,7 +31,7 @@ export interface FavoriteService {
 }
 
 export function createFavoriteService(
-  favoriteModel: FavoriteModelType,
+  repository: FavoriteRepository,
   recipeModel: RecipeModelType,
   userModel: UserModelType,
 ): FavoriteService {
@@ -56,7 +50,7 @@ export function createFavoriteService(
       await validateUser(initiator.id);
       await validateRecipe(recipeId);
 
-      await favoriteModel.create({ user: initiator.id, recipe: recipeId });
+      await repository.create({ user: initiator.id, recipe: recipeId });
       return { favorited: true };
     },
 
@@ -64,37 +58,25 @@ export function createFavoriteService(
       await validateUser(initiator.id);
       await validateRecipe(recipeId);
 
-      await favoriteModel.findOneAndDelete({
-        user: initiator.id,
-        recipe: recipeId,
-      });
+      await repository.delete(initiator.id, recipeId);
       return { favorited: false };
     },
 
-    findByUser: async (userId, params) => {
+    findByUser: async (userId, { query, initiator }) => {
       await validateUser(userId);
 
-      const { page, limit } = params.query;
+      const [favoriteRecipes, total] = await repository.findByUser(userId, {
+        query,
+        initiator,
+      });
 
-      const [favorites, total] = extractTotalCountResult(
-        await favoriteModel.aggregate<
-          WithTotalCountResult<{ recipe: RecipeDocumentPopulated }>
-        >(buildFindByUserPipeline(userId, params)),
-      );
+      const result = favoriteRecipes.map((recipe) => toRecipe(recipe, true));
 
-      const items = favorites
-        .map((fav) => fav.recipe)
-        .filter((recipe) => recipe != null)
-        .map((recipe) => toRecipe(recipe, true));
-
-      return withPagination(items, total, page, limit);
+      return withPagination(result, total, query.page, query.limit);
     },
 
     isFavorited: async (recipeId, { initiator }) => {
-      return !!(await favoriteModel.exists({
-        user: initiator.id,
-        recipe: recipeId,
-      }));
+      return repository.exists(initiator.id, recipeId);
     },
   };
 }
