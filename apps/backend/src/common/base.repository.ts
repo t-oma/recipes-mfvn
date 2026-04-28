@@ -84,13 +84,26 @@ export class BaseRepository<
     return query.lean<Merge<TDoc, TPopulate>>();
   }
 
+  /**
+   * Deletes a document by id or filter.
+   *
+   * @param filter - The filter to use for finding the document to delete.
+   * @param options - The options to use for the delete operation.
+   * @returns The deleted document, or null if no document was found.
+   */
   // biome-ignore lint/complexity/noBannedTypes: default object value
   async delete<TPopulate extends PopulateKeys<TDoc> = {}>(
-    id: string,
+    filter: string | QueryFilter<TDoc>,
     options: QueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
+    if (typeof filter === "string") {
+      return this.model
+        .findByIdAndDelete(filter, options)
+        .lean<Merge<TDoc, TPopulate>>();
+    }
+
     return this.model
-      .findByIdAndDelete(id, options)
+      .findOneAndDelete(filter, options)
       .lean<Merge<TDoc, TPopulate>>();
   }
 
