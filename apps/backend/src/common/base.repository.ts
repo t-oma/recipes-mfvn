@@ -14,9 +14,11 @@ export type PopulateKeys<T> = Partial<Prettify<Record<RefKeys<T>, unknown>>>;
 
 export type RefsForInput<T> = Prettify<
   Omit<T, RefKeys<T>> & {
-    [K in RefKeys<T>]: T[K] extends Types.ObjectId
-      ? string | Types.ObjectId
-      : T[K];
+    [K in RefKeys<T>]: T[K] extends readonly Types.ObjectId[]
+      ? readonly (Types.ObjectId | string)[]
+      : T[K] extends Types.ObjectId
+        ? Types.ObjectId | string
+        : T[K];
   }
 >;
 export type CreateInput<T extends { _id: Types.ObjectId }> = Partial<
