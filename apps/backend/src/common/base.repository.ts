@@ -46,7 +46,7 @@ export class BaseRepository<
   }
 
   // biome-ignore lint/complexity/noBannedTypes: default object value
-  async findMany<TPopulate extends PopulateKeys<TDoc> = {}>(
+  async find<TPopulate extends PopulateKeys<TDoc> = {}>(
     filter: QueryFilter<TDoc> = {},
     options: QueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate>[]> {
