@@ -7,8 +7,10 @@ import type {
   QueryOptions,
   Types,
 } from "mongoose";
+import type { RefKeys } from "@/common/types/mongoose.js";
 
-type Merge<A, B> = Prettify<Omit<A, keyof B> & B>;
+export type Merge<A, B> = Prettify<Omit<A, keyof B> & B>;
+export type PopulateKeys<T> = Partial<Prettify<Record<RefKeys<T>, unknown>>>;
 
 export class BaseRepository<
   TDoc extends { _id: Types.ObjectId },
@@ -21,8 +23,10 @@ export class BaseRepository<
     this.model = model;
   }
 
-  // biome-ignore lint/complexity/noBannedTypes: default object value
-  async findById<TPopulate extends Record<string, unknown> = {}>(
+  async findById<
+    // biome-ignore lint/complexity/noBannedTypes: default object value
+    TPopulate extends PopulateKeys<TDoc> = {},
+  >(
     id: string,
     options: QueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
@@ -32,7 +36,7 @@ export class BaseRepository<
   }
 
   // biome-ignore lint/complexity/noBannedTypes: default object value
-  async findOne<TPopulate extends Record<string, unknown> = {}>(
+  async findOne<TPopulate extends PopulateKeys<TDoc> = {}>(
     filter: QueryFilter<TDoc>,
     options: QueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
@@ -42,7 +46,7 @@ export class BaseRepository<
   }
 
   // biome-ignore lint/complexity/noBannedTypes: default object value
-  async findMany<TPopulate extends Record<string, unknown> = {}>(
+  async findMany<TPopulate extends PopulateKeys<TDoc> = {}>(
     filter: QueryFilter<TDoc> = {},
     options: QueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate>[]> {
@@ -52,7 +56,7 @@ export class BaseRepository<
   }
 
   // biome-ignore lint/complexity/noBannedTypes: default object value
-  async create<TPopulate extends Record<string, unknown> = {}>(
+  async create<TPopulate extends PopulateKeys<TDoc> = {}>(
     data: TCreate,
     options: PopulateOption = {},
   ): Promise<Merge<TDoc, TPopulate>> {
@@ -66,7 +70,7 @@ export class BaseRepository<
   }
 
   // biome-ignore lint/complexity/noBannedTypes: default object value
-  async update<TPopulate extends Record<string, unknown> = {}>(
+  async update<TPopulate extends PopulateKeys<TDoc> = {}>(
     id: string,
     data: TUpdate,
     options: QueryOptions = {},
@@ -81,7 +85,7 @@ export class BaseRepository<
   }
 
   // biome-ignore lint/complexity/noBannedTypes: default object value
-  async delete<TPopulate extends Record<string, unknown> = {}>(
+  async delete<TPopulate extends PopulateKeys<TDoc> = {}>(
     id: string,
     options: QueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
