@@ -26,11 +26,7 @@ import type {
   CommentDocumentPopulated,
 } from "./comment.model.js";
 
-export class CommentRepository extends BaseRepository<
-  CommentDocument,
-  CreateCommentBody & { recipe: string; author: string },
-  never
-> {
+export class CommentRepository extends BaseRepository<CommentDocument> {
   async findByRecipe(
     recipeId: string,
     { query, initiator }: QueryMethodParams,

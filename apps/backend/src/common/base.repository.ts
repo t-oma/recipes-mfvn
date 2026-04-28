@@ -12,11 +12,21 @@ import type { RefKeys } from "@/common/types/mongoose.js";
 export type Merge<A, B> = Prettify<Omit<A, keyof B> & B>;
 export type PopulateKeys<T> = Partial<Prettify<Record<RefKeys<T>, unknown>>>;
 
-export class BaseRepository<
-  TDoc extends { _id: Types.ObjectId },
-  TCreate extends Partial<TDoc>,
-  TUpdate extends Partial<TDoc> = TCreate,
-> {
+export type RefsForInput<T> = Prettify<
+  Omit<T, RefKeys<T>> & {
+    [K in RefKeys<T>]: T[K] extends Types.ObjectId
+      ? string | Types.ObjectId
+      : T[K];
+  }
+>;
+export type CreateInput<T extends { _id: Types.ObjectId }> = Partial<
+  Omit<RefsForInput<T>, "_id">
+>;
+export type UpdateInput<T extends { _id: Types.ObjectId }> = Partial<
+  Omit<RefsForInput<T>, "_id">
+>;
+
+export class BaseRepository<TDoc extends { _id: Types.ObjectId }> {
   protected readonly model: Model<TDoc>;
 
   constructor(model: Model<TDoc>) {
@@ -57,10 +67,10 @@ export class BaseRepository<
 
   // biome-ignore lint/complexity/noBannedTypes: default object value
   async create<TPopulate extends PopulateKeys<TDoc> = {}>(
-    data: TCreate,
+    data: CreateInput<TDoc>,
     options: PopulateOption = {},
   ): Promise<Merge<TDoc, TPopulate>> {
-    const doc = await this.model.create(data);
+    const doc = await this.model.create(this.castInput(data));
 
     if (options.populate) {
       await doc.populate(options.populate);
@@ -72,10 +82,10 @@ export class BaseRepository<
   // biome-ignore lint/complexity/noBannedTypes: default object value
   async update<TPopulate extends PopulateKeys<TDoc> = {}>(
     id: string,
-    data: TUpdate,
+    data: UpdateInput<TDoc>,
     options: QueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
-    const query = this.model.findByIdAndUpdate(id, data, {
+    const query = this.model.findByIdAndUpdate(id, this.castInput(data), {
       returnDocument: "after",
       runValidators: true,
       ...options,
@@ -119,5 +129,11 @@ export class BaseRepository<
     pipeline: PipelineStage[],
   ): Promise<TResult[]> {
     return this.model.aggregate<TResult>(pipeline);
+  }
+
+  protected castInput<TInput extends Record<string, unknown>>(
+    data: TInput,
+  ): Partial<TDoc> {
+    return this.model.castObject(data) as Partial<TDoc>;
   }
 }
