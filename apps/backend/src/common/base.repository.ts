@@ -22,13 +22,17 @@ export type RefsForInput<T> = Prettify<
   }
 >;
 export type CreateInput<T extends { _id: Types.ObjectId }> = Partial<
-  Omit<RefsForInput<T>, "_id">
+  RefsForInput<T>
 >;
 export type UpdateInput<T extends { _id: Types.ObjectId }> = Partial<
   Omit<RefsForInput<T>, "_id">
 >;
 
-export class BaseRepository<TDoc extends { _id: Types.ObjectId }> {
+export class BaseRepository<
+  TDoc extends { _id: Types.ObjectId },
+  TCreate extends CreateInput<TDoc> = CreateInput<TDoc>,
+  TUpdate extends UpdateInput<TDoc> = UpdateInput<TDoc>,
+> {
   protected readonly model: Model<TDoc>;
 
   constructor(model: Model<TDoc>) {
@@ -69,7 +73,7 @@ export class BaseRepository<TDoc extends { _id: Types.ObjectId }> {
 
   // biome-ignore lint/complexity/noBannedTypes: default object value
   async create<TPopulate extends PopulateKeys<TDoc> = {}>(
-    data: CreateInput<TDoc>,
+    data: TCreate,
     options: PopulateOption = {},
   ): Promise<Merge<TDoc, TPopulate>> {
     const doc = await this.model.create(this.castInput(data));
@@ -84,7 +88,7 @@ export class BaseRepository<TDoc extends { _id: Types.ObjectId }> {
   // biome-ignore lint/complexity/noBannedTypes: default object value
   async update<TPopulate extends PopulateKeys<TDoc> = {}>(
     id: string,
-    data: UpdateInput<TDoc>,
+    data: TUpdate,
     options: QueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
     const query = this.model.findByIdAndUpdate(id, this.castInput(data), {

@@ -1,6 +1,10 @@
-import type { CreateCommentBody } from "@recipes/shared";
+import type { RequireKeys } from "@recipes/shared";
 import type { PipelineStage } from "mongoose";
-import type { PopulateKeys } from "@/common/base.repository.js";
+import type {
+  CreateInput,
+  PopulateKeys,
+  UpdateInput,
+} from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
 import type {
   OptionalInitiator,
@@ -25,6 +29,12 @@ import type {
   CommentDocument,
   CommentDocumentPopulated,
 } from "./comment.model.js";
+
+export type CommentCreateInput = RequireKeys<
+  CreateInput<CommentDocument>,
+  "recipe" | "author" | "text"
+>;
+export type CommentUpdateInput = UpdateInput<CommentDocument>;
 
 export class CommentRepository extends BaseRepository<CommentDocument> {
   async findByRecipe(
@@ -80,13 +90,19 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
       author: Pick<UserDocument, "_id" | "name" | "email">;
       recipe: Pick<RecipeDocument, "_id" | "title">;
     },
-  >(
-    data: CreateCommentBody & {
-      recipe: string;
-      author: string;
-    },
-  ) {
-    return super.create<TPopulate>(data);
+  >(data: CommentCreateInput) {
+    return super.create<TPopulate>(data, {
+      populate: [
+        {
+          path: "author recipe",
+          select: "name email",
+        },
+        {
+          path: "recipe",
+          select: "title",
+        },
+      ],
+    });
   }
 }
 
