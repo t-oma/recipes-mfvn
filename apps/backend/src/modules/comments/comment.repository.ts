@@ -1,10 +1,6 @@
 import type { RequireKeys } from "@recipes/shared";
 import type { PipelineStage } from "mongoose";
-import type {
-  CreateInput,
-  PopulateKeys,
-  UpdateInput,
-} from "@/common/base.repository.js";
+import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
 import type {
   OptionalInitiator,
@@ -35,8 +31,17 @@ export type CommentCreateInput = RequireKeys<
   "recipe" | "author" | "text"
 >;
 export type CommentUpdateInput = UpdateInput<CommentDocument>;
+export type CommentDefaultPopulate = {
+  author: Pick<UserDocument, "_id" | "name" | "email">;
+  recipe: Pick<RecipeDocument, "_id" | "title">;
+};
 
-export class CommentRepository extends BaseRepository<CommentDocument> {
+export class CommentRepository extends BaseRepository<
+  CommentDocument,
+  CommentCreateInput,
+  CommentUpdateInput,
+  CommentDefaultPopulate
+> {
   async findByRecipe(
     recipeId: string,
     { query, initiator }: QueryMethodParams,
@@ -85,24 +90,11 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
     return extractTotalCountResult(result);
   }
 
-  override async create<
-    TPopulate extends PopulateKeys<CommentDocument> = {
-      author: Pick<UserDocument, "_id" | "name" | "email">;
-      recipe: Pick<RecipeDocument, "_id" | "title">;
-    },
-  >(data: CommentCreateInput) {
-    return super.create<TPopulate>(data, {
-      populate: [
-        {
-          path: "author recipe",
-          select: "name email",
-        },
-        {
-          path: "recipe",
-          select: "title",
-        },
-      ],
-    });
+  protected override getDefaultPopulate() {
+    return [
+      { path: "author", select: "_id name email" },
+      { path: "recipe", select: "_id title" },
+    ];
   }
 }
 

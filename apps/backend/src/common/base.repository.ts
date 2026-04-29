@@ -2,7 +2,7 @@ import type { Prettify } from "@recipes/shared";
 import type {
   Model,
   PipelineStage,
-  PopulateOption,
+  PopulateOptions,
   QueryFilter,
   QueryOptions,
   Types,
@@ -11,6 +11,14 @@ import type { RefKeys } from "@/common/types/mongoose.js";
 
 export type Merge<A, B> = Prettify<Omit<A, keyof B> & B>;
 export type PopulateKeys<T> = Partial<Prettify<Record<RefKeys<T>, unknown>>>;
+
+export type TimestampKeys = "createdAt" | "updatedAt";
+export type AutoFields = "_id" | TimestampKeys;
+
+export type RepositoryPopulate = PopulateOptions | PopulateOptions[];
+export type RepositoryQueryOptions = Omit<QueryOptions, "populate"> & {
+  populate?: RepositoryPopulate;
+};
 
 export type RefsForInput<T> = Prettify<
   Omit<T, RefKeys<T>> & {
@@ -32,6 +40,8 @@ export class BaseRepository<
   TDoc extends { _id: Types.ObjectId },
   TCreate extends CreateInput<TDoc> = CreateInput<TDoc>,
   TUpdate extends UpdateInput<TDoc> = UpdateInput<TDoc>,
+  // biome-ignore lint/complexity/noBannedTypes: default object value
+  TDefaultPopulate extends PopulateKeys<TDoc> = {},
 > {
   protected readonly model: Model<TDoc>;
 
@@ -39,63 +49,77 @@ export class BaseRepository<
     this.model = model;
   }
 
-  async findById<
-    // biome-ignore lint/complexity/noBannedTypes: default object value
-    TPopulate extends PopulateKeys<TDoc> = {},
-  >(
+  async findById<TPopulate extends PopulateKeys<TDoc> = TDefaultPopulate>(
     id: string,
-    options: QueryOptions = {},
+    options: RepositoryQueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
-    const query = this.model.findById(id, null, options);
+    const { queryOptions, populate } = this.resolveOptions(options);
+    const query = this.model.findById(id, null, queryOptions);
+
+    if (populate) {
+      query.populate<TPopulate>(populate);
+    }
 
     return query.lean<Merge<TDoc, TPopulate>>();
   }
 
-  // biome-ignore lint/complexity/noBannedTypes: default object value
-  async findOne<TPopulate extends PopulateKeys<TDoc> = {}>(
+  async findOne<TPopulate extends PopulateKeys<TDoc> = TDefaultPopulate>(
     filter: QueryFilter<TDoc>,
-    options: QueryOptions = {},
+    options: RepositoryQueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
-    const query = this.model.findOne(filter, null, options);
+    const { queryOptions, populate } = this.resolveOptions(options);
+    const query = this.model.findOne(filter, null, queryOptions);
+
+    if (populate) {
+      query.populate<TPopulate>(populate);
+    }
 
     return query.lean<Merge<TDoc, TPopulate>>();
   }
 
-  // biome-ignore lint/complexity/noBannedTypes: default object value
-  async find<TPopulate extends PopulateKeys<TDoc> = {}>(
+  async find<TPopulate extends PopulateKeys<TDoc> = TDefaultPopulate>(
     filter: QueryFilter<TDoc> = {},
-    options: QueryOptions = {},
+    options: RepositoryQueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate>[]> {
-    const query = this.model.find(filter, null, options);
+    const { queryOptions, populate } = this.resolveOptions(options);
+    const query = this.model.find(filter, null, queryOptions);
+
+    if (populate) {
+      query.populate<TPopulate>(populate);
+    }
 
     return query.lean<Merge<TDoc, TPopulate>[]>();
   }
 
-  // biome-ignore lint/complexity/noBannedTypes: default object value
-  async create<TPopulate extends PopulateKeys<TDoc> = {}>(
+  async create<TPopulate extends PopulateKeys<TDoc> = TDefaultPopulate>(
     data: TCreate,
-    options: PopulateOption = {},
+    options: { populate?: RepositoryPopulate } = {},
   ): Promise<Merge<TDoc, TPopulate>> {
+    const populate = this.mergePopulate(options.populate);
     const doc = await this.model.create(this.castInput(data));
 
-    if (options.populate) {
-      await doc.populate(options.populate);
+    if (populate) {
+      await doc.populate<TPopulate>(populate);
     }
 
     return doc.toObject<Merge<TDoc, TPopulate>>();
   }
 
-  // biome-ignore lint/complexity/noBannedTypes: default object value
-  async update<TPopulate extends PopulateKeys<TDoc> = {}>(
+  async update<TPopulate extends PopulateKeys<TDoc> = TDefaultPopulate>(
     id: string,
     data: TUpdate,
-    options: QueryOptions = {},
+    options: RepositoryQueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
+    const { queryOptions, populate } = this.resolveOptions(options);
     const query = this.model.findByIdAndUpdate(id, this.castInput(data), {
       returnDocument: "after",
       runValidators: true,
-      ...options,
+      ...queryOptions,
     });
+
+    if (populate) {
+      query.populate<TPopulate>(populate);
+    }
 
     return query.lean<Merge<TDoc, TPopulate>>();
   }
@@ -107,20 +131,22 @@ export class BaseRepository<
    * @param options - The options to use for the delete operation.
    * @returns The deleted document, or null if no document was found.
    */
-  // biome-ignore lint/complexity/noBannedTypes: default object value
-  async delete<TPopulate extends PopulateKeys<TDoc> = {}>(
+  async delete<TPopulate extends PopulateKeys<TDoc> = TDefaultPopulate>(
     filter: string | QueryFilter<TDoc>,
-    options: QueryOptions = {},
+    options: RepositoryQueryOptions = {},
   ): Promise<Merge<TDoc, TPopulate> | null> {
-    if (typeof filter === "string") {
-      return this.model
-        .findByIdAndDelete(filter, options)
-        .lean<Merge<TDoc, TPopulate>>();
+    const { queryOptions, populate } = this.resolveOptions(options);
+
+    const query =
+      typeof filter === "string"
+        ? this.model.findByIdAndDelete(filter, queryOptions)
+        : this.model.findOneAndDelete(filter, queryOptions);
+
+    if (populate) {
+      query.populate<TPopulate>(populate);
     }
 
-    return this.model
-      .findOneAndDelete(filter, options)
-      .lean<Merge<TDoc, TPopulate>>();
+    return query.lean<Merge<TDoc, TPopulate>>();
   }
 
   async exists(filter: QueryFilter<TDoc>): Promise<boolean> {
@@ -141,5 +167,27 @@ export class BaseRepository<
     data: TInput,
   ): Partial<TDoc> {
     return this.model.castObject(data) as Partial<TDoc>;
+  }
+
+  protected getDefaultPopulate(): RepositoryPopulate | undefined {
+    return undefined;
+  }
+
+  protected mergePopulate(
+    populate?: RepositoryPopulate,
+  ): RepositoryPopulate | undefined {
+    return populate ?? this.getDefaultPopulate();
+  }
+
+  protected resolveOptions(options: RepositoryQueryOptions = {}): {
+    queryOptions: Omit<RepositoryQueryOptions, "populate">;
+    populate?: RepositoryPopulate;
+  } {
+    const { populate, ...queryOptions } = options;
+
+    return {
+      queryOptions,
+      populate: this.mergePopulate(populate),
+    };
   }
 }
