@@ -1,6 +1,8 @@
 import type { CacheService } from "@/common/cache/cache.service.js";
 import type { TypedEmitter } from "@/common/events.js";
 import type { Logger } from "@/common/logger.js";
+import { createBcryptPasswordService } from "@/common/passwords/bcrypt.service.js";
+import { env } from "@/config/env.js";
 import type { AuthService } from "@/modules/auth/auth.service.js";
 import { createAuthService } from "@/modules/auth/auth.service.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
@@ -47,6 +49,8 @@ export function createServices(
   const favoriteRepository = new FavoriteRepository(FavoriteModel);
   const recipeRatingRepository = new RecipeRatingRepository(RecipeRatingModel);
 
+  const passwordService = createBcryptPasswordService(env.BCRYPT_SALT_ROUNDS);
+
   const commentService = createCommentService(
     commentRepository,
     RecipeModel,
@@ -82,7 +86,7 @@ export function createServices(
     recipeCache,
     bus,
   );
-  const authService = createAuthService(UserModel, log);
+  const authService = createAuthService(UserModel, passwordService, log);
 
   return {
     auth: authService,

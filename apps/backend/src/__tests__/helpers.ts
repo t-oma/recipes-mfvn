@@ -122,7 +122,6 @@ export function createUserDoc(
     role: "user",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
-    comparePassword: vi.fn().mockResolvedValue(true),
     ...overrides,
   };
 }
@@ -234,6 +233,16 @@ export function createMockUserModel(overrides: Record<string, Mock> = {}) {
     findOne: viFn().mockReturnValue(chainable),
     exists: viFn(),
     create: viFn(),
+    ...overrides,
+  };
+}
+
+export function createMockPasswordService(
+  overrides: Record<string, Mock> = {},
+) {
+  return {
+    hash: viFn().mockResolvedValue("hashed-password"),
+    verify: viFn().mockResolvedValue(true),
     ...overrides,
   };
 }
