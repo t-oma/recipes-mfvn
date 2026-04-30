@@ -13,7 +13,7 @@ import type {
 import { toUser } from "@/common/utils/mongo.js";
 import type { CommentService } from "@/modules/comments/comment.service.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "./user.repository.js";
 
 export interface UserService {
   getCurrentUser(userId: string): Promise<User>;
@@ -28,13 +28,13 @@ export interface UserService {
 }
 
 export function createUserService(
+  repository: UserRepository,
   commentService: CommentService,
   favoriteService: FavoriteService,
-  userModel: UserModelType,
 ): UserService {
   return {
     getCurrentUser: async (userId) => {
-      const user = await userModel.findById(userId).lean();
+      const user = await repository.findById(userId);
       if (!user) {
         throw new NotFoundError("User not found");
       }
