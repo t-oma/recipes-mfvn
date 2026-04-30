@@ -27,6 +27,7 @@ import { createRecipeService } from "@/modules/recipes/recipe.service.js";
 import { UserModel } from "@/modules/users/user.model.js";
 import type { UserService } from "@/modules/users/user.service.js";
 import { createUserService } from "@/modules/users/user.service.js";
+import { UserRepository } from "./modules/users/user.repository.js";
 
 export interface Services {
   auth: AuthService;
@@ -48,6 +49,7 @@ export function createServices(
   const categoryRepository = new CategoryRepository(CategoryModel);
   const favoriteRepository = new FavoriteRepository(FavoriteModel);
   const recipeRatingRepository = new RecipeRatingRepository(RecipeRatingModel);
+  const userRepository = new UserRepository(UserModel);
 
   const passwordService = createBcryptPasswordService(env.BCRYPT_SALT_ROUNDS);
 
@@ -62,9 +64,9 @@ export function createServices(
     UserModel,
   );
   const userService = createUserService(
+    userRepository,
     commentService,
     favoriteService,
-    UserModel,
   );
   const recipeRatingService = createRecipeRatingService(
     recipeRatingRepository,
@@ -86,7 +88,7 @@ export function createServices(
     recipeCache,
     bus,
   );
-  const authService = createAuthService(UserModel, passwordService, log);
+  const authService = createAuthService(userRepository, passwordService, log);
 
   return {
     auth: authService,

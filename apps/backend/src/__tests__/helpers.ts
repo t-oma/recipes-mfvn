@@ -237,6 +237,13 @@ export function createMockUserModel(overrides: Record<string, Mock> = {}) {
   };
 }
 
+export function createMockUserRepository(overrides: Record<string, Mock> = {}) {
+  return {
+    ...createMockRepository(overrides),
+    ...overrides,
+  };
+}
+
 export function createMockPasswordService(
   overrides: Record<string, Mock> = {},
 ) {

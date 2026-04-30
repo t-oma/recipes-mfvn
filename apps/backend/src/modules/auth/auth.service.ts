@@ -4,7 +4,7 @@ import type { Logger } from "@/common/logger.js";
 import type { PasswordService } from "@/common/passwords/password.service.js";
 import { signToken } from "@/common/utils/jwt.js";
 import { toUser } from "@/common/utils/mongo.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 
 export interface AuthService {
   register(data: RegisterBody): Promise<AuthResponse>;
@@ -12,13 +12,13 @@ export interface AuthService {
 }
 
 export function createAuthService(
-  userModel: UserModelType,
+  userRepository: UserRepository,
   passwordService: PasswordService,
   log: Logger,
 ): AuthService {
   return {
     register: async (data) => {
-      const exists = await userModel.exists({ email: data.email });
+      const exists = await userRepository.exists({ email: data.email });
       if (exists) {
         log.warn(
           { email: data.email },
@@ -28,27 +28,31 @@ export function createAuthService(
       }
 
       const password = await passwordService.hash(data.password);
-      const user = await userModel.create({
+      const user = await userRepository.create({
         ...data,
         password,
       });
       const token = signToken({
-        userId: user.id,
+        userId: user._id.toString(),
         email: user.email,
         role: user.role,
       });
 
-      log.info({ userId: user.id, email: user.email }, "User registered");
+      log.info(
+        { userId: user._id.toString(), email: user.email },
+        "User registered",
+      );
 
       return {
-        user: toUser(user.toObject()),
+        user: toUser(user),
         token,
       };
     },
     login: async (data) => {
-      const user = await userModel
-        .findOne({ email: data.email })
-        .select("+password");
+      const user = await userRepository.findOne(
+        { email: data.email },
+        { select: "+password" },
+      );
       if (
         !user ||
         !(await passwordService.verify(data.password, user.password))
@@ -58,15 +62,18 @@ export function createAuthService(
       }
 
       const token = signToken({
-        userId: user.id,
+        userId: user._id.toString(),
         email: user.email,
         role: user.role,
       });
 
-      log.info({ userId: user.id, email: user.email }, "User logged in");
+      log.info(
+        { userId: user._id.toString(), email: user.email },
+        "User logged in",
+      );
 
       return {
-        user: toUser(user.toObject()),
+        user: toUser(user),
         token,
       };
     },

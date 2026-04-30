@@ -2,12 +2,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockLogger,
   createMockPasswordService,
-  createMockUserModel,
+  createMockRepository,
   createUserDoc,
 } from "@/__tests__/helpers.js";
 import { ConflictError, UnauthorizedError } from "@/common/errors.js";
 import type { PasswordService } from "@/common/passwords/password.service.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 import { createAuthService } from "./auth.service.js";
 
 const { signToken } = vi.hoisted(() => ({
@@ -17,11 +17,11 @@ const { signToken } = vi.hoisted(() => ({
 vi.mock("@/common/utils/jwt.js", () => ({ signToken }));
 
 describe("authService", () => {
-  const userModel = createMockUserModel();
+  const userRepository = createMockRepository();
   const passwordService = createMockPasswordService();
   const log = createMockLogger();
   const service = createAuthService(
-    userModel as unknown as UserModelType,
+    userRepository as unknown as UserRepository,
     passwordService as unknown as PasswordService,
     log,
   );
@@ -32,9 +32,9 @@ describe("authService", () => {
 
   describe("register", () => {
     it("should register user and return auth response", async () => {
-      userModel.exists.mockResolvedValue(null);
+      userRepository.exists.mockResolvedValue(false);
       const doc = createUserDoc({ email: "new@test.com", name: "New User" });
-      userModel.create.mockResolvedValue({ ...doc, toObject: () => doc });
+      userRepository.create.mockResolvedValue(doc);
 
       const result = await service.register({
         email: "new@test.com",
@@ -42,9 +42,11 @@ describe("authService", () => {
         name: "New User",
       });
 
-      expect(userModel.exists).toHaveBeenCalledWith({ email: "new@test.com" });
+      expect(userRepository.exists).toHaveBeenCalledWith({
+        email: "new@test.com",
+      });
       expect(passwordService.hash).toHaveBeenCalledWith("Password123!");
-      expect(userModel.create).toHaveBeenCalledWith({
+      expect(userRepository.create).toHaveBeenCalledWith({
         email: "new@test.com",
         password: "hashed-password",
         name: "New User",
@@ -55,7 +57,7 @@ describe("authService", () => {
     });
 
     it("should throw ConflictError when email already in use", async () => {
-      userModel.exists.mockResolvedValue({ _id: "existing-id" });
+      userRepository.exists.mockResolvedValue(true);
 
       await expect(
         service.register({
@@ -77,21 +79,17 @@ describe("authService", () => {
   describe("login", () => {
     it("should login and return auth response", async () => {
       const doc = createUserDoc({ email: "user@test.com" });
-      userModel.findOne.mockReturnValue({
-        select: vi.fn().mockResolvedValue({
-          ...doc,
-          toObject: () => doc,
-        }),
-      });
+      userRepository.findOne.mockResolvedValue(doc);
 
       const result = await service.login({
         email: "user@test.com",
         password: "correct-password",
       });
 
-      expect(userModel.findOne).toHaveBeenCalledWith({
-        email: "user@test.com",
-      });
+      expect(userRepository.findOne).toHaveBeenCalledWith(
+        { email: "user@test.com" },
+        { select: "+password" },
+      );
       expect(passwordService.verify).toHaveBeenCalledWith(
         "correct-password",
         "hashedPassword",
@@ -101,9 +99,7 @@ describe("authService", () => {
     });
 
     it("should throw UnauthorizedError when user not found", async () => {
-      userModel.findOne.mockReturnValue({
-        select: vi.fn().mockResolvedValue(null),
-      });
+      userRepository.findOne.mockResolvedValue(null);
 
       await expect(
         service.login({ email: "nobody@test.com", password: "pass" }),
@@ -115,12 +111,7 @@ describe("authService", () => {
 
     it("should throw UnauthorizedError when password is wrong", async () => {
       const doc = createUserDoc({ email: "user@test.com" });
-      userModel.findOne.mockReturnValue({
-        select: vi.fn().mockResolvedValue({
-          ...doc,
-          toObject: () => doc,
-        }),
-      });
+      userRepository.findOne.mockResolvedValue(doc);
       passwordService.verify.mockResolvedValue(false);
 
       await expect(
