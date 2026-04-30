@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockLogger,
+  createMockPasswordService,
   createMockUserModel,
   createUserDoc,
 } from "@/__tests__/helpers.js";
 import { ConflictError, UnauthorizedError } from "@/common/errors.js";
+import type { PasswordService } from "@/common/passwords/password.service.js";
 import type { UserModelType } from "@/modules/users/user.model.js";
 import { createAuthService } from "./auth.service.js";
 
@@ -16,8 +18,13 @@ vi.mock("@/common/utils/jwt.js", () => ({ signToken }));
 
 describe("authService", () => {
   const userModel = createMockUserModel();
+  const passwordService = createMockPasswordService();
   const log = createMockLogger();
-  const service = createAuthService(userModel as unknown as UserModelType, log);
+  const service = createAuthService(
+    userModel as unknown as UserModelType,
+    passwordService as unknown as PasswordService,
+    log,
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -36,7 +43,12 @@ describe("authService", () => {
       });
 
       expect(userModel.exists).toHaveBeenCalledWith({ email: "new@test.com" });
-      expect(userModel.create).toHaveBeenCalled();
+      expect(passwordService.hash).toHaveBeenCalledWith("Password123!");
+      expect(userModel.create).toHaveBeenCalledWith({
+        email: "new@test.com",
+        password: "hashed-password",
+        name: "New User",
+      });
       expect(signToken).toHaveBeenCalled();
       expect(result.user.email).toBe("new@test.com");
       expect(result.token).toBe("mock-jwt-token");
@@ -80,6 +92,10 @@ describe("authService", () => {
       expect(userModel.findOne).toHaveBeenCalledWith({
         email: "user@test.com",
       });
+      expect(passwordService.verify).toHaveBeenCalledWith(
+        "correct-password",
+        "hashedPassword",
+      );
       expect(result.user.email).toBe("user@test.com");
       expect(result.token).toBe("mock-jwt-token");
     });
@@ -98,16 +114,14 @@ describe("authService", () => {
     });
 
     it("should throw UnauthorizedError when password is wrong", async () => {
-      const doc = createUserDoc({
-        email: "user@test.com",
-        comparePassword: vi.fn().mockResolvedValue(false),
-      });
+      const doc = createUserDoc({ email: "user@test.com" });
       userModel.findOne.mockReturnValue({
         select: vi.fn().mockResolvedValue({
           ...doc,
           toObject: () => doc,
         }),
       });
+      passwordService.verify.mockResolvedValue(false);
 
       await expect(
         service.login({ email: "user@test.com", password: "wrong" }),
