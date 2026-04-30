@@ -88,7 +88,7 @@ export function createServices(
     recipeCache,
     bus,
   );
-  const authService = createAuthService(UserModel, passwordService, log);
+  const authService = createAuthService(userRepository, passwordService, log);
 
   return {
     auth: authService,
