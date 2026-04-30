@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  createMockUserModel,
+  createMockUserRepository,
   createObjectId,
   createUserDoc,
   queryParams,
@@ -8,11 +8,11 @@ import {
 import { NotFoundError } from "@/common/errors.js";
 import type { CommentService } from "@/modules/comments/comment.service.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
 import { createUserService } from "@/modules/users/user.service.js";
+import type { UserRepository } from "./user.repository.js";
 
 describe("userService", () => {
-  const userModel = createMockUserModel();
+  const userRepository = createMockUserRepository();
   const commentService = {
     findByAuthor: vi.fn(),
     findByRecipe: vi.fn(),
@@ -26,9 +26,9 @@ describe("userService", () => {
     isFavorited: vi.fn(),
   };
   const service = createUserService(
+    userRepository as unknown as UserRepository,
     commentService as unknown as CommentService,
     favoriteService as unknown as FavoriteService,
-    userModel as unknown as UserModelType,
   );
 
   beforeEach(() => {
@@ -38,8 +38,7 @@ describe("userService", () => {
   describe("getCurrentUser", () => {
     it("should return user by ID", async () => {
       const doc = createUserDoc({ email: "user@test.com", name: "Test" });
-      const lean = vi.fn().mockResolvedValue(doc);
-      userModel.findById.mockReturnValue({ lean });
+      userRepository.findById.mockReturnValue(doc);
 
       const result = await service.getCurrentUser(createObjectId().toString());
 
@@ -49,9 +48,7 @@ describe("userService", () => {
     });
 
     it("should throw NotFoundError when user not found", async () => {
-      userModel.findById.mockReturnValue({
-        lean: vi.fn().mockResolvedValue(null),
-      });
+      userRepository.findById.mockReturnValue(null);
 
       await expect(
         service.getCurrentUser(createObjectId().toString()),
