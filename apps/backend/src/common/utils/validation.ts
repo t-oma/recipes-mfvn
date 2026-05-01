@@ -1,6 +1,7 @@
-import type { Model } from "mongoose";
+import type { Model, Types } from "mongoose";
 import { isObjectIdOrHexString } from "mongoose";
 import { BadRequestError, NotFoundError } from "@/common/errors.js";
+import type { BaseRepository } from "../base.repository.js";
 
 type NoSubstring<S extends string, Forbidden extends string> =
   Lowercase<S> extends `${string}${Lowercase<Forbidden>}${string}`
@@ -28,11 +29,10 @@ export function assertValidId<const T extends string>(
  *
  * @param model - Model to check
  * @param id - ID to check
- * @param forceLabel - Force a specific label to use in the error message
  * @throws {NotFoundError} if the ID does not exist in the model
  */
-export async function assertExists(
-  model: Model<unknown>,
+export async function assertExists<T extends { _id: Types.ObjectId }>(
+  model: Model<unknown> | BaseRepository<T>,
   id: string,
 ): Promise<void> {
   const exists = await model.exists({ _id: id });
