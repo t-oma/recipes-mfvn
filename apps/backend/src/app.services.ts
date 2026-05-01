@@ -84,7 +84,7 @@ export function createServices(
     RecipeModel,
     userRepository,
     favoriteRepository,
-    CategoryModel,
+    categoryRepository,
     recipeCache,
     bus,
   );

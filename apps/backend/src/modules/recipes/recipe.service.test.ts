@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockBus,
   createMockCache,
-  createMockCategoryModel,
+  createMockCategoryRepository,
   createMockFavoriteRepository,
   createMockRecipeModel,
   createMockUserRepository,
@@ -18,7 +18,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "@/common/errors.js";
-import type { CategoryModelType } from "@/modules/categories/category.model.js";
+import type { CategoryRepository } from "@/modules/categories/category.repository.js";
 import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
@@ -29,14 +29,14 @@ describe("recipeService", () => {
   const recipeModel = createMockRecipeModel();
   const userRepository = createMockUserRepository();
   const favoriteRepository = createMockFavoriteRepository();
-  const categoryModel = createMockCategoryModel();
+  const categoryRepository = createMockCategoryRepository();
   const cache = createMockCache();
   const bus = createMockBus();
   const service = createRecipeService(
     recipeModel as unknown as RecipeModelType,
     userRepository as unknown as UserRepository,
     favoriteRepository as unknown as FavoriteRepository,
-    categoryModel as unknown as CategoryModelType,
+    categoryRepository as unknown as CategoryRepository,
     cache,
     bus,
   );
@@ -234,7 +234,7 @@ describe("recipeService", () => {
     };
 
     it("should create and return a recipe", async () => {
-      categoryModel.exists.mockResolvedValue(true);
+      categoryRepository.exists.mockResolvedValue(true);
       userRepository.exists.mockResolvedValue(true);
 
       const authorId = createObjectId();
@@ -287,7 +287,7 @@ describe("recipeService", () => {
     });
 
     it("should throw NotFoundError when category not found", async () => {
-      categoryModel.exists.mockResolvedValue(null);
+      categoryRepository.exists.mockResolvedValue(null);
 
       await expect(
         service.create({
@@ -298,7 +298,7 @@ describe("recipeService", () => {
     });
 
     it("should throw NotFoundError when author not found", async () => {
-      categoryModel.exists.mockResolvedValue(true);
+      categoryRepository.exists.mockResolvedValue(true);
       userRepository.exists.mockResolvedValue(null);
 
       await expect(

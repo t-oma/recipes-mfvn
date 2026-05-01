@@ -21,10 +21,8 @@ import { toRecipe } from "@/common/utils/mongo.js";
 import type { WithTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import { extractTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
-import type {
-  CategoryDocument,
-  CategoryModelType,
-} from "@/modules/categories/category.model.js";
+import type { CategoryDocument } from "@/modules/categories/category.model.js";
+import type { CategoryRepository } from "@/modules/categories/category.repository.js";
 import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type {
@@ -56,7 +54,7 @@ export function createRecipeService(
   recipeModel: RecipeModelType,
   userRepository: UserRepository,
   favoriteRepository: FavoriteRepository,
-  categoryModel: CategoryModelType,
+  categoryRepository: CategoryRepository,
   cache: CacheService,
   bus: TypedEmitter,
 ): RecipeService {
@@ -135,7 +133,7 @@ export function createRecipeService(
       assertValidId(initiator.id, "Author");
       assertValidId(data.category, "Category");
 
-      await assertExists(categoryModel, data.category);
+      await assertExists(categoryRepository, data.category);
       await assertExists(userRepository, initiator.id);
 
       const recipe = await recipeModel.create({
