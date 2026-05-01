@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockFavoriteRepository,
   createMockRecipeModel,
-  createMockUserModel,
+  createMockUserRepository,
   createObjectId,
   createRecipeDoc,
   initiator,
@@ -13,17 +13,17 @@ import { BadRequestError, NotFoundError } from "@/common/errors.js";
 import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { createFavoriteService } from "@/modules/favorites/favorite.service.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 
 describe("favoriteService", () => {
   const favoriteRepository = createMockFavoriteRepository();
   const recipeModel = createMockRecipeModel();
-  const userModel = createMockUserModel();
+  const userRepository = createMockUserRepository();
 
   const service = createFavoriteService(
     favoriteRepository as unknown as FavoriteRepository,
     recipeModel as unknown as RecipeModelType,
-    userModel as unknown as UserModelType,
+    userRepository as unknown as UserRepository,
   );
 
   beforeEach(() => {
@@ -32,7 +32,7 @@ describe("favoriteService", () => {
 
   describe("add", () => {
     it("should add a favorite and return favorited: true", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(true);
 
       const init = initiator();
@@ -55,7 +55,7 @@ describe("favoriteService", () => {
     });
 
     it("should throw BadRequestError for invalid recipe ID", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
 
       await expect(
         service.add("invalid-id", { initiator: initiator() }),
@@ -63,7 +63,7 @@ describe("favoriteService", () => {
     });
 
     it("should throw NotFoundError when user does not exist", async () => {
-      userModel.exists.mockResolvedValue(false);
+      userRepository.exists.mockResolvedValue(false);
       recipeModel.exists.mockResolvedValue(true);
 
       await expect(
@@ -72,7 +72,7 @@ describe("favoriteService", () => {
     });
 
     it("should throw NotFoundError when recipe does not exist", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(false);
 
       await expect(
@@ -83,7 +83,7 @@ describe("favoriteService", () => {
 
   describe("remove", () => {
     it("should remove a favorite and return favorited: false", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(true);
 
       const init = initiator();
@@ -122,7 +122,7 @@ describe("favoriteService", () => {
 
   describe("findByUser", () => {
     it("should return paginated recipes from favorites", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       const recipe = populateRecipeDoc(createRecipeDoc(), {
         isFavorited: true,
       });
@@ -138,7 +138,7 @@ describe("favoriteService", () => {
     });
 
     it("should return empty paginated result when no favorites", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       favoriteRepository.findByUser.mockResolvedValue([[], 0]);
 
       const result = await service.findByUser(
