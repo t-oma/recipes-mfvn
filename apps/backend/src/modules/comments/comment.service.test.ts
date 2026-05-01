@@ -3,7 +3,7 @@ import {
   createCommentDoc,
   createMockCommentRepository,
   createMockRecipeModel,
-  createMockUserModel,
+  createMockUserRepository,
   createObjectId,
   initiator,
   queryParams,
@@ -16,16 +16,17 @@ import {
 import type { CommentRepository } from "@/modules/comments/comment.repository.js";
 import { createCommentService } from "@/modules/comments/comment.service.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 
 describe("commentService", () => {
   const commentRepository = createMockCommentRepository();
   const recipeModel = createMockRecipeModel();
-  const userModel = createMockUserModel();
+  const userRepository = createMockUserRepository();
+
   const service = createCommentService(
     commentRepository as unknown as CommentRepository,
     recipeModel as unknown as RecipeModelType,
-    userModel as unknown as UserModelType,
+    userRepository as unknown as UserRepository,
   );
 
   beforeEach(() => {
@@ -90,7 +91,7 @@ describe("commentService", () => {
 
   describe("findByAuthor", () => {
     it("should return paginated comments by author", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       const authorId = createObjectId();
       const populatedComment = {
         _id: createObjectId(),
@@ -121,7 +122,7 @@ describe("commentService", () => {
   describe("create", () => {
     it("should create a comment and return populated DTO", async () => {
       recipeModel.exists.mockResolvedValue(true);
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
 
       const authorId = createObjectId();
       const populated = {
@@ -176,7 +177,7 @@ describe("commentService", () => {
 
     it("should throw NotFoundError when author not found", async () => {
       recipeModel.exists.mockResolvedValue(true);
-      userModel.exists.mockResolvedValue(null);
+      userRepository.exists.mockResolvedValue(null);
 
       await expect(
         service.create(createObjectId().toString(), {
