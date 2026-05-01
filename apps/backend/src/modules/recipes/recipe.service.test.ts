@@ -6,7 +6,7 @@ import {
   createMockCategoryModel,
   createMockFavoriteModel,
   createMockRecipeModel,
-  createMockUserModel,
+  createMockUserRepository,
   createObjectId,
   createRecipeDoc,
   initiator,
@@ -23,18 +23,18 @@ import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import { createRecipeService } from "@/modules/recipes/recipe.service.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 
 describe("recipeService", () => {
   const recipeModel = createMockRecipeModel();
-  const userModel = createMockUserModel();
+  const userRepository = createMockUserRepository();
   const favoriteModel = createMockFavoriteModel();
   const categoryModel = createMockCategoryModel();
   const cache = createMockCache();
   const bus = createMockBus();
   const service = createRecipeService(
     recipeModel as unknown as RecipeModelType,
-    userModel as unknown as UserModelType,
+    userRepository as unknown as UserRepository,
     favoriteModel as unknown as FavoriteModelType,
     categoryModel as unknown as CategoryModelType,
     cache,
@@ -235,7 +235,7 @@ describe("recipeService", () => {
 
     it("should create and return a recipe", async () => {
       categoryModel.exists.mockResolvedValue(true);
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
 
       const authorId = createObjectId();
       const categoryId = createObjectId();
@@ -299,7 +299,7 @@ describe("recipeService", () => {
 
     it("should throw NotFoundError when author not found", async () => {
       categoryModel.exists.mockResolvedValue(true);
-      userModel.exists.mockResolvedValue(null);
+      userRepository.exists.mockResolvedValue(null);
 
       await expect(
         service.create({

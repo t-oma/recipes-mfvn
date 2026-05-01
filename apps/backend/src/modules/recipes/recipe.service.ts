@@ -35,10 +35,8 @@ import {
   buildFindByIdPipeline,
   buildSearchPipeline,
 } from "@/modules/recipes/recipe.pipeline.js";
-import type {
-  UserDocument,
-  UserModelType,
-} from "@/modules/users/user.model.js";
+import type { UserDocument } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 
 export interface RecipeService {
   findAll(params: QueryMethodParams<RecipeQuery>): Promise<Paginated<Recipe>>;
@@ -56,7 +54,7 @@ export interface RecipeService {
 
 export function createRecipeService(
   recipeModel: RecipeModelType,
-  userModel: UserModelType,
+  userRepository: UserRepository,
   favoriteModel: FavoriteModelType,
   categoryModel: CategoryModelType,
   cache: CacheService,
@@ -138,7 +136,7 @@ export function createRecipeService(
       assertValidId(data.category, "Category");
 
       await assertExists(categoryModel, data.category);
-      await assertExists(userModel, initiator.id);
+      await assertExists(userRepository, initiator.id);
 
       const recipe = await recipeModel.create({
         ...data,
