@@ -83,7 +83,7 @@ export function createServices(
   const recipeService = createRecipeService(
     RecipeModel,
     userRepository,
-    FavoriteModel,
+    favoriteRepository,
     CategoryModel,
     recipeCache,
     bus,

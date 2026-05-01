@@ -4,7 +4,7 @@ import {
   createMockBus,
   createMockCache,
   createMockCategoryModel,
-  createMockFavoriteModel,
+  createMockFavoriteRepository,
   createMockRecipeModel,
   createMockUserRepository,
   createObjectId,
@@ -19,7 +19,7 @@ import {
   NotFoundError,
 } from "@/common/errors.js";
 import type { CategoryModelType } from "@/modules/categories/category.model.js";
-import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
+import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import { createRecipeService } from "@/modules/recipes/recipe.service.js";
@@ -28,14 +28,14 @@ import type { UserRepository } from "@/modules/users/user.repository.js";
 describe("recipeService", () => {
   const recipeModel = createMockRecipeModel();
   const userRepository = createMockUserRepository();
-  const favoriteModel = createMockFavoriteModel();
+  const favoriteRepository = createMockFavoriteRepository();
   const categoryModel = createMockCategoryModel();
   const cache = createMockCache();
   const bus = createMockBus();
   const service = createRecipeService(
     recipeModel as unknown as RecipeModelType,
     userRepository as unknown as UserRepository,
-    favoriteModel as unknown as FavoriteModelType,
+    favoriteRepository as unknown as FavoriteRepository,
     categoryModel as unknown as CategoryModelType,
     cache,
     bus,
@@ -322,9 +322,7 @@ describe("recipeService", () => {
         }),
       };
       recipeModel.findById.mockResolvedValue(recipe);
-      favoriteModel.findOne.mockReturnValue({
-        lean: vi.fn().mockResolvedValue(null),
-      });
+      favoriteRepository.exists.mockReturnValue(false);
 
       const id = createObjectId().toString();
       const result = await service.update(id, {
@@ -355,9 +353,7 @@ describe("recipeService", () => {
         }),
       };
       recipeModel.findById.mockResolvedValue(recipe);
-      favoriteModel.findOne.mockReturnValue({
-        lean: vi.fn().mockResolvedValue(null),
-      });
+      favoriteRepository.exists.mockReturnValue(false);
 
       const id = createObjectId().toString();
       await expect(

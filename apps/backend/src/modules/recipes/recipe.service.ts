@@ -25,7 +25,7 @@ import type {
   CategoryDocument,
   CategoryModelType,
 } from "@/modules/categories/category.model.js";
-import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
+import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type {
   RecipeDocumentPopulated,
@@ -55,7 +55,7 @@ export interface RecipeService {
 export function createRecipeService(
   recipeModel: RecipeModelType,
   userRepository: UserRepository,
-  favoriteModel: FavoriteModelType,
+  favoriteRepository: FavoriteRepository,
   categoryModel: CategoryModelType,
   cache: CacheService,
   bus: TypedEmitter,
@@ -177,12 +177,10 @@ export function createRecipeService(
         { path: "category", select: "name slug" },
       ]);
 
-      const isFavorited = !!(await favoriteModel
-        .findOne({
-          user: initiator.id,
-          recipe: id,
-        })
-        .lean());
+      const isFavorited = await favoriteRepository.exists({
+        user: initiator.id,
+        recipe: id,
+      });
 
       await Promise.all([
         cache.delete(recipeCache.keys.byId(id)),
