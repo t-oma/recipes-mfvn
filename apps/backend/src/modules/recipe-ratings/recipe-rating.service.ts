@@ -7,7 +7,7 @@ import type {
 } from "@/common/types/methods.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 import type { RecipeRatingRepository } from "./recipe-rating.repository.js";
 
 export interface RecipeRatingService {
@@ -21,12 +21,12 @@ export interface RecipeRatingService {
 export function createRecipeRatingService(
   repository: RecipeRatingRepository,
   recipeModel: RecipeModelType,
-  userModel: UserModelType,
+  userRepository: UserRepository,
   bus: TypedEmitter,
 ): RecipeRatingService {
   async function validateUser(userId: string): Promise<void> {
     assertValidId(userId, "User");
-    await assertExists(userModel, userId);
+    await assertExists(userRepository, userId);
   }
 
   async function validateRecipe(recipeId: string): Promise<void> {

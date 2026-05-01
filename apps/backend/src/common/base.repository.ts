@@ -50,9 +50,11 @@ export class BaseRepository<
   TDefaultPopulate extends PopulateKeys<TDoc> = EmptyObject,
 > {
   protected readonly model: Model<TDoc>;
+  public readonly modelName: string;
 
   constructor(model: Model<TDoc>) {
     this.model = model;
+    this.modelName = model.modelName;
   }
 
   async findById<TPopulate extends PopulateKeys<TDoc> = TDefaultPopulate>(

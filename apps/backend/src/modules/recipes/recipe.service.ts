@@ -21,11 +21,9 @@ import { toRecipe } from "@/common/utils/mongo.js";
 import type { WithTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import { extractTotalCountResult } from "@/common/utils/mongoose.aggregation.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
-import type {
-  CategoryDocument,
-  CategoryModelType,
-} from "@/modules/categories/category.model.js";
-import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
+import type { CategoryDocument } from "@/modules/categories/category.model.js";
+import type { CategoryRepository } from "@/modules/categories/category.repository.js";
+import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type {
   RecipeDocumentPopulated,
@@ -35,10 +33,8 @@ import {
   buildFindByIdPipeline,
   buildSearchPipeline,
 } from "@/modules/recipes/recipe.pipeline.js";
-import type {
-  UserDocument,
-  UserModelType,
-} from "@/modules/users/user.model.js";
+import type { UserDocument } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 
 export interface RecipeService {
   findAll(params: QueryMethodParams<RecipeQuery>): Promise<Paginated<Recipe>>;
@@ -56,9 +52,9 @@ export interface RecipeService {
 
 export function createRecipeService(
   recipeModel: RecipeModelType,
-  userModel: UserModelType,
-  favoriteModel: FavoriteModelType,
-  categoryModel: CategoryModelType,
+  userRepository: UserRepository,
+  favoriteRepository: FavoriteRepository,
+  categoryRepository: CategoryRepository,
   cache: CacheService,
   bus: TypedEmitter,
 ): RecipeService {
@@ -137,8 +133,8 @@ export function createRecipeService(
       assertValidId(initiator.id, "Author");
       assertValidId(data.category, "Category");
 
-      await assertExists(categoryModel, data.category);
-      await assertExists(userModel, initiator.id);
+      await assertExists(categoryRepository, data.category);
+      await assertExists(userRepository, initiator.id);
 
       const recipe = await recipeModel.create({
         ...data,
@@ -179,12 +175,10 @@ export function createRecipeService(
         { path: "category", select: "name slug" },
       ]);
 
-      const isFavorited = !!(await favoriteModel
-        .findOne({
-          user: initiator.id,
-          recipe: id,
-        })
-        .lean());
+      const isFavorited = await favoriteRepository.exists({
+        user: initiator.id,
+        recipe: id,
+      });
 
       await Promise.all([
         cache.delete(recipeCache.keys.byId(id)),

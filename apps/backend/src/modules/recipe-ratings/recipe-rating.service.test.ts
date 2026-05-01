@@ -3,7 +3,7 @@ import {
   createMockBus,
   createMockRecipeModel,
   createMockRecipeRatingRepository,
-  createMockUserModel,
+  createMockUserRepository,
   createObjectId,
   initiator,
 } from "@/__tests__/helpers.js";
@@ -11,18 +11,18 @@ import { BadRequestError, NotFoundError } from "@/common/errors.js";
 import type { RecipeRatingRepository } from "@/modules/recipe-ratings/recipe-rating.repository.js";
 import { createRecipeRatingService } from "@/modules/recipe-ratings/recipe-rating.service.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 
 describe("recipeRatingService", () => {
   const repository = createMockRecipeRatingRepository();
   const recipeModel = createMockRecipeModel();
-  const userModel = createMockUserModel();
+  const userRepository = createMockUserRepository();
   const bus = createMockBus();
 
   const service = createRecipeRatingService(
     repository as unknown as RecipeRatingRepository,
     recipeModel as unknown as RecipeModelType,
-    userModel as unknown as UserModelType,
+    userRepository as unknown as UserRepository,
     bus,
   );
 
@@ -32,7 +32,7 @@ describe("recipeRatingService", () => {
 
   describe("rate", () => {
     it("should create a new rating", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(true);
       repository.upsert.mockResolvedValue({
         _id: createObjectId(),
@@ -58,7 +58,7 @@ describe("recipeRatingService", () => {
     });
 
     it("should update an existing rating", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(true);
       repository.upsert.mockResolvedValue({
         _id: createObjectId(),
@@ -88,7 +88,7 @@ describe("recipeRatingService", () => {
     });
 
     it("should throw BadRequestError for invalid recipe ID", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
 
       await expect(
         service.rate("invalid-id", {
@@ -99,7 +99,7 @@ describe("recipeRatingService", () => {
     });
 
     it("should throw NotFoundError when user does not exist", async () => {
-      userModel.exists.mockResolvedValue(false);
+      userRepository.exists.mockResolvedValue(false);
       recipeModel.exists.mockResolvedValue(true);
 
       await expect(
@@ -111,7 +111,7 @@ describe("recipeRatingService", () => {
     });
 
     it("should throw NotFoundError when recipe does not exist", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(false);
 
       await expect(
@@ -125,7 +125,7 @@ describe("recipeRatingService", () => {
 
   describe("remove", () => {
     it("should remove an existing rating", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(true);
       repository.delete.mockResolvedValue({
         _id: createObjectId(),
@@ -147,7 +147,7 @@ describe("recipeRatingService", () => {
     });
 
     it("should throw NotFoundError when rating does not exist", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(true);
       repository.delete.mockResolvedValue(null);
 
@@ -167,7 +167,7 @@ describe("recipeRatingService", () => {
     });
 
     it("should throw NotFoundError when recipe does not exist", async () => {
-      userModel.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
       recipeModel.exists.mockResolvedValue(false);
 
       await expect(

@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockBus,
   createMockCache,
-  createMockCategoryModel,
-  createMockFavoriteModel,
+  createMockCategoryRepository,
+  createMockFavoriteRepository,
   createMockRecipeModel,
-  createMockUserModel,
+  createMockUserRepository,
   createObjectId,
   createRecipeDoc,
   initiator,
@@ -18,25 +18,25 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "@/common/errors.js";
-import type { CategoryModelType } from "@/modules/categories/category.model.js";
-import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
+import type { CategoryRepository } from "@/modules/categories/category.repository.js";
+import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
 import { createRecipeService } from "@/modules/recipes/recipe.service.js";
-import type { UserModelType } from "@/modules/users/user.model.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
 
 describe("recipeService", () => {
   const recipeModel = createMockRecipeModel();
-  const userModel = createMockUserModel();
-  const favoriteModel = createMockFavoriteModel();
-  const categoryModel = createMockCategoryModel();
+  const userRepository = createMockUserRepository();
+  const favoriteRepository = createMockFavoriteRepository();
+  const categoryRepository = createMockCategoryRepository();
   const cache = createMockCache();
   const bus = createMockBus();
   const service = createRecipeService(
     recipeModel as unknown as RecipeModelType,
-    userModel as unknown as UserModelType,
-    favoriteModel as unknown as FavoriteModelType,
-    categoryModel as unknown as CategoryModelType,
+    userRepository as unknown as UserRepository,
+    favoriteRepository as unknown as FavoriteRepository,
+    categoryRepository as unknown as CategoryRepository,
     cache,
     bus,
   );
@@ -234,8 +234,8 @@ describe("recipeService", () => {
     };
 
     it("should create and return a recipe", async () => {
-      categoryModel.exists.mockResolvedValue(true);
-      userModel.exists.mockResolvedValue(true);
+      categoryRepository.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(true);
 
       const authorId = createObjectId();
       const categoryId = createObjectId();
@@ -287,7 +287,7 @@ describe("recipeService", () => {
     });
 
     it("should throw NotFoundError when category not found", async () => {
-      categoryModel.exists.mockResolvedValue(null);
+      categoryRepository.exists.mockResolvedValue(null);
 
       await expect(
         service.create({
@@ -298,8 +298,8 @@ describe("recipeService", () => {
     });
 
     it("should throw NotFoundError when author not found", async () => {
-      categoryModel.exists.mockResolvedValue(true);
-      userModel.exists.mockResolvedValue(null);
+      categoryRepository.exists.mockResolvedValue(true);
+      userRepository.exists.mockResolvedValue(null);
 
       await expect(
         service.create({
@@ -322,9 +322,7 @@ describe("recipeService", () => {
         }),
       };
       recipeModel.findById.mockResolvedValue(recipe);
-      favoriteModel.findOne.mockReturnValue({
-        lean: vi.fn().mockResolvedValue(null),
-      });
+      favoriteRepository.exists.mockReturnValue(false);
 
       const id = createObjectId().toString();
       const result = await service.update(id, {
@@ -355,9 +353,7 @@ describe("recipeService", () => {
         }),
       };
       recipeModel.findById.mockResolvedValue(recipe);
-      favoriteModel.findOne.mockReturnValue({
-        lean: vi.fn().mockResolvedValue(null),
-      });
+      favoriteRepository.exists.mockReturnValue(false);
 
       const id = createObjectId().toString();
       await expect(
