@@ -72,7 +72,7 @@ export function createServices(
   );
   const recipeRatingService = createRecipeRatingService(
     recipeRatingRepository,
-    RecipeModel,
+    recipeRepository,
     userRepository,
     bus,
   );

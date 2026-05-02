@@ -6,7 +6,7 @@ import type {
   DeleteMethodParams,
 } from "@/common/types/methods.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
-import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
+import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
 import type { RecipeRatingRepository } from "./recipe-rating.repository.js";
 
@@ -20,7 +20,7 @@ export interface RecipeRatingService {
 
 export function createRecipeRatingService(
   repository: RecipeRatingRepository,
-  recipeModel: RecipeModelType,
+  recipeRepository: RecipeRepository,
   userRepository: UserRepository,
   bus: TypedEmitter,
 ): RecipeRatingService {
@@ -31,7 +31,7 @@ export function createRecipeRatingService(
 
   async function validateRecipe(recipeId: string): Promise<void> {
     assertValidId(recipeId, "Recipe");
-    await assertExists(recipeModel, recipeId);
+    await assertExists(recipeRepository, recipeId);
   }
 
   return {
