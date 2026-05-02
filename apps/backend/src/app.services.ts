@@ -78,7 +78,7 @@ export function createServices(
   );
   const categoryService = createCategoryService(
     categoryRepository,
-    RecipeModel,
+    recipeRepository,
     categoryCache,
     bus,
   );

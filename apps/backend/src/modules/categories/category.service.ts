@@ -14,7 +14,7 @@ import type {
 import { toCategory } from "@/common/utils/mongo.js";
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import type { CategoryRepository } from "@/modules/categories/category.repository.js";
-import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
+import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 
 export interface CategoryService {
   findAll(params: QueryMethodParams<CategoryQuery>): Promise<Category[]>;
@@ -24,7 +24,7 @@ export interface CategoryService {
 
 export function createCategoryService(
   repository: CategoryRepository,
-  recipeModel: RecipeModelType,
+  recipeRepository: RecipeRepository,
   cache: CacheService,
   bus: TypedEmitter,
 ): CategoryService {
@@ -55,7 +55,7 @@ export function createCategoryService(
     },
 
     deleteById: async (id) => {
-      const recipeCount = await recipeModel.countDocuments({
+      const recipeCount = await recipeRepository.count({
         category: id,
       });
       if (recipeCount > 0) {
