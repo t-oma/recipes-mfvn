@@ -1,8 +1,10 @@
 import type {
-  Category,
+  CategoryComputed,
   CategorySummary,
+  CategoryWithComputed,
   Comment,
   CommentForRecipe,
+  Prettify,
   Recipe,
   RecipeSummary,
   Replace,
@@ -10,10 +12,7 @@ import type {
   UserSummary,
 } from "@recipes/shared";
 import { Types } from "mongoose";
-import type {
-  CategoryDocument,
-  CategoryDocumentWithCount,
-} from "@/modules/categories/category.model.js";
+import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type { RecipeDocument } from "@/modules/recipes/recipe.model.js";
 import type { UserDocument } from "@/modules/users/user.model.js";
@@ -66,14 +65,14 @@ export function toRecipe<T extends RecipeDocument>(
 }
 
 export function toCategory(
-  doc: CategoryDocument | CategoryDocumentWithCount,
-): Category {
+  doc: Prettify<CategoryDocument & Partial<CategoryComputed>>,
+): CategoryWithComputed {
   return {
     id: doc._id.toString(),
     name: doc.name,
     slug: doc.slug,
     description: doc.description,
-    recipeCount: "recipeCount" in doc ? doc.recipeCount : 0,
+    recipeCount: doc.recipeCount ?? 0,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };
