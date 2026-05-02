@@ -62,7 +62,7 @@ export function createServices(
   );
   const favoriteService = createFavoriteService(
     favoriteRepository,
-    RecipeModel,
+    recipeRepository,
     userRepository,
   );
   const userService = createUserService(

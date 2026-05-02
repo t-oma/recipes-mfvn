@@ -7,7 +7,7 @@ import type {
 } from "@/common/types/methods.js";
 import { toRecipe } from "@/common/utils/mongo.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
-import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
+import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
 import type { FavoriteRepository } from "./favorite.repository.js";
 
@@ -32,7 +32,7 @@ export interface FavoriteService {
 
 export function createFavoriteService(
   repository: FavoriteRepository,
-  recipeModel: RecipeModelType,
+  recipeRepository: RecipeRepository,
   userRepository: UserRepository,
 ): FavoriteService {
   async function validateUser(id: string): Promise<void> {
@@ -42,7 +42,7 @@ export function createFavoriteService(
 
   async function validateRecipe(id: string): Promise<void> {
     assertValidId(id, "Recipe");
-    await assertExists(recipeModel, id);
+    await assertExists(recipeRepository, id);
   }
 
   return {
