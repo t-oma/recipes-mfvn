@@ -57,12 +57,12 @@ export function createServices(
 
   const commentService = createCommentService(
     commentRepository,
-    RecipeModel,
+    recipeRepository,
     userRepository,
   );
   const favoriteService = createFavoriteService(
     favoriteRepository,
-    RecipeModel,
+    recipeRepository,
     userRepository,
   );
   const userService = createUserService(
@@ -72,13 +72,13 @@ export function createServices(
   );
   const recipeRatingService = createRecipeRatingService(
     recipeRatingRepository,
-    RecipeModel,
+    recipeRepository,
     userRepository,
     bus,
   );
   const categoryService = createCategoryService(
     categoryRepository,
-    RecipeModel,
+    recipeRepository,
     categoryCache,
     bus,
   );

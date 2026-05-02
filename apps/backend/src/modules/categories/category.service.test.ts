@@ -5,7 +5,7 @@ import {
   createMockBus,
   createMockCache,
   createMockCategoryRepository,
-  createMockRecipeModel,
+  createMockRecipeRepository,
   createObjectId,
   initiator,
   noInitiator,
@@ -14,16 +14,16 @@ import { ConflictError, NotFoundError } from "@/common/errors.js";
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import type { CategoryRepository } from "@/modules/categories/category.repository.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
-import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
+import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 
 describe("categoryService", () => {
   const categoryRepository = createMockCategoryRepository();
-  const recipeModel = createMockRecipeModel();
+  const recipeRepository = createMockRecipeRepository();
   const cache = createMockCache();
   const bus = createMockBus();
   const service = createCategoryService(
     categoryRepository as unknown as CategoryRepository,
-    recipeModel as unknown as RecipeModelType,
+    recipeRepository as unknown as RecipeRepository,
     cache,
     bus,
   );
@@ -132,13 +132,15 @@ describe("categoryService", () => {
 
   describe("deleteById", () => {
     it("should delete category when no recipes exist", async () => {
-      recipeModel.countDocuments.mockResolvedValue(0);
+      recipeRepository.count.mockResolvedValue(0);
       categoryRepository.delete.mockResolvedValue(createCategoryDoc());
 
       const id = createObjectId().toString();
       await service.deleteById(id, { initiator: initiator() });
 
-      expect(recipeModel.countDocuments).toHaveBeenCalledWith({ category: id });
+      expect(recipeRepository.count).toHaveBeenCalledWith({
+        category: id,
+      });
       expect(categoryRepository.delete).toHaveBeenCalledWith(id);
       expect(cache.deletePattern).toHaveBeenCalledWith(
         categoryCache.keys.allPattern(),
@@ -147,7 +149,7 @@ describe("categoryService", () => {
     });
 
     it("should throw ConflictError when recipes exist", async () => {
-      recipeModel.countDocuments.mockResolvedValue(3);
+      recipeRepository.count.mockResolvedValue(3);
 
       await expect(
         service.deleteById(createObjectId().toString(), {
@@ -157,7 +159,7 @@ describe("categoryService", () => {
     });
 
     it("should throw NotFoundError when category not found", async () => {
-      recipeModel.countDocuments.mockResolvedValue(0);
+      recipeRepository.count.mockResolvedValue(0);
       categoryRepository.delete.mockResolvedValue(null);
 
       await expect(

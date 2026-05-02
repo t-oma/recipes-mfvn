@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockFavoriteRepository,
-  createMockRecipeModel,
+  createMockRecipeRepository,
   createMockUserRepository,
   createObjectId,
   createRecipeDoc,
@@ -12,17 +12,17 @@ import {
 import { BadRequestError, NotFoundError } from "@/common/errors.js";
 import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { createFavoriteService } from "@/modules/favorites/favorite.service.js";
-import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
+import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
 
 describe("favoriteService", () => {
   const favoriteRepository = createMockFavoriteRepository();
-  const recipeModel = createMockRecipeModel();
+  const recipeRepository = createMockRecipeRepository();
   const userRepository = createMockUserRepository();
 
   const service = createFavoriteService(
     favoriteRepository as unknown as FavoriteRepository,
-    recipeModel as unknown as RecipeModelType,
+    recipeRepository as unknown as RecipeRepository,
     userRepository as unknown as UserRepository,
   );
 
@@ -33,7 +33,7 @@ describe("favoriteService", () => {
   describe("add", () => {
     it("should add a favorite and return favorited: true", async () => {
       userRepository.exists.mockResolvedValue(true);
-      recipeModel.exists.mockResolvedValue(true);
+      recipeRepository.exists.mockResolvedValue(true);
 
       const init = initiator();
       const recipeId = createObjectId().toString();
@@ -64,7 +64,7 @@ describe("favoriteService", () => {
 
     it("should throw NotFoundError when user does not exist", async () => {
       userRepository.exists.mockResolvedValue(false);
-      recipeModel.exists.mockResolvedValue(true);
+      recipeRepository.exists.mockResolvedValue(true);
 
       await expect(
         service.add(createObjectId().toString(), { initiator: initiator() }),
@@ -73,7 +73,7 @@ describe("favoriteService", () => {
 
     it("should throw NotFoundError when recipe does not exist", async () => {
       userRepository.exists.mockResolvedValue(true);
-      recipeModel.exists.mockResolvedValue(false);
+      recipeRepository.exists.mockResolvedValue(false);
 
       await expect(
         service.add(createObjectId().toString(), { initiator: initiator() }),
@@ -84,7 +84,7 @@ describe("favoriteService", () => {
   describe("remove", () => {
     it("should remove a favorite and return favorited: false", async () => {
       userRepository.exists.mockResolvedValue(true);
-      recipeModel.exists.mockResolvedValue(true);
+      recipeRepository.exists.mockResolvedValue(true);
 
       const init = initiator();
       const recipeId = createObjectId().toString();
