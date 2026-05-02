@@ -57,7 +57,7 @@ export function createServices(
 
   const commentService = createCommentService(
     commentRepository,
-    RecipeModel,
+    recipeRepository,
     userRepository,
   );
   const favoriteService = createFavoriteService(

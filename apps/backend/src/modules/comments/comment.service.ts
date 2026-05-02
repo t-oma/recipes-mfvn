@@ -13,7 +13,7 @@ import type {
 } from "@/common/types/methods.js";
 import { toComment, toCommentForRecipe } from "@/common/utils/mongo.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
-import type { RecipeModelType } from "@/modules/recipes/recipe.model.js";
+import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
 import type { CommentRepository } from "./comment.repository.js";
 
@@ -35,13 +35,13 @@ export interface CommentService {
 
 export function createCommentService(
   repository: CommentRepository,
-  recipeModel: RecipeModelType,
+  recipeRepository: RecipeRepository,
   userRepository: UserRepository,
 ): CommentService {
   return {
     findByRecipe: async (recipeId, { query, initiator }) => {
       assertValidId(recipeId, "Recipe");
-      await assertExists(recipeModel, recipeId);
+      await assertExists(recipeRepository, recipeId);
 
       const [comments, total] = await repository.findByRecipe(recipeId, {
         query,
@@ -77,7 +77,7 @@ export function createCommentService(
       assertValidId(recipeId, "Recipe");
       assertValidId(initiator.id, "Author");
 
-      await assertExists(recipeModel, recipeId);
+      await assertExists(recipeRepository, recipeId);
       await assertExists(userRepository, initiator.id);
 
       const comment = await repository.create({
