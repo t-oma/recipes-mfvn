@@ -3,7 +3,6 @@ import type {
   CategorySummary,
   CategoryWithComputed,
   Comment,
-  CommentForRecipe,
   Prettify,
   Recipe,
   RecipeSummary,
@@ -94,30 +93,6 @@ export function toComment<T extends CommentDocument>(
       id: doc.recipe._id.toString(),
       title: doc.recipe.title,
     } satisfies RecipeSummary,
-    author: {
-      id: doc.author._id.toString(),
-      email: doc.author.email,
-      name: doc.author.name,
-    } satisfies UserSummary,
-    createdAt: doc.createdAt.toISOString(),
-    updatedAt: doc.updatedAt.toISOString(),
-  };
-}
-
-export function toCommentForRecipe<T extends CommentDocument>(
-  doc: Omit<
-    Replace<
-      T,
-      {
-        author: Pick<UserDocument, "_id" | "name" | "email">;
-      }
-    >,
-    "recipe"
-  >,
-): CommentForRecipe {
-  return {
-    id: doc._id.toString(),
-    text: doc.text,
     author: {
       id: doc.author._id.toString(),
       email: doc.author.email,

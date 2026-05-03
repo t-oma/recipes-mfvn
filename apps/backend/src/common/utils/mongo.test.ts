@@ -11,7 +11,6 @@ import {
 import {
   toCategory,
   toComment,
-  toCommentForRecipe,
   toObjectId,
   toRecipe,
   toUser,
@@ -188,21 +187,5 @@ describe("toComment", () => {
       id: recipeId.toString(),
       title: "Pasta",
     });
-  });
-});
-
-describe("toCommentForRecipe", () => {
-  it("should map comment document to CommentForRecipe DTO (no recipe field)", () => {
-    const authorId = createObjectId();
-    const doc = {
-      ...createCommentDoc({ text: "Great!" }),
-      author: { _id: authorId, name: "User", email: "user@test.com" },
-    };
-
-    const result = toCommentForRecipe(doc);
-
-    expect(result.text).toBe("Great!");
-    expect(result).not.toHaveProperty("recipe");
-    expect(result.author.id).toBe(authorId.toString());
   });
 });

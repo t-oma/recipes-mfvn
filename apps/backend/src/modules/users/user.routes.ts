@@ -1,6 +1,6 @@
 import {
-  commentForRecipeSchema,
   commentQuerySchema,
+  commentSchema,
   favoriteQuerySchema,
   paginatedSchema,
   recipeSchema,
@@ -74,7 +74,7 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
         schema: {
           querystring: commentQuerySchema,
           response: {
-            200: paginatedSchema(commentForRecipeSchema),
+            200: paginatedSchema(commentSchema),
           },
           tags: ["Users"],
           summary: "Get current user's comments",
