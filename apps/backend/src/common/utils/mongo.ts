@@ -5,7 +5,9 @@ import type {
   Comment,
   Prettify,
   Recipe,
+  RecipeComputed,
   RecipeSummary,
+  RecipeWithComputed,
   Replace,
   User,
   UserSummary,
@@ -27,13 +29,10 @@ export function toRecipe<T extends RecipeDocument>(
       category: Pick<CategoryDocument, "_id" | "name" | "slug">;
       author: Pick<UserDocument, "_id" | "name" | "email">;
     }
-  > & {
-    userRating?: number | null;
-    averageRating?: number | null;
-    ratingCount?: number;
-  },
+  > &
+    Partial<Omit<RecipeComputed, "isFavorited">>,
   isFavorited: boolean,
-): Recipe {
+): RecipeWithComputed {
   return {
     id: doc._id.toString(),
     title: doc.title,

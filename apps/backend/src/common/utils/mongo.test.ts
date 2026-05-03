@@ -1,4 +1,4 @@
-import type { Minutes } from "@recipes/shared";
+import type { Minutes, RecipeComputed } from "@recipes/shared";
 import { Types } from "mongoose";
 import { describe, expect, it } from "vitest";
 import {
@@ -116,7 +116,7 @@ describe("toRecipe", () => {
       userRating: 4,
       averageRating: 4.2,
       ratingCount: 10,
-    } satisfies RecipeDocumentPopulated;
+    } satisfies RecipeDocumentPopulated & RecipeComputed;
 
     const result = toRecipe(doc, doc.isFavorited);
 

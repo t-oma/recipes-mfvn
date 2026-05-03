@@ -4,6 +4,7 @@ import {
   createCommentSchema,
   createRecipeSchema,
   paginatedSchema,
+  recipeComputedSchema,
   recipeQuerySchema,
   recipeSchema,
   updateRecipeSchema,
@@ -37,7 +38,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           querystring: recipeQuerySchema,
           response: {
-            200: paginatedSchema(recipeSchema),
+            200: paginatedSchema(
+              recipeSchema.extend(recipeComputedSchema.shape),
+            ),
           },
           tags: ["Recipes"],
           summary: "Get all recipes with pagination",
@@ -58,7 +61,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           params: recipeParamsSchema,
           response: {
-            200: recipeSchema,
+            200: recipeSchema.extend(recipeComputedSchema.shape),
           },
           tags: ["Recipes"],
           summary: "Get recipe by ID",
@@ -78,7 +81,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           body: createRecipeSchema,
           response: {
-            201: recipeSchema,
+            201: recipeSchema.extend(recipeComputedSchema.shape),
           },
           tags: ["Recipes"],
           summary: "Create a recipe",
@@ -103,7 +106,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
           params: recipeParamsSchema,
           body: updateRecipeSchema,
           response: {
-            200: recipeSchema,
+            200: recipeSchema.extend(recipeComputedSchema.shape),
           },
           tags: ["Recipes"],
           summary: "Update a recipe",
