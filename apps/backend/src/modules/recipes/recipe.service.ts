@@ -1,7 +1,6 @@
 import type {
   CreateRecipeBody,
   Paginated,
-  Recipe,
   RecipeQuery,
   RecipeWithComputed,
   UpdateRecipeBody,
