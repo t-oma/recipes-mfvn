@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Rating from "@/common/ui/Rating.vue";
+
 const props = defineProps<{
   text: string;
   author: string;
@@ -10,14 +12,8 @@ const props = defineProps<{
   <div
     class="rounded-2xl border border-stone-100 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:shadow-stone-900/5"
   >
-    <div class="mb-4 flex gap-1">
-      <i
-        v-for="s in 5"
-        :key="s"
-        class="pi text-sm text-amber-400"
-        :class="s <= Math.round(props.rating) ? 'pi-star-fill' : 'pi-star'"
-      />
-    </div>
+    <Rating :rating="rating" class="mb-4" />
+
     <p class="text-lg leading-relaxed text-stone-700 italic">"{{ text }}"</p>
     <div class="mt-6 flex items-center gap-3">
       <div

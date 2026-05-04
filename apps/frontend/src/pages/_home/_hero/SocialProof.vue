@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Rating from "@/common/ui/Rating.vue";
 import { useReviewStats } from "@/features/reviews/reviews.queries";
 
 const { data: stats, isLoading } = useReviewStats();
@@ -21,18 +22,8 @@ const { data: stats, isLoading } = useReviewStats();
         v-if="isLoading"
         class="h-3.5 w-24 animate-pulse rounded bg-stone-200"
       />
-      <div v-else class="flex items-center gap-1">
-        <i
-          v-for="i in 5"
-          :key="i"
-          class="pi text-xs text-amber-400"
-          :class="
-            i <= Math.round(stats?.averageRating ?? 5)
-              ? 'pi-star-fill'
-              : 'pi-star'
-          "
-        />
-      </div>
+      <Rating v-else :rating="stats?.averageRating" />
+
       <p class="mt-0.5 text-sm text-stone-500">
         <span
           v-if="isLoading"
