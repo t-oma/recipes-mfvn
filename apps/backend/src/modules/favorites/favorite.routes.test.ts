@@ -1,0 +1,136 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createTestApp, authHeader } from "@/__tests__/build-test-app.js";
+import { favoriteRoutes } from "@/modules/favorites/favorite.routes.js";
+
+const { verifyToken } = vi.hoisted(() => ({
+  verifyToken: vi.fn(),
+}));
+
+vi.mock("@/common/utils/jwt.js", () => ({ verifyToken }));
+
+describe("favoriteRoutes", () => {
+  const mockFavoriteService = {
+    isFavorited: vi.fn(),
+    add: vi.fn(),
+    remove: vi.fn(),
+  };
+
+  const userId = "507f1f77bcf86cd799439011";
+  const recipeId = "507f1f77bcf86cd799439033";
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  function buildApp() {
+    const app = createTestApp();
+    app.register(favoriteRoutes, { service: mockFavoriteService, prefix: "/api/recipes" });
+    return app;
+  }
+
+  describe("GET /api/recipes/:id/favorite", () => {
+    it("should return favorited status when authenticated", async () => {
+      const app = buildApp();
+      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      mockFavoriteService.isFavorited.mockResolvedValue(true);
+
+      const response = await app.inject({
+        method: "GET",
+        url: `/api/recipes/${recipeId}/favorite`,
+        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.payload);
+      expect(body.favorited).toBe(true);
+      expect(mockFavoriteService.isFavorited).toHaveBeenCalledWith(recipeId, {
+        initiator: { id: userId, role: "user" },
+      });
+    });
+
+    it("should return 401 when not authenticated", async () => {
+      const app = buildApp();
+      const response = await app.inject({
+        method: "GET",
+        url: `/api/recipes/${recipeId}/favorite`,
+      });
+
+      expect(response.statusCode).toBe(401);
+    });
+
+    it("should return 400 for invalid recipe id", async () => {
+      const app = buildApp();
+      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/recipes/bad-id/favorite",
+        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+      });
+
+      expect(response.statusCode).toBe(400);
+    });
+  });
+
+  describe("POST /api/recipes/:id/favorite", () => {
+    it("should add favorite when authenticated", async () => {
+      const app = buildApp();
+      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      mockFavoriteService.add.mockResolvedValue({ favorited: true });
+
+      const response = await app.inject({
+        method: "POST",
+        url: `/api/recipes/${recipeId}/favorite`,
+        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.payload);
+      expect(body.favorited).toBe(true);
+      expect(mockFavoriteService.add).toHaveBeenCalledWith(recipeId, {
+        initiator: { id: userId, role: "user" },
+      });
+    });
+
+    it("should return 401 when not authenticated", async () => {
+      const app = buildApp();
+      const response = await app.inject({
+        method: "POST",
+        url: `/api/recipes/${recipeId}/favorite`,
+      });
+
+      expect(response.statusCode).toBe(401);
+    });
+  });
+
+  describe("DELETE /api/recipes/:id/favorite", () => {
+    it("should remove favorite when authenticated", async () => {
+      const app = buildApp();
+      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      mockFavoriteService.remove.mockResolvedValue({ favorited: false });
+
+      const response = await app.inject({
+        method: "DELETE",
+        url: `/api/recipes/${recipeId}/favorite`,
+        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.payload);
+      expect(body.favorited).toBe(false);
+      expect(mockFavoriteService.remove).toHaveBeenCalledWith(recipeId, {
+        initiator: { id: userId, role: "user" },
+      });
+    });
+
+    it("should return 401 when not authenticated", async () => {
+      const app = buildApp();
+      const response = await app.inject({
+        method: "DELETE",
+        url: `/api/recipes/${recipeId}/favorite`,
+      });
+
+      expect(response.statusCode).toBe(401);
+    });
+  });
+});
