@@ -18,6 +18,12 @@ describe("userRoutes", () => {
 
   const userId = "507f1f77bcf86cd799439011";
 
+  const testJwtPayload = {
+    userId,
+    email: "user@test.com",
+    role: "user",
+  } as const;
+
   let app: FastifyInstance;
 
   beforeEach(async () => {
@@ -31,14 +37,10 @@ describe("userRoutes", () => {
 
   describe("GET /api/users/me", () => {
     it("should return current user when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockUserService.getCurrentUser.mockResolvedValue({
-        id: userId,
-        email: "user@test.com",
+        id: testJwtPayload.userId,
+        email: testJwtPayload.email,
         name: "Test User",
         createdAt: "2024-01-01T00:00:00.000Z",
         updatedAt: "2024-01-01T00:00:00.000Z",
@@ -47,13 +49,15 @@ describe("userRoutes", () => {
       const response = await app.inject({
         method: "GET",
         url: "/api/users/me",
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(200);
-      expect(mockUserService.getCurrentUser).toHaveBeenCalledWith(userId);
+      expect(mockUserService.getCurrentUser).toHaveBeenCalledWith(
+        testJwtPayload.userId,
+      );
       const body = JSON.parse(response.payload);
-      expect(body.email).toBe("user@test.com");
+      expect(body.email).toBe(testJwtPayload.email);
     });
 
     it("should return 401 when not authenticated", async () => {
@@ -68,11 +72,7 @@ describe("userRoutes", () => {
 
   describe("GET /api/users/me/favorites", () => {
     it("should return favorites when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockUserService.getFavorites.mockResolvedValue({
         items: [],
         pagination: {
@@ -88,7 +88,7 @@ describe("userRoutes", () => {
       const response = await app.inject({
         method: "GET",
         url: "/api/users/me/favorites",
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(200);
@@ -96,7 +96,7 @@ describe("userRoutes", () => {
         userId,
         expect.objectContaining({
           query: expect.any(Object),
-          initiator: { id: userId, role: "user" },
+          initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
         }),
       );
     });
@@ -113,11 +113,7 @@ describe("userRoutes", () => {
 
   describe("GET /api/users/me/comments", () => {
     it("should return comments when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockUserService.getComments.mockResolvedValue({
         items: [],
         pagination: {
@@ -133,7 +129,7 @@ describe("userRoutes", () => {
       const response = await app.inject({
         method: "GET",
         url: "/api/users/me/comments",
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(200);
@@ -141,7 +137,7 @@ describe("userRoutes", () => {
         userId,
         expect.objectContaining({
           query: expect.any(Object),
-          initiator: { id: userId, role: "user" },
+          initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
         }),
       );
     });

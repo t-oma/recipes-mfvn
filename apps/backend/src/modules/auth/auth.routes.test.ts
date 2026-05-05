@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTestApp } from "@/__tests__/build-test-app.js";
+import { ConflictError, UnauthorizedError } from "@/common/errors.js";
 import { authRoutes } from "@/modules/auth/auth.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
@@ -87,10 +88,7 @@ describe("authRoutes", () => {
 
     it("should return 409 when email already exists", async () => {
       mockAuthService.register.mockRejectedValue(
-        Object.assign(new Error("Email already in use"), {
-          statusCode: 409,
-          code: "CONFLICT",
-        }),
+        new ConflictError("Email already in use"),
       );
 
       const response = await app.inject({
@@ -150,10 +148,7 @@ describe("authRoutes", () => {
 
     it("should return 401 when credentials are wrong", async () => {
       mockAuthService.login.mockRejectedValue(
-        Object.assign(new Error("Invalid email or password"), {
-          statusCode: 401,
-          code: "UNAUTHORIZED",
-        }),
+        new UnauthorizedError("Invalid email or password"),
       );
 
       const response = await app.inject({

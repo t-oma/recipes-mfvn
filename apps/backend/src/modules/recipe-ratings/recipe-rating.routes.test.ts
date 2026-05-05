@@ -18,6 +18,12 @@ describe("recipeRatingRoutes", () => {
   const userId = "507f1f77bcf86cd799439011";
   const recipeId = "507f1f77bcf86cd799439033";
 
+  const testJwtPayload = {
+    userId,
+    email: "user@test.com",
+    role: "user",
+  } as const;
+
   let app: FastifyInstance;
 
   beforeEach(async () => {
@@ -31,18 +37,14 @@ describe("recipeRatingRoutes", () => {
 
   describe("PUT /api/recipes/:id/rating", () => {
     it("should rate recipe when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockRecipeRatingService.rate.mockResolvedValue({ value: 5 });
 
       const response = await app.inject({
         method: "PUT",
         url: `/api/recipes/${recipeId}/rating`,
         payload: { value: 5 },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(200);
@@ -50,7 +52,7 @@ describe("recipeRatingRoutes", () => {
       expect(body.value).toBe(5);
       expect(mockRecipeRatingService.rate).toHaveBeenCalledWith(recipeId, {
         data: { value: 5 },
-        initiator: { id: userId, role: "user" },
+        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
       });
     });
 
@@ -65,17 +67,13 @@ describe("recipeRatingRoutes", () => {
     });
 
     it("should return 400 for invalid rating value", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "PUT",
         url: `/api/recipes/${recipeId}/rating`,
         payload: { value: 10 },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(400);
@@ -84,17 +82,13 @@ describe("recipeRatingRoutes", () => {
     });
 
     it("should return 400 for invalid recipe id", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "PUT",
         url: "/api/recipes/bad-id/rating",
         payload: { value: 5 },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(400);
@@ -103,22 +97,18 @@ describe("recipeRatingRoutes", () => {
 
   describe("DELETE /api/recipes/:id/rating", () => {
     it("should remove rating when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockRecipeRatingService.remove.mockResolvedValue(undefined);
 
       const response = await app.inject({
         method: "DELETE",
         url: `/api/recipes/${recipeId}/rating`,
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(204);
       expect(mockRecipeRatingService.remove).toHaveBeenCalledWith(recipeId, {
-        initiator: { id: userId, role: "user" },
+        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
       });
     });
 

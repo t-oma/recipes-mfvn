@@ -1,6 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
+import { noInitiator } from "@/__tests__/helpers.js";
+import { NotFoundError } from "@/common/errors.js";
 import { recipeRoutes } from "@/modules/recipes/recipe.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
@@ -65,6 +67,12 @@ describe("recipeRoutes", () => {
     },
   };
 
+  const testJwtPayload = {
+    userId,
+    email: "user@test.com",
+    role: "user",
+  } as const;
+
   let app: FastifyInstance;
 
   beforeEach(async () => {
@@ -81,38 +89,39 @@ describe("recipeRoutes", () => {
     it("should return paginated recipes for unauthenticated user", async () => {
       mockRecipeService.findAll.mockResolvedValue(paginatedResult);
 
+      const page = 1;
+      const limit = 10;
       const response = await app.inject({
         method: "GET",
-        url: "/api/recipes?page=1&limit=10",
+        url: `/api/recipes?page=${page}&limit=${limit}`,
       });
 
       expect(response.statusCode).toBe(200);
       expect(mockRecipeService.findAll).toHaveBeenCalledWith({
-        query: expect.objectContaining({ page: 1, limit: 10 }),
-        initiator: { id: undefined, role: undefined },
+        query: expect.objectContaining({ page, limit }),
+        initiator: noInitiator(),
       });
       const body = JSON.parse(response.payload);
-      expect(body.items).toHaveLength(1);
+      expect(body.items).toHaveLength(paginatedResult.items.length);
     });
 
     it("should return paginated recipes for authenticated user", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockRecipeService.findAll.mockResolvedValue(paginatedResult);
 
       const response = await app.inject({
         method: "GET",
         url: "/api/recipes",
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(200);
       expect(mockRecipeService.findAll).toHaveBeenCalledWith({
         query: expect.any(Object),
-        initiator: { id: userId, role: "user" },
+        initiator: {
+          id: testJwtPayload.userId,
+          role: testJwtPayload.role,
+        },
       });
     });
 
@@ -139,7 +148,7 @@ describe("recipeRoutes", () => {
 
       expect(response.statusCode).toBe(200);
       expect(mockRecipeService.findById).toHaveBeenCalledWith(recipeId, {
-        initiator: { id: undefined, role: undefined },
+        initiator: noInitiator(),
       });
       const body = JSON.parse(response.payload);
       expect(body.title).toBe("Test Recipe");
@@ -158,10 +167,7 @@ describe("recipeRoutes", () => {
 
     it("should return 404 when recipe not found", async () => {
       mockRecipeService.findById.mockRejectedValue(
-        Object.assign(new Error("Recipe not found"), {
-          statusCode: 404,
-          code: "NOT_FOUND",
-        }),
+        new NotFoundError("Recipe not found"),
       );
 
       const response = await app.inject({
@@ -175,11 +181,7 @@ describe("recipeRoutes", () => {
 
   describe("POST /api/recipes", () => {
     it("should create recipe when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockRecipeService.create.mockResolvedValue(validRecipe);
 
       const payload = {
@@ -198,13 +200,16 @@ describe("recipeRoutes", () => {
         method: "POST",
         url: "/api/recipes",
         payload,
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(201);
       expect(mockRecipeService.create).toHaveBeenCalledWith({
         data: payload,
-        initiator: { id: userId, role: "user" },
+        initiator: {
+          id: testJwtPayload.userId,
+          role: testJwtPayload.role,
+        },
       });
     });
 
@@ -219,17 +224,13 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 400 for invalid body", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "POST",
         url: "/api/recipes",
         payload: { title: "AB" },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(400);
@@ -240,11 +241,7 @@ describe("recipeRoutes", () => {
 
   describe("PATCH /api/recipes/:id", () => {
     it("should update recipe when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockRecipeService.update.mockResolvedValue({
         ...validRecipe,
         title: "Updated",
@@ -254,13 +251,16 @@ describe("recipeRoutes", () => {
         method: "PATCH",
         url: `/api/recipes/${recipeId}`,
         payload: { title: "Updated" },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(200);
       expect(mockRecipeService.update).toHaveBeenCalledWith(recipeId, {
         data: { title: "Updated", isPublic: true },
-        initiator: { id: userId, role: "user" },
+        initiator: {
+          id: testJwtPayload.userId,
+          role: testJwtPayload.role,
+        },
       });
     });
 
@@ -275,17 +275,13 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 400 for invalid id", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "PATCH",
         url: "/api/recipes/bad-id",
         payload: {},
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(400);
@@ -294,22 +290,21 @@ describe("recipeRoutes", () => {
 
   describe("DELETE /api/recipes/:id", () => {
     it("should delete recipe when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockRecipeService.delete.mockResolvedValue(undefined);
 
       const response = await app.inject({
         method: "DELETE",
         url: `/api/recipes/${recipeId}`,
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(204);
       expect(mockRecipeService.delete).toHaveBeenCalledWith(recipeId, {
-        initiator: { id: userId, role: "user" },
+        initiator: {
+          id: testJwtPayload.userId,
+          role: testJwtPayload.role,
+        },
       });
     });
 
@@ -345,7 +340,7 @@ describe("recipeRoutes", () => {
       expect(response.statusCode).toBe(200);
       expect(mockCommentService.findByRecipe).toHaveBeenCalledWith(recipeId, {
         query: expect.any(Object),
-        initiator: { id: undefined, role: undefined },
+        initiator: noInitiator(),
       });
     });
 
@@ -361,16 +356,16 @@ describe("recipeRoutes", () => {
 
   describe("POST /api/recipes/:id/comments", () => {
     it("should create comment when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockCommentService.create.mockResolvedValue({
         id: commentId,
         text: "Great!",
         recipe: { id: recipeId, title: "Test" },
-        author: { id: userId, email: "user@test.com", name: "User" },
+        author: {
+          id: testJwtPayload.userId,
+          email: testJwtPayload.email,
+          name: "User",
+        },
         createdAt: "2024-01-01T00:00:00.000Z",
         updatedAt: "2024-01-01T00:00:00.000Z",
       });
@@ -379,13 +374,16 @@ describe("recipeRoutes", () => {
         method: "POST",
         url: `/api/recipes/${recipeId}/comments`,
         payload: { text: "Great!" },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(201);
       expect(mockCommentService.create).toHaveBeenCalledWith(recipeId, {
         data: { text: "Great!" },
-        initiator: { id: userId, role: "user" },
+        initiator: {
+          id: testJwtPayload.userId,
+          role: testJwtPayload.role,
+        },
       });
     });
 
@@ -402,22 +400,21 @@ describe("recipeRoutes", () => {
 
   describe("DELETE /api/recipes/comments/:id", () => {
     it("should delete comment when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockCommentService.delete.mockResolvedValue(undefined);
 
       const response = await app.inject({
         method: "DELETE",
         url: `/api/recipes/comments/${commentId}`,
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(204);
       expect(mockCommentService.delete).toHaveBeenCalledWith(commentId, {
-        initiator: { id: userId, role: "user" },
+        initiator: {
+          id: testJwtPayload.userId,
+          role: testJwtPayload.role,
+        },
       });
     });
 

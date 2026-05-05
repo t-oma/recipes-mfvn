@@ -34,6 +34,12 @@ describe("reviewRoutes", () => {
     updatedAt: "2024-01-01T00:00:00.000Z",
   };
 
+  const testJwtPayload = {
+    userId,
+    email: "user@test.com",
+    role: "user",
+  } as const;
+
   let app: FastifyInstance;
 
   beforeEach(async () => {
@@ -83,24 +89,20 @@ describe("reviewRoutes", () => {
 
   describe("POST /api/reviews", () => {
     it("should create review when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockReviewService.create.mockResolvedValue(validReview);
 
       const response = await app.inject({
         method: "POST",
         url: "/api/reviews",
         payload: { text: "Great platform!", rating: 5 },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(201);
       expect(mockReviewService.create).toHaveBeenCalledWith({
         data: { text: "Great platform!", rating: 5 },
-        initiator: { id: userId, role: "user" },
+        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
       });
     });
 
@@ -115,17 +117,13 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 400 for invalid body", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "POST",
         url: "/api/reviews",
         payload: { text: "Hi", rating: 10 },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(400);
@@ -178,16 +176,12 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 403 when not admin", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "GET",
         url: "/api/reviews",
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(403);
@@ -196,11 +190,7 @@ describe("reviewRoutes", () => {
 
   describe("PATCH /api/reviews/:id", () => {
     it("should update review when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockReviewService.update.mockResolvedValue({
         ...validReview,
         text: "Updated",
@@ -210,13 +200,13 @@ describe("reviewRoutes", () => {
         method: "PATCH",
         url: `/api/reviews/${reviewId}`,
         payload: { text: "Updated" },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(200);
       expect(mockReviewService.update).toHaveBeenCalledWith(reviewId, {
         data: { text: "Updated" },
-        initiator: { id: userId, role: "user" },
+        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
       });
     });
 
@@ -231,17 +221,13 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 400 for invalid id", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "PATCH",
         url: "/api/reviews/bad-id",
         payload: { text: "Updated" },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(400);
@@ -290,17 +276,13 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 403 when not admin", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "PATCH",
         url: `/api/reviews/${reviewId}/feature`,
         payload: { isFeatured: true },
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(403);
@@ -309,22 +291,18 @@ describe("reviewRoutes", () => {
 
   describe("DELETE /api/reviews/:id", () => {
     it("should delete review when authenticated", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
       mockReviewService.delete.mockResolvedValue(undefined);
 
       const response = await app.inject({
         method: "DELETE",
         url: `/api/reviews/${reviewId}`,
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(204);
       expect(mockReviewService.delete).toHaveBeenCalledWith(reviewId, {
-        initiator: { id: userId, role: "user" },
+        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
       });
     });
 
@@ -338,16 +316,12 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 400 for invalid id", async () => {
-      verifyToken.mockReturnValue({
-        userId,
-        email: "user@test.com",
-        role: "user",
-      });
+      verifyToken.mockReturnValue(testJwtPayload);
 
       const response = await app.inject({
         method: "DELETE",
         url: "/api/reviews/bad-id",
-        headers: authHeader({ userId, email: "user@test.com", role: "user" }),
+        headers: authHeader(testJwtPayload),
       });
 
       expect(response.statusCode).toBe(400);
