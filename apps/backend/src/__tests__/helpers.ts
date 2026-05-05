@@ -3,10 +3,6 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { Types } from "mongoose";
 import type { Mock } from "vitest";
 import { vi } from "vitest";
-import type { CacheService } from "@/common/cache/cache.service.js";
-import { createMemoryCache } from "@/common/cache/memory-cache.service.js";
-import type { TypedEmitter } from "@/common/events.js";
-import { createEventBus } from "@/common/events.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type {
@@ -168,54 +164,11 @@ export function createReviewDoc(
 
 // ── Mongoose model mock factories ──
 
-export function createMockRepository(overrides: Record<string, Mock> = {}) {
-  return {
-    findById: viFn(),
-    findDocumentById: viFn(),
-    findOne: viFn(),
-    exists: viFn(),
-    create: viFn(),
-    update: viFn(),
-    delete: viFn(),
-    save: viFn(),
-    deleteDocument: viFn(),
-    aggregate: viFn(),
-    ...overrides,
-  };
-}
-
 const chainable = {
   select: viFn().mockReturnThis(),
   sort: viFn().mockReturnThis(),
   lean: viFn().mockResolvedValue(null),
 };
-
-export function createMockCategoryModel(overrides: Record<string, Mock> = {}) {
-  return {
-    find: viFn().mockReturnValue(chainable),
-    aggregate: viFn(),
-    create: viFn(),
-    findByIdAndDelete: viFn(),
-    countDocuments: viFn().mockResolvedValue(0),
-    exists: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockCategoryRepository(
-  overrides: Record<string, Mock> = {},
-) {
-  return {
-    findMany: viFn(),
-    findById: viFn(),
-    findOne: viFn(),
-    exists: viFn(),
-    create: viFn(),
-    delete: viFn(),
-    aggregate: viFn(),
-    ...overrides,
-  };
-}
 
 export function createMockUserModel(overrides: Record<string, Mock> = {}) {
   return {
@@ -225,167 +178,6 @@ export function createMockUserModel(overrides: Record<string, Mock> = {}) {
     create: viFn(),
     ...overrides,
   };
-}
-
-export function createMockUserRepository(overrides: Record<string, Mock> = {}) {
-  return {
-    ...createMockRepository(overrides),
-    ...overrides,
-  };
-}
-
-export function createMockRecipeModel(overrides: Record<string, Mock> = {}) {
-  return {
-    findById: viFn(),
-    aggregate: viFn(),
-    create: viFn(),
-    countDocuments: viFn().mockResolvedValue(0),
-    exists: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockRecipeRepository(
-  overrides: Record<string, Mock> = {},
-) {
-  return {
-    aggregateSearch: viFn(),
-    aggregateById: viFn(),
-    findDocumentById: viFn(),
-    create: viFn(),
-    save: viFn(),
-    deleteDocument: viFn(),
-    findById: viFn(),
-    findOne: viFn(),
-    find: viFn(),
-    update: viFn(),
-    delete: viFn(),
-    exists: viFn(),
-    count: viFn(),
-    aggregate: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockCommentModel(overrides: Record<string, Mock> = {}) {
-  return {
-    aggregate: viFn(),
-    findById: viFn(),
-    create: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockCommentRepository(
-  overrides: Record<string, Mock> = {},
-) {
-  return {
-    findByRecipe: viFn(),
-    findByAuthor: viFn(),
-    findById: viFn(),
-    findOne: viFn(),
-    create: viFn(),
-    delete: viFn(),
-    aggregate: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockFavoriteModel(overrides: Record<string, Mock> = {}) {
-  return {
-    aggregate: viFn(),
-    create: viFn(),
-    findOneAndDelete: viFn(),
-    exists: viFn(),
-    findOne: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockFavoriteRepository(
-  overrides: Record<string, Mock> = {},
-) {
-  return {
-    create: viFn(),
-    delete: viFn(),
-    exists: viFn(),
-    findByUser: viFn(),
-    findOne: viFn(),
-    aggregate: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockRatingModel(overrides: Record<string, Mock> = {}) {
-  return {
-    findOneAndUpdate: viFn(),
-    findOneAndDelete: viFn(),
-    exists: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockRecipeRatingRepository(
-  overrides: Record<string, Mock> = {},
-) {
-  return {
-    ...createMockRepository(overrides),
-    upsert: viFn(),
-    ...overrides,
-  };
-}
-
-export function createMockReviewRepository(
-  overrides: Record<string, Mock> = {},
-) {
-  return {
-    ...createMockRepository(overrides),
-    findFeatured: viFn(),
-    findAll: viFn(),
-    aggregateStats: viFn(),
-    ...overrides,
-  };
-}
-
-// ── Cache mock ──
-
-export interface MockCache extends CacheService {
-  spies: {
-    get: Mock;
-    set: Mock;
-    delete: Mock;
-    deletePattern: Mock;
-    flush: Mock;
-  };
-}
-
-export function createMockCache(): MockCache {
-  const memoryCache = createMemoryCache();
-
-  const spies = {
-    get: vi.spyOn(memoryCache, "get"),
-    set: vi.spyOn(memoryCache, "set"),
-    delete: vi.spyOn(memoryCache, "delete"),
-    deletePattern: vi.spyOn(memoryCache, "deletePattern"),
-    flush: vi.spyOn(memoryCache, "flush"),
-  };
-
-  return {
-    ...memoryCache,
-    spies,
-  };
-}
-
-// ── Event bus mock ──
-
-export interface MockBus extends TypedEmitter {
-  emit: Mock;
-}
-
-export function createMockBus(): MockBus {
-  const bus = createEventBus();
-  const emit = vi.spyOn(bus, "emit");
-  return Object.assign(bus, { emit });
 }
 
 // ── Service param builders ──
