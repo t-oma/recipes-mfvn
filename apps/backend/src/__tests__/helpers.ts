@@ -7,7 +7,6 @@ import type { CacheService } from "@/common/cache/cache.service.js";
 import { createMemoryCache } from "@/common/cache/memory-cache.service.js";
 import type { TypedEmitter } from "@/common/events.js";
 import { createEventBus } from "@/common/events.js";
-import type { Logger } from "@/common/logger.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type {
@@ -20,35 +19,6 @@ import type { UserDocument } from "@/modules/users/user.model.js";
 type LocalProcedure = (...args: unknown[]) => unknown;
 function viFn<T extends LocalProcedure>(fn?: T): Mock<T> {
   return vi.fn(fn);
-}
-
-// ── Logger mocks ──
-
-export interface MockLogger extends Logger {
-  spies: {
-    fatal: Mock;
-    error: Mock;
-    warn: Mock;
-    info: Mock;
-    debug: Mock;
-    trace: Mock;
-  };
-}
-
-export function createMockLogger(): MockLogger {
-  const spies = {
-    fatal: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-    trace: vi.fn(),
-  };
-
-  return {
-    ...spies,
-    spies,
-  } as unknown as MockLogger;
 }
 
 // ── Fastify mocks ──
@@ -260,16 +230,6 @@ export function createMockUserModel(overrides: Record<string, Mock> = {}) {
 export function createMockUserRepository(overrides: Record<string, Mock> = {}) {
   return {
     ...createMockRepository(overrides),
-    ...overrides,
-  };
-}
-
-export function createMockPasswordService(
-  overrides: Record<string, Mock> = {},
-) {
-  return {
-    hash: viFn().mockResolvedValue("hashed-password"),
-    verify: viFn().mockResolvedValue(true),
     ...overrides,
   };
 }
