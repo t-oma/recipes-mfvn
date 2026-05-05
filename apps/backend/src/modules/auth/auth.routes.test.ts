@@ -1,3 +1,4 @@
+import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTestApp } from "@/__tests__/build-test-app.js";
 import { authRoutes } from "@/modules/auth/auth.routes.js";
@@ -14,19 +15,19 @@ describe("authRoutes", () => {
     login: vi.fn(),
   };
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  let app: FastifyInstance;
 
-  function buildApp() {
-    const app = createTestApp();
-    app.register(authRoutes, { service: mockAuthService, prefix: "/api/auth" });
-    return app;
-  }
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    app = createTestApp();
+    await app.register(authRoutes, {
+      service: mockAuthService,
+      prefix: "/api/auth",
+    });
+  });
 
   describe("POST /api/auth/register", () => {
     it("should register a new user and return 201", async () => {
-      const app = buildApp();
       const payload = {
         email: "new@test.com",
         password: "Password123!",
@@ -57,7 +58,6 @@ describe("authRoutes", () => {
     });
 
     it("should return 400 for invalid email", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "POST",
         url: "/api/auth/register",
@@ -70,7 +70,6 @@ describe("authRoutes", () => {
     });
 
     it("should return 400 for short password", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "POST",
         url: "/api/auth/register",
@@ -87,7 +86,6 @@ describe("authRoutes", () => {
     });
 
     it("should return 409 when email already exists", async () => {
-      const app = buildApp();
       mockAuthService.register.mockRejectedValue(
         Object.assign(new Error("Email already in use"), {
           statusCode: 409,
@@ -111,7 +109,6 @@ describe("authRoutes", () => {
 
   describe("POST /api/auth/login", () => {
     it("should login and return 200 with token", async () => {
-      const app = buildApp();
       mockAuthService.login.mockResolvedValue({
         user: {
           id: "507f1f77bcf86cd799439011",
@@ -140,7 +137,6 @@ describe("authRoutes", () => {
     });
 
     it("should return 400 for invalid email format", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "POST",
         url: "/api/auth/login",
@@ -153,7 +149,6 @@ describe("authRoutes", () => {
     });
 
     it("should return 401 when credentials are wrong", async () => {
-      const app = buildApp();
       mockAuthService.login.mockRejectedValue(
         Object.assign(new Error("Invalid email or password"), {
           statusCode: 401,

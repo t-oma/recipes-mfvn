@@ -1,5 +1,6 @@
+import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createTestApp, authHeader } from "@/__tests__/build-test-app.js";
+import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
 import { reviewRoutes } from "@/modules/reviews/review.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
@@ -33,19 +34,19 @@ describe("reviewRoutes", () => {
     updatedAt: "2024-01-01T00:00:00.000Z",
   };
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  let app: FastifyInstance;
 
-  function buildApp() {
-    const app = createTestApp();
-    app.register(reviewRoutes, { service: mockReviewService, prefix: "/api/reviews" });
-    return app;
-  }
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    app = createTestApp();
+    await app.register(reviewRoutes, {
+      service: mockReviewService,
+      prefix: "/api/reviews",
+    });
+  });
 
   describe("GET /api/reviews/testimonials", () => {
     it("should return featured testimonials", async () => {
-      const app = buildApp();
       mockReviewService.findFeatured.mockResolvedValue([validReview]);
 
       const response = await app.inject({
@@ -62,7 +63,6 @@ describe("reviewRoutes", () => {
 
   describe("GET /api/reviews/stats", () => {
     it("should return review statistics", async () => {
-      const app = buildApp();
       mockReviewService.getStats.mockResolvedValue({
         totalReviews: 42,
         averageRating: 4.5,
@@ -83,8 +83,11 @@ describe("reviewRoutes", () => {
 
   describe("POST /api/reviews", () => {
     it("should create review when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockReviewService.create.mockResolvedValue(validReview);
 
       const response = await app.inject({
@@ -102,7 +105,6 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "POST",
         url: "/api/reviews",
@@ -113,8 +115,11 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 400 for invalid body", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "POST",
@@ -131,17 +136,31 @@ describe("reviewRoutes", () => {
 
   describe("GET /api/reviews", () => {
     it("should return paginated reviews when admin", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId: adminId, email: "admin@test.com", role: "admin" });
+      verifyToken.mockReturnValue({
+        userId: adminId,
+        email: "admin@test.com",
+        role: "admin",
+      });
       mockReviewService.findAll.mockResolvedValue({
         items: [validReview],
-        pagination: { page: 1, limit: 10, total: 1, totalPages: 1, hasNext: false, hasPrev: false },
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 1,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const response = await app.inject({
         method: "GET",
         url: "/api/reviews",
-        headers: authHeader({ userId: adminId, email: "admin@test.com", role: "admin" }),
+        headers: authHeader({
+          userId: adminId,
+          email: "admin@test.com",
+          role: "admin",
+        }),
       });
 
       expect(response.statusCode).toBe(200);
@@ -150,7 +169,6 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: "/api/reviews",
@@ -160,8 +178,11 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 403 when not admin", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "GET",
@@ -175,9 +196,15 @@ describe("reviewRoutes", () => {
 
   describe("PATCH /api/reviews/:id", () => {
     it("should update review when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
-      mockReviewService.update.mockResolvedValue({ ...validReview, text: "Updated" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
+      mockReviewService.update.mockResolvedValue({
+        ...validReview,
+        text: "Updated",
+      });
 
       const response = await app.inject({
         method: "PATCH",
@@ -194,7 +221,6 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "PATCH",
         url: `/api/reviews/${reviewId}`,
@@ -205,8 +231,11 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 400 for invalid id", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "PATCH",
@@ -221,15 +250,25 @@ describe("reviewRoutes", () => {
 
   describe("PATCH /api/reviews/:id/feature", () => {
     it("should feature review when admin", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId: adminId, email: "admin@test.com", role: "admin" });
-      mockReviewService.feature.mockResolvedValue({ ...validReview, isFeatured: true });
+      verifyToken.mockReturnValue({
+        userId: adminId,
+        email: "admin@test.com",
+        role: "admin",
+      });
+      mockReviewService.feature.mockResolvedValue({
+        ...validReview,
+        isFeatured: true,
+      });
 
       const response = await app.inject({
         method: "PATCH",
         url: `/api/reviews/${reviewId}/feature`,
         payload: { isFeatured: true },
-        headers: authHeader({ userId: adminId, email: "admin@test.com", role: "admin" }),
+        headers: authHeader({
+          userId: adminId,
+          email: "admin@test.com",
+          role: "admin",
+        }),
       });
 
       expect(response.statusCode).toBe(200);
@@ -241,7 +280,6 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "PATCH",
         url: `/api/reviews/${reviewId}/feature`,
@@ -252,8 +290,11 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 403 when not admin", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "PATCH",
@@ -268,8 +309,11 @@ describe("reviewRoutes", () => {
 
   describe("DELETE /api/reviews/:id", () => {
     it("should delete review when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockReviewService.delete.mockResolvedValue(undefined);
 
       const response = await app.inject({
@@ -285,7 +329,6 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "DELETE",
         url: `/api/reviews/${reviewId}`,
@@ -295,8 +338,11 @@ describe("reviewRoutes", () => {
     });
 
     it("should return 400 for invalid id", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "DELETE",

@@ -1,3 +1,4 @@
+import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
 import { recipeRoutes } from "@/modules/recipes/recipe.routes.js";
@@ -25,7 +26,6 @@ describe("recipeRoutes", () => {
   };
 
   const userId = "507f1f77bcf86cd799439011";
-  const adminId = "507f1f77bcf86cd799439022";
   const recipeId = "507f1f77bcf86cd799439033";
   const commentId = "507f1f77bcf86cd799439044";
 
@@ -65,23 +65,20 @@ describe("recipeRoutes", () => {
     },
   };
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  let app: FastifyInstance;
 
-  function buildApp() {
-    const app = createTestApp();
-    app.register(recipeRoutes, {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    app = createTestApp();
+    await app.register(recipeRoutes, {
       service: mockRecipeService,
       commentService: mockCommentService,
       prefix: "/api/recipes",
     });
-    return app;
-  }
+  });
 
   describe("GET /api/recipes", () => {
     it("should return paginated recipes for unauthenticated user", async () => {
-      const app = buildApp();
       mockRecipeService.findAll.mockResolvedValue(paginatedResult);
 
       const response = await app.inject({
@@ -99,7 +96,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return paginated recipes for authenticated user", async () => {
-      const app = buildApp();
       verifyToken.mockReturnValue({
         userId,
         email: "user@test.com",
@@ -121,7 +117,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 400 for invalid query params", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: "/api/recipes?page=abc",
@@ -135,21 +130,12 @@ describe("recipeRoutes", () => {
 
   describe("GET /api/recipes/:id", () => {
     it("should return recipe by id", async () => {
-      const app = buildApp();
       mockRecipeService.findById.mockResolvedValue(validRecipe);
 
       const response = await app.inject({
         method: "GET",
         url: `/api/recipes/${recipeId}`,
       });
-
-      if (response.statusCode !== 200) {
-        console.log(
-          "GET /api/recipes/:id response:",
-          response.statusCode,
-          JSON.parse(response.payload),
-        );
-      }
 
       expect(response.statusCode).toBe(200);
       expect(mockRecipeService.findById).toHaveBeenCalledWith(recipeId, {
@@ -160,7 +146,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 400 for invalid id", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: "/api/recipes/invalid-id",
@@ -172,7 +157,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 404 when recipe not found", async () => {
-      const app = buildApp();
       mockRecipeService.findById.mockRejectedValue(
         Object.assign(new Error("Recipe not found"), {
           statusCode: 404,
@@ -191,7 +175,6 @@ describe("recipeRoutes", () => {
 
   describe("POST /api/recipes", () => {
     it("should create recipe when authenticated", async () => {
-      const app = buildApp();
       verifyToken.mockReturnValue({
         userId,
         email: "user@test.com",
@@ -218,14 +201,6 @@ describe("recipeRoutes", () => {
         headers: authHeader({ userId, email: "user@test.com", role: "user" }),
       });
 
-      if (response.statusCode !== 201) {
-        console.log(
-          "POST /api/recipes response:",
-          response.statusCode,
-          JSON.parse(response.payload),
-        );
-      }
-
       expect(response.statusCode).toBe(201);
       expect(mockRecipeService.create).toHaveBeenCalledWith({
         data: payload,
@@ -234,7 +209,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "POST",
         url: "/api/recipes",
@@ -245,7 +219,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 400 for invalid body", async () => {
-      const app = buildApp();
       verifyToken.mockReturnValue({
         userId,
         email: "user@test.com",
@@ -267,7 +240,6 @@ describe("recipeRoutes", () => {
 
   describe("PATCH /api/recipes/:id", () => {
     it("should update recipe when authenticated", async () => {
-      const app = buildApp();
       verifyToken.mockReturnValue({
         userId,
         email: "user@test.com",
@@ -293,7 +265,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "PATCH",
         url: `/api/recipes/${recipeId}`,
@@ -304,7 +275,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 400 for invalid id", async () => {
-      const app = buildApp();
       verifyToken.mockReturnValue({
         userId,
         email: "user@test.com",
@@ -324,7 +294,6 @@ describe("recipeRoutes", () => {
 
   describe("DELETE /api/recipes/:id", () => {
     it("should delete recipe when authenticated", async () => {
-      const app = buildApp();
       verifyToken.mockReturnValue({
         userId,
         email: "user@test.com",
@@ -345,7 +314,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "DELETE",
         url: `/api/recipes/${recipeId}`,
@@ -357,7 +325,6 @@ describe("recipeRoutes", () => {
 
   describe("GET /api/recipes/:id/comments", () => {
     it("should return comments for recipe", async () => {
-      const app = buildApp();
       mockCommentService.findByRecipe.mockResolvedValue({
         items: [],
         pagination: {
@@ -383,7 +350,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 400 for invalid recipe id", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: "/api/recipes/bad-id/comments",
@@ -395,7 +361,6 @@ describe("recipeRoutes", () => {
 
   describe("POST /api/recipes/:id/comments", () => {
     it("should create comment when authenticated", async () => {
-      const app = buildApp();
       verifyToken.mockReturnValue({
         userId,
         email: "user@test.com",
@@ -425,7 +390,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "POST",
         url: `/api/recipes/${recipeId}/comments`,
@@ -438,7 +402,6 @@ describe("recipeRoutes", () => {
 
   describe("DELETE /api/recipes/comments/:id", () => {
     it("should delete comment when authenticated", async () => {
-      const app = buildApp();
       verifyToken.mockReturnValue({
         userId,
         email: "user@test.com",
@@ -459,7 +422,6 @@ describe("recipeRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "DELETE",
         url: `/api/recipes/comments/${commentId}`,

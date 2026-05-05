@@ -1,5 +1,6 @@
+import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createTestApp, authHeader } from "@/__tests__/build-test-app.js";
+import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
 import { categoryRoutes } from "@/modules/categories/category.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
@@ -28,22 +29,29 @@ describe("categoryRoutes", () => {
     updatedAt: "2024-01-01T00:00:00.000Z",
   };
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  let app: FastifyInstance;
 
-  function buildApp() {
-    const app = createTestApp();
-    app.register(categoryRoutes, { service: mockCategoryService, prefix: "/api/categories" });
-    return app;
-  }
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    app = createTestApp();
+    await app.register(categoryRoutes, {
+      service: mockCategoryService,
+      prefix: "/api/categories",
+    });
+  });
 
   describe("GET /api/categories", () => {
     it("should return paginated categories", async () => {
-      const app = buildApp();
       mockCategoryService.findAll.mockResolvedValue({
         items: [{ ...validCategory, recipeCount: 5 }],
-        pagination: { page: 1, limit: 10, total: 1, totalPages: 1, hasNext: false, hasPrev: false },
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 1,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const response = await app.inject({
@@ -58,7 +66,6 @@ describe("categoryRoutes", () => {
     });
 
     it("should return 400 for invalid query", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: "/api/categories?page=abc",
@@ -70,15 +77,22 @@ describe("categoryRoutes", () => {
 
   describe("POST /api/categories", () => {
     it("should create category when admin", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId: adminId, email: "admin@test.com", role: "admin" });
+      verifyToken.mockReturnValue({
+        userId: adminId,
+        email: "admin@test.com",
+        role: "admin",
+      });
       mockCategoryService.create.mockResolvedValue(validCategory);
 
       const response = await app.inject({
         method: "POST",
         url: "/api/categories",
         payload: { name: "Desserts" },
-        headers: authHeader({ userId: adminId, email: "admin@test.com", role: "admin" }),
+        headers: authHeader({
+          userId: adminId,
+          email: "admin@test.com",
+          role: "admin",
+        }),
       });
 
       expect(response.statusCode).toBe(201);
@@ -89,7 +103,6 @@ describe("categoryRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "POST",
         url: "/api/categories",
@@ -100,8 +113,11 @@ describe("categoryRoutes", () => {
     });
 
     it("should return 403 when not admin", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "POST",
@@ -114,14 +130,21 @@ describe("categoryRoutes", () => {
     });
 
     it("should return 400 for invalid body", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId: adminId, email: "admin@test.com", role: "admin" });
+      verifyToken.mockReturnValue({
+        userId: adminId,
+        email: "admin@test.com",
+        role: "admin",
+      });
 
       const response = await app.inject({
         method: "POST",
         url: "/api/categories",
         payload: { name: "" },
-        headers: authHeader({ userId: adminId, email: "admin@test.com", role: "admin" }),
+        headers: authHeader({
+          userId: adminId,
+          email: "admin@test.com",
+          role: "admin",
+        }),
       });
 
       expect(response.statusCode).toBe(400);
@@ -132,14 +155,21 @@ describe("categoryRoutes", () => {
 
   describe("DELETE /api/categories/:id", () => {
     it("should delete category when admin", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId: adminId, email: "admin@test.com", role: "admin" });
+      verifyToken.mockReturnValue({
+        userId: adminId,
+        email: "admin@test.com",
+        role: "admin",
+      });
       mockCategoryService.deleteById.mockResolvedValue(undefined);
 
       const response = await app.inject({
         method: "DELETE",
         url: `/api/categories/${categoryId}`,
-        headers: authHeader({ userId: adminId, email: "admin@test.com", role: "admin" }),
+        headers: authHeader({
+          userId: adminId,
+          email: "admin@test.com",
+          role: "admin",
+        }),
       });
 
       expect(response.statusCode).toBe(204);
@@ -149,7 +179,6 @@ describe("categoryRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "DELETE",
         url: `/api/categories/${categoryId}`,
@@ -159,8 +188,11 @@ describe("categoryRoutes", () => {
     });
 
     it("should return 403 when not admin", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "DELETE",
@@ -172,13 +204,20 @@ describe("categoryRoutes", () => {
     });
 
     it("should return 400 for invalid id", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId: adminId, email: "admin@test.com", role: "admin" });
+      verifyToken.mockReturnValue({
+        userId: adminId,
+        email: "admin@test.com",
+        role: "admin",
+      });
 
       const response = await app.inject({
         method: "DELETE",
         url: "/api/categories/bad-id",
-        headers: authHeader({ userId: adminId, email: "admin@test.com", role: "admin" }),
+        headers: authHeader({
+          userId: adminId,
+          email: "admin@test.com",
+          role: "admin",
+        }),
       });
 
       expect(response.statusCode).toBe(400);

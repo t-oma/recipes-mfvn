@@ -1,5 +1,6 @@
+import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createTestApp, authHeader } from "@/__tests__/build-test-app.js";
+import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
 import { userRoutes } from "@/modules/users/user.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
@@ -17,20 +18,24 @@ describe("userRoutes", () => {
 
   const userId = "507f1f77bcf86cd799439011";
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  let app: FastifyInstance;
 
-  function buildApp() {
-    const app = createTestApp();
-    app.register(userRoutes, { service: mockUserService, prefix: "/api/users" });
-    return app;
-  }
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    app = createTestApp();
+    await app.register(userRoutes, {
+      service: mockUserService,
+      prefix: "/api/users",
+    });
+  });
 
   describe("GET /api/users/me", () => {
     it("should return current user when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockUserService.getCurrentUser.mockResolvedValue({
         id: userId,
         email: "user@test.com",
@@ -52,7 +57,6 @@ describe("userRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: "/api/users/me",
@@ -64,11 +68,21 @@ describe("userRoutes", () => {
 
   describe("GET /api/users/me/favorites", () => {
     it("should return favorites when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockUserService.getFavorites.mockResolvedValue({
         items: [],
-        pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNext: false, hasPrev: false },
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const response = await app.inject({
@@ -88,7 +102,6 @@ describe("userRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: "/api/users/me/favorites",
@@ -100,11 +113,21 @@ describe("userRoutes", () => {
 
   describe("GET /api/users/me/comments", () => {
     it("should return comments when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockUserService.getComments.mockResolvedValue({
         items: [],
-        pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNext: false, hasPrev: false },
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const response = await app.inject({
@@ -124,7 +147,6 @@ describe("userRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: "/api/users/me/comments",

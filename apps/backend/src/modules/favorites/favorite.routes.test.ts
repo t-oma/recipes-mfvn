@@ -1,5 +1,6 @@
+import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createTestApp, authHeader } from "@/__tests__/build-test-app.js";
+import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
 import { favoriteRoutes } from "@/modules/favorites/favorite.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
@@ -18,20 +19,24 @@ describe("favoriteRoutes", () => {
   const userId = "507f1f77bcf86cd799439011";
   const recipeId = "507f1f77bcf86cd799439033";
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  let app: FastifyInstance;
 
-  function buildApp() {
-    const app = createTestApp();
-    app.register(favoriteRoutes, { service: mockFavoriteService, prefix: "/api/recipes" });
-    return app;
-  }
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    app = createTestApp();
+    await app.register(favoriteRoutes, {
+      service: mockFavoriteService,
+      prefix: "/api/recipes",
+    });
+  });
 
   describe("GET /api/recipes/:id/favorite", () => {
     it("should return favorited status when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockFavoriteService.isFavorited.mockResolvedValue(true);
 
       const response = await app.inject({
@@ -49,7 +54,6 @@ describe("favoriteRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "GET",
         url: `/api/recipes/${recipeId}/favorite`,
@@ -59,8 +63,11 @@ describe("favoriteRoutes", () => {
     });
 
     it("should return 400 for invalid recipe id", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "GET",
@@ -74,8 +81,11 @@ describe("favoriteRoutes", () => {
 
   describe("POST /api/recipes/:id/favorite", () => {
     it("should add favorite when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockFavoriteService.add.mockResolvedValue({ favorited: true });
 
       const response = await app.inject({
@@ -93,7 +103,6 @@ describe("favoriteRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "POST",
         url: `/api/recipes/${recipeId}/favorite`,
@@ -105,8 +114,11 @@ describe("favoriteRoutes", () => {
 
   describe("DELETE /api/recipes/:id/favorite", () => {
     it("should remove favorite when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockFavoriteService.remove.mockResolvedValue({ favorited: false });
 
       const response = await app.inject({
@@ -124,7 +136,6 @@ describe("favoriteRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "DELETE",
         url: `/api/recipes/${recipeId}/favorite`,

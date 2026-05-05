@@ -1,5 +1,6 @@
+import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createTestApp, authHeader } from "@/__tests__/build-test-app.js";
+import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
 import { recipeRatingRoutes } from "@/modules/recipe-ratings/recipe-rating.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
@@ -17,20 +18,24 @@ describe("recipeRatingRoutes", () => {
   const userId = "507f1f77bcf86cd799439011";
   const recipeId = "507f1f77bcf86cd799439033";
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  let app: FastifyInstance;
 
-  function buildApp() {
-    const app = createTestApp();
-    app.register(recipeRatingRoutes, { service: mockRecipeRatingService, prefix: "/api/recipes" });
-    return app;
-  }
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    app = createTestApp();
+    await app.register(recipeRatingRoutes, {
+      service: mockRecipeRatingService,
+      prefix: "/api/recipes",
+    });
+  });
 
   describe("PUT /api/recipes/:id/rating", () => {
     it("should rate recipe when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockRecipeRatingService.rate.mockResolvedValue({ value: 5 });
 
       const response = await app.inject({
@@ -50,7 +55,6 @@ describe("recipeRatingRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "PUT",
         url: `/api/recipes/${recipeId}/rating`,
@@ -61,8 +65,11 @@ describe("recipeRatingRoutes", () => {
     });
 
     it("should return 400 for invalid rating value", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "PUT",
@@ -77,8 +84,11 @@ describe("recipeRatingRoutes", () => {
     });
 
     it("should return 400 for invalid recipe id", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
 
       const response = await app.inject({
         method: "PUT",
@@ -93,8 +103,11 @@ describe("recipeRatingRoutes", () => {
 
   describe("DELETE /api/recipes/:id/rating", () => {
     it("should remove rating when authenticated", async () => {
-      const app = buildApp();
-      verifyToken.mockReturnValue({ userId, email: "user@test.com", role: "user" });
+      verifyToken.mockReturnValue({
+        userId,
+        email: "user@test.com",
+        role: "user",
+      });
       mockRecipeRatingService.remove.mockResolvedValue(undefined);
 
       const response = await app.inject({
@@ -110,7 +123,6 @@ describe("recipeRatingRoutes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const app = buildApp();
       const response = await app.inject({
         method: "DELETE",
         url: `/api/recipes/${recipeId}/rating`,
