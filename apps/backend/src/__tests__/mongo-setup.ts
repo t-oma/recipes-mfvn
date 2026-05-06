@@ -4,11 +4,18 @@ import { afterAll, afterEach, beforeAll } from "vitest";
 
 let mongoServer: MongoMemoryServer;
 
+function getTestDbName() {
+  const poolId = process.env.VITEST_POOL_ID ?? "0";
+  return `test_db_${poolId}`;
+}
+
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create({
     binary: { version: "8.0.21" },
   });
-  await mongoose.connect(mongoServer.getUri());
+  await mongoose.connect(mongoServer.getUri(), {
+    dbName: getTestDbName(),
+  });
 });
 
 afterEach(async () => {
