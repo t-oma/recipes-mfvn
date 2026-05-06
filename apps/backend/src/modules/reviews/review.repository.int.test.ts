@@ -1,28 +1,10 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createDbReview, createDbUser } from "@/__tests__/db-factories.js";
-import {
-  clearTestDatabase,
-  connectTestDatabase,
-  disconnectTestDatabase,
-} from "@/__tests__/mongo-setup.js";
 import { ReviewModel } from "./review.model.js";
 import { ReviewRepository } from "./review.repository.js";
 
 describe("ReviewRepository", () => {
-  let repository: ReviewRepository;
-
-  beforeAll(async () => {
-    await connectTestDatabase();
-    repository = new ReviewRepository(ReviewModel);
-  });
-
-  afterAll(async () => {
-    await disconnectTestDatabase();
-  });
-
-  afterEach(async () => {
-    await clearTestDatabase();
-  });
+  const repository = new ReviewRepository(ReviewModel);
 
   describe("findFeatured", () => {
     it("should return featured reviews with populated authors", async () => {

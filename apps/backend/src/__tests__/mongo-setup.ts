@@ -1,33 +1,25 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
+import { afterAll, afterEach, beforeAll } from "vitest";
 
-let mongod: MongoMemoryServer | undefined;
+let mongoServer: MongoMemoryServer;
 
-export async function connectTestDatabase(): Promise<void> {
-  mongod = await MongoMemoryServer.create({
-    binary: { version: "7.0.14" },
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create({
+    binary: { version: "8.0.21" },
   });
-  const uri = mongod.getUri();
-  await mongoose.connect(uri);
-}
+  await mongoose.connect(mongoServer.getUri());
+});
 
-export async function disconnectTestDatabase(): Promise<void> {
-  await mongoose.disconnect();
-  for (const modelName of Object.keys(mongoose.models)) {
-    mongoose.deleteModel(modelName);
-  }
-  if (mongod) {
-    await mongod.stop();
-    mongod = undefined;
-  }
-}
-
-export async function clearTestDatabase(): Promise<void> {
+afterEach(async () => {
   const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    const collection = collections[key];
-    if (collection) {
-      await collection.deleteMany({});
-    }
+
+  for (const collection of Object.values(collections)) {
+    await collection.deleteMany({});
   }
-}
+});
+
+afterAll(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
