@@ -12,9 +12,9 @@
     "check:fix": "biome check --write src/",
     "format": "biome format --write src/",
     "lint": "pnpm typecheck && pnpm check",
-    "test": "vitest run --coverage",
-    "test:unit": "vitest run --project unit --coverage",
-    "test:integration": "vitest run --project integration --coverage",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui --coverage"
   },
