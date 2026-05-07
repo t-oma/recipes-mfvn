@@ -77,13 +77,17 @@ export function addFields(
   return { $addFields: fields };
 }
 
-export type LookupStage = PipelineStage.Lookup["$lookup"] & {
-  unwind?: {
-    required?: boolean;
-  };
-};
+function parseUnwind(unwind: boolean | { required?: boolean }): boolean {
+  return typeof unwind === "boolean" ? unwind : !unwind.required;
+}
+
 export function lookup(
-  lookup: LookupStage,
+  lookup: PipelineStage.Lookup["$lookup"],
+  unwind?:
+    | {
+        required?: boolean;
+      }
+    | boolean,
 ): [PipelineStage.Lookup] | [PipelineStage.Lookup, PipelineStage.Unwind] {
   const lookupPipeline: PipelineStage.Lookup = {
     $lookup: {
@@ -96,7 +100,7 @@ export function lookup(
     },
   };
 
-  if (!lookup.unwind) {
+  if (!unwind) {
     return [lookupPipeline];
   }
 
@@ -105,7 +109,7 @@ export function lookup(
     {
       $unwind: {
         path: `$${lookup.as}`,
-        preserveNullAndEmptyArrays: !lookup.unwind.required,
+        preserveNullAndEmptyArrays: parseUnwind(unwind),
       },
     },
   ];

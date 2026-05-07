@@ -107,20 +107,22 @@ export class ReviewRepository extends BaseRepository<
 }
 
 function withAuthor() {
-  return stages.lookup({
-    from: usersCollectionName,
-    localField: "author",
-    foreignField: "_id",
-    pipeline: [
-      stages.project({
-        _id: 1,
-        name: 1,
-        email: 1,
-      }),
-    ],
-    as: "author",
-    unwind: {
+  return stages.lookup(
+    {
+      from: usersCollectionName,
+      localField: "author",
+      foreignField: "_id",
+      pipeline: [
+        stages.project({
+          _id: 1,
+          name: 1,
+          email: 1,
+        }),
+      ],
+      as: "author",
+    },
+    {
       required: true,
     },
-  });
+  );
 }
