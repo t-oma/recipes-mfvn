@@ -67,7 +67,9 @@ export function group(pipeline: PipelineStage.Group["$group"]) {
   };
 }
 
-export function project(fields: Record<string, 1 | 0>): PipelineStage.Project {
+export function project(
+  fields: Record<string, 1 | 0> | Expression,
+): PipelineStage.Project {
   return { $project: fields };
 }
 
@@ -129,7 +131,7 @@ export type PaginatedStageResult<T> = {
  * Creates a facet pipeline stage that paginates the results.
  *
  * @param options - The pagination options.
- * @param pipeline - The pipeline to apply before pagination.
+ * @param pipelines - The pipeline to apply before pagination.
  * @returns A pipeline stage that paginates the results.
  */
 export function paginated(
@@ -138,7 +140,7 @@ export function paginated(
     page: number;
     limit: number;
   },
-  pipeline: PipelineStage.FacetPipelineStage[] = [],
+  ...pipelines: PipelineStage.FacetPipelineStage[]
 ): [PipelineStage.Facet, PipelineStage.Project] {
   const sortPipeline = options.sort ? sort(options.sort) : [];
 
@@ -146,9 +148,9 @@ export function paginated(
     {
       $facet: {
         items: [
-          pipeline,
           sortPipeline,
           paginate(options.page, options.limit),
+          pipelines,
         ].flat(),
         meta: [{ $count: "totalCount" }],
       },
