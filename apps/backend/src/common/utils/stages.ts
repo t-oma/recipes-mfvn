@@ -188,4 +188,5 @@ export default {
   addFields,
   lookup,
   paginated,
+  extractPaginatedResult,
 };
