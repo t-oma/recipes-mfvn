@@ -1,8 +1,8 @@
 import "dotenv/config";
 import type { Minutes } from "@recipes/shared";
 import { hashSync } from "bcryptjs";
-import { Types } from "mongoose";
 import { logger } from "@/common/logger.js";
+import { toObjectId } from "@/common/utils/mongo.js";
 import { connectDatabase, disconnectDatabase } from "@/config/database.js";
 import { env } from "@/config/env.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
@@ -105,8 +105,8 @@ async function seed(): Promise<void> {
       description: recipe.description,
       ingredients: recipe.ingredients,
       instructions: recipe.instructions,
-      category: new Types.ObjectId(categoryId),
-      author: new Types.ObjectId(authorId),
+      category: toObjectId(categoryId),
+      author: toObjectId(authorId),
       difficulty: recipe.difficulty,
       cookingTime: recipe.cookingTime as Minutes,
       servings: recipe.servings,
