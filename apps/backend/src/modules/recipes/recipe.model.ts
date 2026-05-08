@@ -17,7 +17,7 @@ export interface IngredientDocument {
   unit: string;
 }
 
-export type RecipeImage = RequireKeys<Image, "url" | "alt">;
+export type RecipeImage = RequireKeys<Image, "url">;
 
 export interface RecipeDocument extends BaseDocument {
   title: string;
@@ -56,7 +56,7 @@ const ingredientSchema = new Schema<IngredientDocument>(
 const imageSchema = new Schema<RecipeImage>(
   {
     url: { type: String, required: true },
-    alt: { type: String, trim: true, required: true },
+    alt: { type: String, trim: true, required: false },
   },
   { _id: false },
 );

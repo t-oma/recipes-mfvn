@@ -148,10 +148,6 @@ export function createRecipeService(
 
       const recipe = await repository.create({
         ...data,
-        image: {
-          ...data.image,
-          alt: data.image.alt ?? data.title,
-        },
         author: initiator.id,
       });
 
