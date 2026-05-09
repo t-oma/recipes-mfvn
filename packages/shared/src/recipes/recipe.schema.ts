@@ -23,9 +23,7 @@ export const createRecipeSchema = z.object({
   cookingTime: minutesSchema,
   servings: z.number().int().min(1),
   isPublic: z.boolean().default(true),
-  image: imageSchema.required({
-    alt: true,
-  }),
+  image: imageSchema,
 });
 
 export const updateRecipeSchema = createRecipeSchema.partial();
