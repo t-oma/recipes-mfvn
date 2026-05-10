@@ -77,7 +77,10 @@ export function toCategory(
     name: doc.name,
     slug: doc.slug,
     description: doc.description,
-    image: doc.image,
+    image: {
+      ...doc.image,
+      alt: doc.image.alt ?? doc.name,
+    },
     recipeCount: doc.recipeCount ?? 0,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),

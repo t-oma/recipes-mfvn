@@ -97,7 +97,7 @@ export const seedCategories: SeedCategory[] = [
     description:
       "Sweet treats, baked goods, and indulgent finales to complete any meal",
     image: {
-      url: "https://images.unsplash.com/photo-1563729784474-d77dbb9386b5?w=400&h=520&fit=crop",
+      url: "https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=1364&fit=crop",
     },
   },
   {
