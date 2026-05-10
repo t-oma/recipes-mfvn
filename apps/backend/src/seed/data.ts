@@ -10,6 +10,7 @@ export interface SeedUser {
 export interface SeedCategory {
   name: string;
   description: string;
+  image: { url: string };
 }
 
 export interface SeedRecipe {
@@ -55,41 +56,65 @@ export const seedCategories: SeedCategory[] = [
     name: "American",
     description:
       "Classic American comfort food and iconic dishes from coast to coast",
+    image: {
+      url: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=520&fit=crop",
+    },
   },
   {
     name: "Italian",
     description:
       "Traditional and modern Italian cuisine from pasta to pizza and beyond",
+    image: {
+      url: "https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=400&h=520&fit=crop",
+    },
   },
   {
     name: "Mexican",
     description:
       "Vibrant Mexican flavors with fresh ingredients, bold spices, and time-honored traditions",
+    image: {
+      url: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=520&fit=crop",
+    },
   },
   {
     name: "Asian",
     description:
       "Diverse Asian cuisines from fragrant stir-fries to rich, aromatic curries",
+    image: {
+      url: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=400&h=520&fit=crop",
+    },
   },
   {
     name: "French",
     description:
       "Elegant French cooking techniques and timeless classic recipes",
+    image: {
+      url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=520&fit=crop",
+    },
   },
   {
     name: "Desserts",
     description:
       "Sweet treats, baked goods, and indulgent finales to complete any meal",
+    image: {
+      url: "https://images.unsplash.com/photo-1563729784474-d77dbb9386b5?w=400&h=520&fit=crop",
+    },
   },
   {
     name: "Appetizers",
     description:
       "Small plates, starters, and snacks to whet the appetite before the main event",
+    image: {
+      url: "https://images.unsplash.com/photo-1541014741259-de529411b96a?w=400&h=520&fit=crop",
+    },
   },
   {
     name: "Beverages",
     description:
       "Refreshing drinks, cocktails, smoothies, and hot beverages for every mood",
+    image: {
+      url: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=520&fit=crop",
+    },
   },
 ];
 
