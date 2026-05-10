@@ -144,7 +144,12 @@ describe("toRecipe", () => {
   it("should default rating fields when missing", () => {
     const doc = {
       ...createRecipeDoc(),
-      category: { _id: createObjectId(), name: "Cat", slug: "cat", image: { url: "https://example.com/cat.jpg" } },
+      category: {
+        _id: createObjectId(),
+        name: "Cat",
+        slug: "cat",
+        image: { url: "https://example.com/cat.jpg" },
+      },
       author: { _id: createObjectId(), name: "Auth", email: "a@b.c" },
     };
 
@@ -158,7 +163,12 @@ describe("toRecipe", () => {
   it("should map isFavorited=false", () => {
     const doc = {
       ...createRecipeDoc(),
-      category: { _id: createObjectId(), name: "Cat", slug: "cat", image: { url: "https://example.com/cat.jpg" } },
+      category: {
+        _id: createObjectId(),
+        name: "Cat",
+        slug: "cat",
+        image: { url: "https://example.com/cat.jpg" },
+      },
       author: { _id: createObjectId(), name: "Auth", email: "a@b.c" },
     };
 

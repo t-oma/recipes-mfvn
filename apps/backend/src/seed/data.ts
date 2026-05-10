@@ -116,6 +116,46 @@ export const seedCategories: SeedCategory[] = [
       url: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=520&fit=crop",
     },
   },
+  {
+    name: "Soups",
+    description:
+      "Hearty broths, creamy bisques, and nourishing bowls to warm the soul",
+    image: {
+      url: "https://images.unsplash.com/photo-1604152135912-04a022e23696?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "Salads",
+    description:
+      "Fresh, crisp, and vibrant salads from simple greens to loaded grain bowls",
+    image: {
+      url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "Pasta",
+    description:
+      "All things pasta — from classic spaghetti to inventive modern creations",
+    image: {
+      url: "https://images.unsplash.com/photo-1556761223-4c4282c73f77?w=420&h=520&fit=crop",
+    },
+  },
+  {
+    name: "Snacks",
+    description:
+      "Bite-sized treats, finger foods, and quick nibbles for any time of day",
+    image: {
+      url: "https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "Meat",
+    description:
+      "From tender steaks to slow-cooked roasts, the best of meat and poultry",
+    image: {
+      url: "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=400&h=520&fit=crop",
+    },
+  },
 ];
 
 export const seedUsers: SeedUser[] = [

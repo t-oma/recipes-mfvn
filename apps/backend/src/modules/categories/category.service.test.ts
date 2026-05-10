@@ -125,7 +125,10 @@ describe("categoryService", () => {
       mockCategoryRepository.create.mockResolvedValue(doc);
 
       const result = await service.create({
-        data: { name: "New Category", image: { url: "https://example.com/cat.jpg" } },
+        data: {
+          name: "New Category",
+          image: { url: "https://example.com/cat.jpg" },
+        },
         initiator: initiator(),
       });
 

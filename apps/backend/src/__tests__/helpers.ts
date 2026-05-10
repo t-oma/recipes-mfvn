@@ -123,7 +123,12 @@ export function populateRecipeDoc(
 ): RecipeDocumentPopulated & RecipeComputed {
   return {
     ...recipe,
-    category: { _id: createObjectId(), name: "Italian", slug: "italian", image: { url: "https://example.com/italian.jpg" } },
+    category: {
+      _id: createObjectId(),
+      name: "Italian",
+      slug: "italian",
+      image: { url: "https://example.com/italian.jpg" },
+    },
     author: { _id: createObjectId(), name: "Chef", email: "chef@test.com" },
     isFavorited: false,
     userRating: null,
