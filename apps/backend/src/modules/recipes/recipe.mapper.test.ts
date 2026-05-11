@@ -1,8 +1,24 @@
 import type { Minutes, RecipeComputed } from "@recipes/shared";
 import { describe, expect, it } from "vitest";
 import { createObjectId, createRecipeDoc } from "@/__tests__/helpers.js";
-import { toRecipe } from "./recipe.mapper.js";
+import { toRecipe, toRecipeSummary } from "./recipe.mapper.js";
 import type { RecipeDocumentPopulated } from "./recipe.model.js";
+
+describe("toRecipeSummary", () => {
+  it("should map RecipeSummaryView to RecipeSummary DTO", () => {
+    const doc = {
+      _id: createObjectId(),
+      title: "Pasta Carbonara",
+    };
+
+    const result = toRecipeSummary(doc);
+
+    expect(result).toEqual({
+      id: doc._id.toString(),
+      title: "Pasta Carbonara",
+    });
+  });
+});
 
 describe("toRecipe", () => {
   it("should map recipe document to Recipe DTO", () => {
