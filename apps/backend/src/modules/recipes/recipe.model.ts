@@ -1,8 +1,9 @@
 import type {
   Difficulty,
   Image,
+  Merge,
   Minutes,
-  Replace,
+  RecipeStats,
   RequireKeys,
 } from "@recipes/shared";
 import type { Model, Types } from "mongoose";
@@ -31,10 +32,11 @@ export interface RecipeDocument extends BaseDocument {
   servings: number;
   isPublic: boolean;
   image: RecipeImage;
+  stats: RecipeStats;
 }
 
 export interface RecipeDocumentPopulated
-  extends Replace<
+  extends Merge<
     RecipeDocument,
     {
       category: Pick<CategoryDocument, "_id" | "name" | "slug" | "image">;
@@ -57,6 +59,18 @@ const imageSchema = new Schema<RecipeImage>(
   {
     url: { type: String, required: true },
     alt: { type: String, trim: true, required: false },
+  },
+  { _id: false },
+);
+
+const recipeStatsSchema = new Schema<RecipeStats>(
+  {
+    favoritesCount: { type: Number, default: 0 },
+    commentsCount: { type: Number, default: 0 },
+    ratingCount: { type: Number, default: 0 },
+    ratingSum: { type: Number, default: 0 },
+    averageRating: { type: Number, default: null },
+    popularity: { type: Number, default: 0 },
   },
   { _id: false },
 );
@@ -100,6 +114,7 @@ const recipeSchema = new Schema<RecipeDocument>(
     servings: { type: Number, required: true, min: 1 },
     isPublic: { type: Boolean, default: true },
     image: { type: imageSchema, required: true },
+    stats: { type: recipeStatsSchema, default: {} },
   },
   {
     timestamps: true,

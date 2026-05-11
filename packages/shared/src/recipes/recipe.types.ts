@@ -7,6 +7,7 @@ import type {
   recipeComputedSchema,
   recipeQuerySchema,
   recipeSchema,
+  recipeStatsSchema,
   recipeSummarySchema,
   secondsSchema,
   updateRecipeSchema,
@@ -19,6 +20,7 @@ export type Difficulty = z.infer<typeof difficultySchema>;
 export type CreateRecipeBody = z.infer<typeof createRecipeSchema>;
 export type UpdateRecipeBody = z.infer<typeof updateRecipeSchema>;
 export type Recipe = z.infer<typeof recipeSchema>;
+export type RecipeStats = z.infer<typeof recipeStatsSchema>;
 export type RecipeSummary = z.infer<typeof recipeSummarySchema>;
 export type RecipeComputed = z.infer<typeof recipeComputedSchema>;
 

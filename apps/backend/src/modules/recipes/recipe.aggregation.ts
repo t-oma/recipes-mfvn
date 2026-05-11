@@ -135,34 +135,3 @@ export function withUserRating(userId?: string) {
     stages.unset("userRatingDoc"),
   ].flat();
 }
-
-export function withAverageRating() {
-  return [
-    stages.lookup(
-      {
-        from: recipeRatingsCollectionName,
-        localField: "_id",
-        foreignField: "recipe",
-        pipeline: [
-          stages.group({
-            _id: null,
-            avg: { $avg: "$value" },
-            count: { $sum: 1 },
-          }),
-          stages.project({
-            _id: 0,
-            avg: { $round: ["$avg", 1] },
-            count: 1,
-          }),
-        ],
-        as: "ratingStats",
-      },
-      { required: false },
-    ),
-    stages.addFields({
-      averageRating: "$ratingStats.avg",
-      ratingCount: { $ifNull: ["$ratingStats.count", 0] },
-    }),
-    stages.unset("ratingStats"),
-  ].flat();
-}

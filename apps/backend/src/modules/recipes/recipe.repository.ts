@@ -15,7 +15,6 @@ import type { UserDocument } from "@/modules/users/user.model.js";
 import {
   byVisibility,
   withAuthor,
-  withAverageRating,
   withCategories,
   withFavorited,
   withUserRating,
@@ -101,7 +100,6 @@ export function buildSearchPipeline({
 
     withFavorited(initiator.id),
     withUserRating(initiator.id),
-    withAverageRating(),
     stages.match<RecipeDocument>({
       ...(isFavorited !== undefined && { isFavorited }),
     }),
@@ -132,6 +130,5 @@ export function buildFindByIdPipeline(
     withAuthor(),
     withFavorited(initiator.id),
     withUserRating(initiator.id),
-    withAverageRating(),
   ].flat();
 }
