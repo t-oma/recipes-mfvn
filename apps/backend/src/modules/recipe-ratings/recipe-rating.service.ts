@@ -47,16 +47,25 @@ export function createRecipeRatingService(
       await validateUser(initiator.id);
       await validateRecipe(recipeId);
 
-      const rating = await repository.upsert(
+      const { document: rating, oldDoc } = await repository.upsert(
         { user: initiator.id, recipe: recipeId },
         data.value,
       );
 
-      bus.emit("recipe-rating:created", {
-        recipeId,
-        userId: initiator.id,
-        value: rating.value,
-      });
+      if (oldDoc === null) {
+        bus.emit("recipe-rating:created", {
+          recipeId,
+          userId: initiator.id,
+          value: rating.value,
+        });
+      } else {
+        bus.emit("recipe-rating:updated", {
+          recipeId,
+          userId: initiator.id,
+          previousValue: oldDoc.value,
+          value: rating.value,
+        });
+      }
 
       return { value: rating.value };
     },

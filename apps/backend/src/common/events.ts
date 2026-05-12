@@ -25,6 +25,12 @@ export type DomainEvents = {
     userId: string;
     value: number;
   };
+  "recipe-rating:updated": {
+    recipeId: string;
+    userId: string;
+    previousValue: number | null;
+    value: number;
+  };
   "recipe-rating:deleted": {
     recipeId: string;
     userId: string;

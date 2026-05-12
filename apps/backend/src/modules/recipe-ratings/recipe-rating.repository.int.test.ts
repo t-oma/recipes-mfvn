@@ -16,9 +16,9 @@ describe("RecipeRatingRepository", () => {
         4,
       );
 
-      expect(result.value).toBe(4);
-      expect(result.user.toString()).toBe(user._id.toString());
-      expect(result.recipe.toString()).toBe(recipe._id.toString());
+      expect(result.document.value).toBe(4);
+      expect(result.document.user.toString()).toBe(user._id.toString());
+      expect(result.document.recipe.toString()).toBe(recipe._id.toString());
     });
 
     it("should update an existing rating", async () => {
@@ -31,7 +31,7 @@ describe("RecipeRatingRepository", () => {
         5,
       );
 
-      expect(updated.value).toBe(5);
+      expect(updated.document.value).toBe(5);
     });
   });
 
