@@ -116,4 +116,30 @@ describe("toRecipe", () => {
 
     expect(result.isFavorited).toBe(false);
   });
+
+  it("should default partial stats fields when some are missing", () => {
+    const doc = {
+      ...createRecipeDoc(),
+      category: {
+        _id: createObjectId(),
+        name: "Cat",
+        slug: "cat",
+        image: { url: "https://example.com/cat.jpg" },
+      },
+      author: { _id: createObjectId(), name: "Auth", email: "a@b.c" },
+      stats: {
+        favoritesCount: 5,
+        commentsCount: 3,
+      } as never,
+    };
+
+    const result = toRecipe(doc, false);
+
+    expect(result.stats.favoritesCount).toBe(5);
+    expect(result.stats.commentsCount).toBe(3);
+    expect(result.stats.ratingCount).toBe(0);
+    expect(result.stats.ratingSum).toBe(0);
+    expect(result.stats.averageRating).toBeNull();
+    expect(result.stats.popularity).toBe(0);
+  });
 });

@@ -357,6 +357,42 @@ describe("recipeService", () => {
         }),
       ).rejects.toThrow(NotFoundError);
     });
+
+    it("should return recipe with default stats when created", async () => {
+      mockCategoryRepository.exists.mockResolvedValue(true);
+      mockUserRepository.exists.mockResolvedValue(true);
+
+      const authorId = createObjectId();
+      const categoryId = createObjectId();
+      const populated = populateRecipeDoc(
+        createRecipeDoc({ title: "New Recipe" }),
+        {
+          author: { _id: authorId, name: "Chef", email: "chef@test.com" },
+          category: {
+            _id: categoryId,
+            name: "Italian",
+            slug: "italian",
+            image: { url: "https://example.com/italian.jpg" },
+          },
+        },
+      );
+
+      mockRecipeRepository.create.mockResolvedValue(populated);
+
+      const result = await service.create({
+        data: { ...createData, category: categoryId.toString() },
+        initiator: initiator(authorId.toString()),
+      });
+
+      expect(result.stats).toEqual({
+        favoritesCount: 0,
+        commentsCount: 0,
+        ratingCount: 0,
+        ratingSum: 0,
+        averageRating: null,
+        popularity: 0,
+      });
+    });
   });
 
   describe("update", () => {
@@ -453,6 +489,42 @@ describe("recipeService", () => {
           initiator: initiator(createObjectId().toString()),
         }),
       ).rejects.toThrow(ForbiddenError);
+    });
+
+    it("should preserve existing stats when updating only title", async () => {
+      const authorId = createObjectId();
+      const recipe = createMockRecipe(authorId);
+      mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
+      mockFavoriteRepository.exists.mockResolvedValue(false);
+      mockRecipeRepository.save.mockResolvedValue(
+        populateRecipeDoc(createRecipeDoc({ author: authorId }), {
+          title: "Updated",
+          stats: {
+            favoritesCount: 5,
+            commentsCount: 3,
+            ratingCount: 10,
+            ratingSum: 45,
+            averageRating: 4.5,
+            popularity: 42,
+          },
+        }),
+      );
+
+      const id = createObjectId().toString();
+      const result = await service.update(id, {
+        data: { title: "Updated" },
+        initiator: initiator(authorId.toString()),
+      });
+
+      expect(result.title).toBe("Updated");
+      expect(result.stats).toEqual({
+        favoritesCount: 5,
+        commentsCount: 3,
+        ratingCount: 10,
+        ratingSum: 45,
+        averageRating: 4.5,
+        popularity: 42,
+      });
     });
   });
 
