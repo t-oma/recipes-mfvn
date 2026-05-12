@@ -9,6 +9,6 @@ export function registerRecipeEventHandlers(
     log: Logger;
   },
 ) {
-  bus.on("category:changed", () => deps.recipeCache.deletePattern("*"));
-  bus.on("recipe:rated", () => deps.recipeCache.deletePattern("*"));
+  bus.on("category:deleted", () => deps.recipeCache.deletePattern("*"));
+  bus.on("recipe-rating:created", () => deps.recipeCache.deletePattern("*"));
 }

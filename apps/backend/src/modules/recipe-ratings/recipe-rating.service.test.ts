@@ -55,7 +55,11 @@ describe("recipeRatingService", () => {
         { user: init.id, recipe: recipeId },
         4,
       );
-      expect(mockBus.emit).toHaveBeenCalledWith("recipe:rated", recipeId);
+      expect(mockBus.emit).toHaveBeenCalledWith("recipe-rating:created", {
+        recipeId: recipeId,
+        userId: init.id,
+        value: 4,
+      });
     });
 
     it("should update an existing rating", async () => {
@@ -144,7 +148,10 @@ describe("recipeRatingService", () => {
         user: init.id,
         recipe: recipeId,
       });
-      expect(mockBus.emit).toHaveBeenCalledWith("recipe:rated", recipeId);
+      expect(mockBus.emit).toHaveBeenCalledWith("recipe-rating:deleted", {
+        recipeId,
+        userId: init.id,
+      });
     });
 
     it("should throw NotFoundError when rating does not exist", async () => {

@@ -52,7 +52,11 @@ export function createRecipeRatingService(
         data.value,
       );
 
-      bus.emit("recipe:rated", recipeId);
+      bus.emit("recipe-rating:created", {
+        recipeId,
+        userId: initiator.id,
+        value: rating.value,
+      });
 
       return { value: rating.value };
     },
@@ -72,7 +76,10 @@ export function createRecipeRatingService(
         );
       }
 
-      bus.emit("recipe:rated", recipeId);
+      bus.emit("recipe-rating:deleted", {
+        recipeId,
+        userId: initiator.id,
+      });
     },
   };
 }
