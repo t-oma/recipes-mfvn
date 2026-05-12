@@ -11,4 +11,5 @@ export function registerRecipeEventHandlers(
 ) {
   bus.on("category:deleted", () => deps.recipeCache.deletePattern("*"));
   bus.on("recipe-rating:created", () => deps.recipeCache.deletePattern("*"));
+  bus.on("recipe-rating:deleted", () => deps.recipeCache.deletePattern("*"));
 }
