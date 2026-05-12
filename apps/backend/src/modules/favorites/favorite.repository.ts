@@ -12,7 +12,6 @@ import stages, { extractPaginatedResult } from "@/common/utils/stages.js";
 import {
   byVisibility,
   withAuthor,
-  withAverageRating,
   withCategories,
   withUserRating,
 } from "@/modules/recipes/recipe.aggregation.js";
@@ -83,7 +82,6 @@ function withRecipe(
         withCategories(),
         withAuthor(),
         withUserRating(initiator.id),
-        withAverageRating(),
       ].flat(),
       as: "recipe",
     },
