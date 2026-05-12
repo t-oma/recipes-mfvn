@@ -10,6 +10,7 @@ import { CommentModel } from "@/modules/comments/comment.model.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import { RecipeRatingModel } from "@/modules/recipe-ratings/recipe-rating.model.js";
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
+import { rebuildRecipeStats } from "@/modules/recipes/recipe-stats.service.js";
 import { ReviewModel } from "@/modules/reviews/review.model.js";
 import { UserModel } from "@/modules/users/user.model.js";
 import {
@@ -232,6 +233,12 @@ async function seed(): Promise<void> {
 async function main(): Promise<void> {
   try {
     await seed();
+    await rebuildRecipeStats(
+      RecipeModel,
+      FavoriteModel,
+      CommentModel,
+      RecipeRatingModel,
+    );
   } catch (err) {
     logger.error(err, "Seed failed");
     process.exitCode = 1;
