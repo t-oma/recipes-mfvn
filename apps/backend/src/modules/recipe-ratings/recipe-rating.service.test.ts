@@ -167,6 +167,7 @@ describe("recipeRatingService", () => {
       expect(mockBus.emit).toHaveBeenCalledWith("recipe-rating:deleted", {
         recipeId,
         userId: init.id,
+        value: 4,
       });
     });
 

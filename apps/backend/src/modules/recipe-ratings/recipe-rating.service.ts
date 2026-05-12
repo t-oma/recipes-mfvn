@@ -88,6 +88,7 @@ export function createRecipeRatingService(
       bus.emit("recipe-rating:deleted", {
         recipeId,
         userId: initiator.id,
+        value: result.value,
       });
     },
   };

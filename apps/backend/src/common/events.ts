@@ -34,6 +34,7 @@ export type DomainEvents = {
   "recipe-rating:deleted": {
     recipeId: string;
     userId: string;
+    value: number;
   };
 };
 
