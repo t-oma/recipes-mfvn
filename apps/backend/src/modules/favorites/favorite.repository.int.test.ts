@@ -100,6 +100,14 @@ describe("FavoriteRepository", () => {
         author: author._id,
         category: category._id,
         isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 2,
+          ratingSum: 9,
+          averageRating: 4.5,
+          popularity: 0,
+        },
       });
       const otherUser = await createDbUser();
 
@@ -124,8 +132,8 @@ describe("FavoriteRepository", () => {
       });
 
       expect(recipes[0]?.userRating).toBe(4);
-      expect(recipes[0]?.averageRating).toBe(4.5);
-      expect(recipes[0]?.ratingCount).toBe(2);
+      expect(recipes[0]?.stats.averageRating).toBe(4.5);
+      expect(recipes[0]?.stats.ratingCount).toBe(2);
     });
 
     it("should paginate correctly", async () => {

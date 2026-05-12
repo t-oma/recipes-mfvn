@@ -1,4 +1,4 @@
-import type { Minutes } from "@recipes/shared";
+import type { Minutes, RecipeStats } from "@recipes/shared";
 import type { Types } from "mongoose";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
@@ -63,6 +63,7 @@ export async function createDbRecipe(
     servings: number;
     isPublic: boolean;
     image: { url: string; alt?: string };
+    stats: RecipeStats;
   }> = {},
 ) {
   return RecipeModel.create({

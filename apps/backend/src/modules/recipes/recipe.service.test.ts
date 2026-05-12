@@ -135,8 +135,14 @@ describe("recipeService", () => {
     it("should return rating data from aggregation", async () => {
       const populated = populateRecipeDoc(createRecipeDoc(), {
         userRating: 4,
-        averageRating: 4.2,
-        ratingCount: 15,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 15,
+          ratingSum: 63,
+          averageRating: 4.2,
+          popularity: 0,
+        },
       });
       mockRecipeRepository.aggregateSearch.mockResolvedValue([[populated], 1]);
 
@@ -151,8 +157,8 @@ describe("recipeService", () => {
       });
 
       expect(result.items[0]?.userRating).toBe(4);
-      expect(result.items[0]?.averageRating).toBe(4.2);
-      expect(result.items[0]?.ratingCount).toBe(15);
+      expect(result.items[0]?.stats.averageRating).toBe(4.2);
+      expect(result.items[0]?.stats.ratingCount).toBe(15);
     });
 
     it("should return null ratings when recipe has no ratings", async () => {
@@ -170,8 +176,8 @@ describe("recipeService", () => {
       });
 
       expect(result.items[0]?.userRating).toBeNull();
-      expect(result.items[0]?.averageRating).toBeNull();
-      expect(result.items[0]?.ratingCount).toBe(0);
+      expect(result.items[0]?.stats.averageRating).toBeNull();
+      expect(result.items[0]?.stats.ratingCount).toBe(0);
     });
   });
 
@@ -233,8 +239,14 @@ describe("recipeService", () => {
     it("should return rating data from aggregation", async () => {
       const populated = populateRecipeDoc(createRecipeDoc(), {
         userRating: 5,
-        averageRating: 3.8,
-        ratingCount: 42,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 42,
+          ratingSum: 160,
+          averageRating: 3.8,
+          popularity: 0,
+        },
       });
       mockRecipeRepository.aggregateById.mockResolvedValue(populated);
 
@@ -244,8 +256,8 @@ describe("recipeService", () => {
       });
 
       expect(result.userRating).toBe(5);
-      expect(result.averageRating).toBe(3.8);
-      expect(result.ratingCount).toBe(42);
+      expect(result.stats.averageRating).toBe(3.8);
+      expect(result.stats.ratingCount).toBe(42);
     });
   });
 
@@ -295,8 +307,8 @@ describe("recipeService", () => {
       });
       expect(result.title).toBe("New Recipe");
       expect(result.userRating).toBeNull();
-      expect(result.averageRating).toBeNull();
-      expect(result.ratingCount).toBe(0);
+      expect(result.stats.averageRating).toBeNull();
+      expect(result.stats.ratingCount).toBe(0);
       expect(mockCache.deletePattern).toHaveBeenCalledWith(
         recipeCache.keys.listPattern(),
       );
@@ -373,8 +385,8 @@ describe("recipeService", () => {
       });
       expect(result.title).toBe("Updated");
       expect(result.userRating).toBeNull();
-      expect(result.averageRating).toBeNull();
-      expect(result.ratingCount).toBe(0);
+      expect(result.stats.averageRating).toBeNull();
+      expect(result.stats.ratingCount).toBe(0);
       expect(mockCache.delete).toHaveBeenCalledWith(recipeCache.keys.byId(id));
       expect(mockCache.deletePattern).toHaveBeenCalledWith(
         recipeCache.keys.listPattern(),
