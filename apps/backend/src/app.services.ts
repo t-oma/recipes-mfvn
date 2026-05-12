@@ -73,11 +73,13 @@ export function createServices(
     commentRepository,
     recipeRepository,
     userRepository,
+    bus,
   );
   const favoriteService = createFavoriteService(
     favoriteRepository,
     recipeRepository,
     userRepository,
+    bus,
   );
   const userService = createUserService(
     userRepository,
