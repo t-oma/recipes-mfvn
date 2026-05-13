@@ -34,7 +34,7 @@ export const recipeStatsSchema = z.object({
   ratingCount: z.number().int().nonnegative(),
   ratingSum: z.number().int().nonnegative(),
   averageRating: z.number().nullable(),
-  popularity: z.number().int().nonnegative(),
+  popularity: z.number().nonnegative(),
 });
 
 export const recipeSchema = createRecipeSchema
