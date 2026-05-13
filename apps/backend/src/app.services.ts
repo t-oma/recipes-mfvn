@@ -26,6 +26,8 @@ import { RecipeModel } from "@/modules/recipes/recipe.model.js";
 import { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 import type { RecipeService } from "@/modules/recipes/recipe.service.js";
 import { createRecipeService } from "@/modules/recipes/recipe.service.js";
+import type { RecipeStatsService } from "@/modules/recipes/recipe-stats.service.js";
+import { createRecipeStatsService } from "@/modules/recipes/recipe-stats.service.js";
 import { ReviewModel } from "@/modules/reviews/review.model.js";
 import { ReviewRepository } from "@/modules/reviews/review.repository.js";
 import type { ReviewService } from "@/modules/reviews/review.service.js";
@@ -39,6 +41,7 @@ export interface AppServices {
   auth: AuthService;
   user: UserService;
   recipe: RecipeService;
+  recipeStats: RecipeStatsService;
   comment: CommentService;
   favorite: FavoriteService;
   recipeRating: RecipeRatingService;
@@ -106,6 +109,7 @@ export function createServices(
     recipeCache,
     bus,
   );
+  const recipeStatsService = createRecipeStatsService(recipeRepository);
   const reviewService = createReviewService(reviewRepository, userRepository);
   const authService = createAuthService(userRepository, passwordService, log);
 
@@ -113,6 +117,7 @@ export function createServices(
     auth: authService,
     user: userService,
     recipe: recipeService,
+    recipeStats: recipeStatsService,
     comment: commentService,
     favorite: favoriteService,
     recipeRating: recipeRatingService,
