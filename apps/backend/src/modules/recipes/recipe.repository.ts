@@ -24,6 +24,13 @@ import type {
   RecipeDocumentPopulated,
 } from "./recipe.model.js";
 
+export type RecipeStatsDelta = {
+  favoritesCount?: number;
+  commentsCount?: number;
+  ratingCount?: number;
+  ratingSum?: number;
+};
+
 export type RecipeCreateInput = RequireKeys<
   CreateInput<RecipeDocument>,
   | "title"
@@ -74,11 +81,161 @@ export class RecipeRepository extends BaseRepository<
     return result[0];
   }
 
+  async applyFavoritesDelta(
+    recipeId: string,
+    delta: 1 | -1,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      favoritesCount: delta,
+    });
+  }
+
+  async applyCommentsDelta(
+    recipeId: string,
+    delta: 1 | -1,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      commentsCount: delta,
+    });
+  }
+
+  async applyRatingCreated(
+    recipeId: string,
+    value: number,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      ratingCount: 1,
+      ratingSum: value,
+    });
+  }
+
+  async applyRatingUpdated(
+    recipeId: string,
+    previousValue: number,
+    nextValue: number,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      ratingSum: nextValue - previousValue,
+    });
+  }
+
+  async applyRatingDeleted(
+    recipeId: string,
+    value: number,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      ratingCount: -1,
+      ratingSum: -value,
+    });
+  }
+
   protected override getDefaultPopulate() {
     return [
       { path: "author", select: "name email" },
       { path: "category", select: "name slug image" },
     ];
+  }
+
+  private async applyStatsDelta(
+    recipeId: string,
+    delta: RecipeStatsDelta,
+  ): Promise<RecipeDocument | null> {
+    const favoritesDelta = delta.favoritesCount ?? 0;
+    const commentsDelta = delta.commentsCount ?? 0;
+    const ratingCountDelta = delta.ratingCount ?? 0;
+    const ratingSumDelta = delta.ratingSum ?? 0;
+
+    return this.model
+      .findOneAndUpdate(
+        { _id: toObjectId(recipeId) },
+        [
+          {
+            $set: {
+              "stats.favoritesCount": {
+                $max: [
+                  0,
+                  {
+                    $add: [
+                      { $ifNull: ["$stats.favoritesCount", 0] },
+                      favoritesDelta,
+                    ],
+                  },
+                ],
+              },
+              "stats.commentsCount": {
+                $max: [
+                  0,
+                  {
+                    $add: [
+                      { $ifNull: ["$stats.commentsCount", 0] },
+                      commentsDelta,
+                    ],
+                  },
+                ],
+              },
+              "stats.ratingCount": {
+                $max: [
+                  0,
+                  {
+                    $add: [
+                      { $ifNull: ["$stats.ratingCount", 0] },
+                      ratingCountDelta,
+                    ],
+                  },
+                ],
+              },
+              "stats.ratingSum": {
+                $max: [
+                  0,
+                  {
+                    $add: [
+                      { $ifNull: ["$stats.ratingSum", 0] },
+                      ratingSumDelta,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+          {
+            $set: {
+              "stats.averageRating": {
+                $cond: [
+                  { $gt: ["$stats.ratingCount", 0] },
+                  {
+                    $round: [
+                      {
+                        $divide: ["$stats.ratingSum", "$stats.ratingCount"],
+                      },
+                      1,
+                    ],
+                  },
+                  null,
+                ],
+              },
+            },
+          },
+          {
+            $set: {
+              "stats.popularity": {
+                $add: [
+                  { $multiply: ["$stats.favoritesCount", 3] },
+                  { $multiply: ["$stats.commentsCount", 2] },
+                  "$stats.ratingCount",
+                  {
+                    $multiply: [{ $ifNull: ["$stats.averageRating", 0] }, 5],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        {
+          returnDocument: "after",
+          updatePipeline: true,
+        },
+      )
+      .lean();
   }
 }
 
