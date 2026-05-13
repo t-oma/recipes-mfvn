@@ -5,6 +5,7 @@ import type { CommentModelType } from "@/modules/comments/comment.model.js";
 import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
 import type { RecipeRatingModelType } from "@/modules/recipe-ratings/recipe-rating.model.js";
 import type { RecipeModelType } from "./recipe.model.js";
+import type { RecipeRepository } from "./recipe.repository.js";
 
 export function computePopularity(stats: Omit<RecipeStats, "popularity">) {
   return (
@@ -13,6 +14,42 @@ export function computePopularity(stats: Omit<RecipeStats, "popularity">) {
     stats.ratingCount * 1 +
     (stats.averageRating ?? 0) * 5
   );
+}
+
+export type RecipeStatsService = ReturnType<typeof createRecipeStatsService>;
+
+export function createRecipeStatsService(recipeRepository: RecipeRepository) {
+  return {
+    async onFavoriteCreated(recipeId: string) {
+      return recipeRepository.applyFavoritesDelta(recipeId, 1);
+    },
+    async onFavoriteDeleted(recipeId: string) {
+      return recipeRepository.applyFavoritesDelta(recipeId, -1);
+    },
+    async onCommentCreated(recipeId: string) {
+      return recipeRepository.applyCommentsDelta(recipeId, 1);
+    },
+    async onCommentDeleted(recipeId: string) {
+      return recipeRepository.applyCommentsDelta(recipeId, -1);
+    },
+    async onRatingCreated(recipeId: string, value: number) {
+      return recipeRepository.applyRatingCreated(recipeId, value);
+    },
+    async onRatingUpdated(
+      recipeId: string,
+      previousValue: number | null,
+      value: number,
+    ) {
+      return recipeRepository.applyRatingUpdated(
+        recipeId,
+        previousValue ?? 0,
+        value,
+      );
+    },
+    async onRatingDeleted(recipeId: string, value: number) {
+      return recipeRepository.applyRatingDeleted(recipeId, value);
+    },
+  };
 }
 
 export async function rebuildRecipeStats(
