@@ -18,6 +18,18 @@ export function cond(
   };
 }
 
+export function max(...pipeline: Expression[]) {
+  return {
+    $max: [...pipeline],
+  };
+}
+
+export function multiply(...pipeline: Expression[]) {
+  return {
+    $multiply: [...pipeline],
+  };
+}
+
 export type UnsetStage<T> =
   | (keyof T extends string ? keyof T : never)[]
   | string[];
@@ -71,6 +83,12 @@ export function project(
   fields: Record<string, 1 | 0> | Expression,
 ): PipelineStage.Project {
   return { $project: fields };
+}
+
+export function set(pipeline: PipelineStage.Set["$set"]) {
+  return {
+    $set: pipeline,
+  };
 }
 
 export function addFields(
@@ -177,6 +195,8 @@ export function extractPaginatedResult<T>(
 
 export default {
   cond,
+  max,
+  multiply,
   unset,
   match,
   skip,
@@ -185,6 +205,7 @@ export default {
   sort,
   group,
   project,
+  set,
   addFields,
   lookup,
   paginated,

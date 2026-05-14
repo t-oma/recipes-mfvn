@@ -1,5 +1,4 @@
 import type { RecipeComputed, RecipeQuery, RequireKeys } from "@recipes/shared";
-import type { PipelineStage } from "mongoose";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
 import type {
@@ -15,7 +14,6 @@ import type { UserDocument } from "@/modules/users/user.model.js";
 import {
   byVisibility,
   withAuthor,
-  withAverageRating,
   withCategories,
   withFavorited,
   withUserRating,
@@ -24,6 +22,20 @@ import type {
   RecipeDocument,
   RecipeDocumentPopulated,
 } from "./recipe.model.js";
+
+export const RECIPE_POPULARITY_WEIGHTS = {
+  favorites: 3,
+  comments: 2,
+  ratings: 1,
+  averageRating: 5,
+} as const;
+
+export type RecipeStatsDelta = {
+  favoritesCount?: number;
+  commentsCount?: number;
+  ratingCount?: number;
+  ratingSum?: number;
+};
 
 export type RecipeCreateInput = RequireKeys<
   CreateInput<RecipeDocument>,
@@ -57,9 +69,44 @@ export class RecipeRepository extends BaseRepository<
   }: QueryMethodParams<RecipeQuery>): Promise<
     [Array<RecipeDocumentPopulated & RecipeComputed>, number]
   > {
-    const result = await this.aggregate<
-      PaginatedStageResult<RecipeDocumentPopulated & RecipeComputed>
-    >(buildSearchPipeline({ query, initiator }));
+    const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
+      query;
+
+    const sortWithPopularityReplaced = sort.replace(
+      "popularity",
+      "stats.popularity",
+    );
+
+    const pipeline = [
+      stages.match<RecipeDocument>({
+        ...byVisibility(initiator),
+        ...(search && { $text: { $search: search } }),
+        ...(categoryId && { category: toObjectId(categoryId) }),
+        ...(difficulty && { difficulty }),
+      }),
+      stages.unset<RecipeDocument>("__v"),
+
+      withFavorited(initiator.id),
+      withUserRating(initiator.id),
+      stages.match<RecipeDocument>({
+        ...(isFavorited !== undefined && { isFavorited }),
+      }),
+
+      stages.paginated(
+        {
+          sort: sortWithPopularityReplaced,
+          page,
+          limit,
+        },
+        ...withCategories(),
+        ...withAuthor(),
+      ),
+    ].flat();
+
+    const result =
+      await this.aggregate<
+        PaginatedStageResult<RecipeDocumentPopulated & RecipeComputed>
+      >(pipeline);
 
     return extractPaginatedResult(result);
   }
@@ -68,11 +115,71 @@ export class RecipeRepository extends BaseRepository<
     id: string,
     { initiator }: InitiatedMethodParams<OptionalInitiator>,
   ): Promise<(RecipeDocumentPopulated & RecipeComputed) | undefined> {
+    const pipeline = [
+      stages.match<RecipeDocument>({
+        _id: toObjectId(id),
+        ...byVisibility(initiator),
+      }),
+      { $unset: "__v" },
+      withCategories(),
+      withAuthor(),
+      withFavorited(initiator.id),
+      withUserRating(initiator.id),
+    ].flat();
+
     const result = await this.aggregate<
       RecipeDocumentPopulated & RecipeComputed
-    >(buildFindByIdPipeline(id, { initiator }));
+    >(pipeline);
 
     return result[0];
+  }
+
+  async applyFavoritesDelta(
+    recipeId: string,
+    delta: 1 | -1,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      favoritesCount: delta,
+    });
+  }
+
+  async applyCommentsDelta(
+    recipeId: string,
+    delta: 1 | -1,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      commentsCount: delta,
+    });
+  }
+
+  async applyRatingCreated(
+    recipeId: string,
+    value: number,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      ratingCount: 1,
+      ratingSum: value,
+    });
+  }
+
+  async applyRatingUpdated(
+    recipeId: string,
+    previousValue: number,
+    nextValue: number,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      ratingSum: nextValue - previousValue,
+    });
+  }
+
+  async applyRatingDeleted(
+    recipeId: string,
+    value: number,
+  ): Promise<RecipeDocument | null> {
+    return this.applyStatsDelta(recipeId, {
+      ratingCount: -1,
+      ratingSum: -value,
+    });
   }
 
   protected override getDefaultPopulate() {
@@ -81,57 +188,80 @@ export class RecipeRepository extends BaseRepository<
       { path: "category", select: "name slug image" },
     ];
   }
-}
 
-export function buildSearchPipeline({
-  query,
-  initiator,
-}: QueryMethodParams<RecipeQuery>) {
-  const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
-    query;
+  private buildPopularityExpression() {
+    return {
+      $add: [
+        stages.multiply(
+          { $ifNull: ["$stats.favoritesCount", 0] },
+          RECIPE_POPULARITY_WEIGHTS.favorites,
+        ),
+        stages.multiply(
+          { $ifNull: ["$stats.commentsCount", 0] },
+          RECIPE_POPULARITY_WEIGHTS.comments,
+        ),
+        stages.multiply(
+          { $ifNull: ["$stats.ratingCount", 0] },
+          RECIPE_POPULARITY_WEIGHTS.ratings,
+        ),
+        stages.multiply(
+          { $ifNull: ["$stats.averageRating", 0] },
+          RECIPE_POPULARITY_WEIGHTS.averageRating,
+        ),
+      ],
+    };
+  }
 
-  return [
-    stages.match<RecipeDocument>({
-      ...byVisibility(initiator),
-      ...(search && { $text: { $search: search } }),
-      ...(categoryId && { category: toObjectId(categoryId) }),
-      ...(difficulty && { difficulty }),
-    }),
-    stages.unset<RecipeDocument>("__v"),
+  private async applyStatsDelta(
+    recipeId: string,
+    delta: RecipeStatsDelta,
+  ): Promise<RecipeDocument | null> {
+    const favoritesDelta = delta.favoritesCount ?? 0;
+    const commentsDelta = delta.commentsCount ?? 0;
+    const ratingCountDelta = delta.ratingCount ?? 0;
+    const ratingSumDelta = delta.ratingSum ?? 0;
 
-    withFavorited(initiator.id),
-    withUserRating(initiator.id),
-    withAverageRating(),
-    stages.match<RecipeDocument>({
-      ...(isFavorited !== undefined && { isFavorited }),
-    }),
-
-    stages.paginated(
-      {
-        sort,
-        page,
-        limit,
-      },
-      ...withCategories(),
-      ...withAuthor(),
-    ),
-  ].flat();
-}
-
-export function buildFindByIdPipeline(
-  id: string,
-  { initiator }: InitiatedMethodParams<OptionalInitiator>,
-): PipelineStage[] {
-  return [
-    stages.match<RecipeDocument>({
-      _id: toObjectId(id),
-      ...byVisibility(initiator),
-    }),
-    { $unset: "__v" },
-    withCategories(),
-    withAuthor(),
-    withFavorited(initiator.id),
-    withUserRating(initiator.id),
-    withAverageRating(),
-  ].flat();
+    return this.model
+      .findOneAndUpdate(
+        { _id: toObjectId(recipeId) },
+        [
+          stages.set({
+            "stats.favoritesCount": stages.max(0, {
+              $add: [{ $ifNull: ["$stats.favoritesCount", 0] }, favoritesDelta],
+            }),
+            "stats.commentsCount": stages.max(0, {
+              $add: [{ $ifNull: ["$stats.commentsCount", 0] }, commentsDelta],
+            }),
+            "stats.ratingCount": stages.max(0, {
+              $add: [{ $ifNull: ["$stats.ratingCount", 0] }, ratingCountDelta],
+            }),
+            "stats.ratingSum": stages.max(0, {
+              $add: [{ $ifNull: ["$stats.ratingSum", 0] }, ratingSumDelta],
+            }),
+          }),
+          stages.set({
+            "stats.averageRating": stages.cond(
+              { $gt: ["$stats.ratingCount", 0] },
+              {
+                $round: [
+                  {
+                    $divide: ["$stats.ratingSum", "$stats.ratingCount"],
+                  },
+                  1,
+                ],
+              },
+              null,
+            ),
+          }),
+          stages.set({
+            "stats.popularity": this.buildPopularityExpression(),
+          }),
+        ],
+        {
+          returnDocument: "after",
+          updatePipeline: true,
+        },
+      )
+      .lean();
+  }
 }

@@ -28,6 +28,15 @@ export const createRecipeSchema = z.object({
 
 export const updateRecipeSchema = createRecipeSchema.partial();
 
+export const recipeStatsSchema = z.object({
+  favoritesCount: z.number().int().nonnegative(),
+  commentsCount: z.number().int().nonnegative(),
+  ratingCount: z.number().int().nonnegative(),
+  ratingSum: z.number().int().nonnegative(),
+  averageRating: z.number().nullable(),
+  popularity: z.number().nonnegative(),
+});
+
 export const recipeSchema = createRecipeSchema
   // add persistence fields
   .extend({
@@ -38,6 +47,7 @@ export const recipeSchema = createRecipeSchema
   // add new fields
   .extend({
     author: userSummarySchema,
+    stats: recipeStatsSchema,
   })
   // rewrite fields
   .extend({
@@ -47,8 +57,8 @@ export const recipeSchema = createRecipeSchema
 export const recipeComputedSchema = z.object({
   isFavorited: z.boolean(),
   userRating: z.number().int().min(1).max(5).nullable(),
-  averageRating: z.number().nullable(),
-  ratingCount: z.number().int().nonnegative(),
+  // averageRating: z.number().nullable(),
+  // ratingCount: z.number().int().nonnegative(),
 });
 
 export const recipeSummarySchema = recipeSchema.pick({
@@ -58,7 +68,9 @@ export const recipeSummarySchema = recipeSchema.pick({
 
 export const recipeQuerySchema = z
   .object({
-    sort: createSortSchema(["createdAt", "cookingTime"]).default("-createdAt"),
+    sort: createSortSchema(["createdAt", "cookingTime", "popularity"]).default(
+      "-createdAt",
+    ),
     categoryId: z.string().optional(),
     difficulty: difficultySchema.optional(),
     isFavorited: z.stringbool().optional(),

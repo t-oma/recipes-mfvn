@@ -56,10 +56,16 @@ describe("recipeRoutes", () => {
       url: "https://example.com/image.jpg",
       alt: "Test Recipe",
     },
+    stats: {
+      favoritesCount: 0,
+      commentsCount: 0,
+      ratingCount: 0,
+      ratingSum: 0,
+      averageRating: null,
+      popularity: 0,
+    },
     isFavorited: false,
     userRating: null,
-    averageRating: null,
-    ratingCount: 0,
   };
 
   const paginatedResult = {

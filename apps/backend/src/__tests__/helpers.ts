@@ -111,6 +111,14 @@ export function createRecipeDoc(
     servings: 4,
     isPublic: true,
     image: { url: "https://example.com/image.jpg" },
+    stats: {
+      favoritesCount: 0,
+      commentsCount: 0,
+      ratingCount: 0,
+      ratingSum: 0,
+      averageRating: null,
+      popularity: 0,
+    },
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     ...overrides,
@@ -132,8 +140,14 @@ export function populateRecipeDoc(
     author: { _id: createObjectId(), name: "Chef", email: "chef@test.com" },
     isFavorited: false,
     userRating: null,
-    averageRating: null,
-    ratingCount: 0,
+    stats: {
+      favoritesCount: 0,
+      commentsCount: 0,
+      ratingCount: 0,
+      ratingSum: 0,
+      averageRating: null,
+      popularity: 0,
+    },
     ...overrides,
   };
 }

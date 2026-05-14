@@ -135,8 +135,14 @@ describe("recipeService", () => {
     it("should return rating data from aggregation", async () => {
       const populated = populateRecipeDoc(createRecipeDoc(), {
         userRating: 4,
-        averageRating: 4.2,
-        ratingCount: 15,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 15,
+          ratingSum: 63,
+          averageRating: 4.2,
+          popularity: 0,
+        },
       });
       mockRecipeRepository.aggregateSearch.mockResolvedValue([[populated], 1]);
 
@@ -151,8 +157,8 @@ describe("recipeService", () => {
       });
 
       expect(result.items[0]?.userRating).toBe(4);
-      expect(result.items[0]?.averageRating).toBe(4.2);
-      expect(result.items[0]?.ratingCount).toBe(15);
+      expect(result.items[0]?.stats.averageRating).toBe(4.2);
+      expect(result.items[0]?.stats.ratingCount).toBe(15);
     });
 
     it("should return null ratings when recipe has no ratings", async () => {
@@ -170,8 +176,8 @@ describe("recipeService", () => {
       });
 
       expect(result.items[0]?.userRating).toBeNull();
-      expect(result.items[0]?.averageRating).toBeNull();
-      expect(result.items[0]?.ratingCount).toBe(0);
+      expect(result.items[0]?.stats.averageRating).toBeNull();
+      expect(result.items[0]?.stats.ratingCount).toBe(0);
     });
   });
 
@@ -233,8 +239,14 @@ describe("recipeService", () => {
     it("should return rating data from aggregation", async () => {
       const populated = populateRecipeDoc(createRecipeDoc(), {
         userRating: 5,
-        averageRating: 3.8,
-        ratingCount: 42,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 42,
+          ratingSum: 160,
+          averageRating: 3.8,
+          popularity: 0,
+        },
       });
       mockRecipeRepository.aggregateById.mockResolvedValue(populated);
 
@@ -244,8 +256,8 @@ describe("recipeService", () => {
       });
 
       expect(result.userRating).toBe(5);
-      expect(result.averageRating).toBe(3.8);
-      expect(result.ratingCount).toBe(42);
+      expect(result.stats.averageRating).toBe(3.8);
+      expect(result.stats.ratingCount).toBe(42);
     });
   });
 
@@ -295,8 +307,8 @@ describe("recipeService", () => {
       });
       expect(result.title).toBe("New Recipe");
       expect(result.userRating).toBeNull();
-      expect(result.averageRating).toBeNull();
-      expect(result.ratingCount).toBe(0);
+      expect(result.stats.averageRating).toBeNull();
+      expect(result.stats.ratingCount).toBe(0);
       expect(mockCache.deletePattern).toHaveBeenCalledWith(
         recipeCache.keys.listPattern(),
       );
@@ -345,6 +357,42 @@ describe("recipeService", () => {
         }),
       ).rejects.toThrow(NotFoundError);
     });
+
+    it("should return recipe with default stats when created", async () => {
+      mockCategoryRepository.exists.mockResolvedValue(true);
+      mockUserRepository.exists.mockResolvedValue(true);
+
+      const authorId = createObjectId();
+      const categoryId = createObjectId();
+      const populated = populateRecipeDoc(
+        createRecipeDoc({ title: "New Recipe" }),
+        {
+          author: { _id: authorId, name: "Chef", email: "chef@test.com" },
+          category: {
+            _id: categoryId,
+            name: "Italian",
+            slug: "italian",
+            image: { url: "https://example.com/italian.jpg" },
+          },
+        },
+      );
+
+      mockRecipeRepository.create.mockResolvedValue(populated);
+
+      const result = await service.create({
+        data: { ...createData, category: categoryId.toString() },
+        initiator: initiator(authorId.toString()),
+      });
+
+      expect(result.stats).toEqual({
+        favoritesCount: 0,
+        commentsCount: 0,
+        ratingCount: 0,
+        ratingSum: 0,
+        averageRating: null,
+        popularity: 0,
+      });
+    });
   });
 
   describe("update", () => {
@@ -373,8 +421,8 @@ describe("recipeService", () => {
       });
       expect(result.title).toBe("Updated");
       expect(result.userRating).toBeNull();
-      expect(result.averageRating).toBeNull();
-      expect(result.ratingCount).toBe(0);
+      expect(result.stats.averageRating).toBeNull();
+      expect(result.stats.ratingCount).toBe(0);
       expect(mockCache.delete).toHaveBeenCalledWith(recipeCache.keys.byId(id));
       expect(mockCache.deletePattern).toHaveBeenCalledWith(
         recipeCache.keys.listPattern(),
@@ -441,6 +489,42 @@ describe("recipeService", () => {
           initiator: initiator(createObjectId().toString()),
         }),
       ).rejects.toThrow(ForbiddenError);
+    });
+
+    it("should preserve existing stats when updating only title", async () => {
+      const authorId = createObjectId();
+      const recipe = createMockRecipe(authorId);
+      mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
+      mockFavoriteRepository.exists.mockResolvedValue(false);
+      mockRecipeRepository.save.mockResolvedValue(
+        populateRecipeDoc(createRecipeDoc({ author: authorId }), {
+          title: "Updated",
+          stats: {
+            favoritesCount: 5,
+            commentsCount: 3,
+            ratingCount: 10,
+            ratingSum: 45,
+            averageRating: 4.5,
+            popularity: 42,
+          },
+        }),
+      );
+
+      const id = createObjectId().toString();
+      const result = await service.update(id, {
+        data: { title: "Updated" },
+        initiator: initiator(authorId.toString()),
+      });
+
+      expect(result.title).toBe("Updated");
+      expect(result.stats).toEqual({
+        favoritesCount: 5,
+        commentsCount: 3,
+        ratingCount: 10,
+        ratingSum: 45,
+        averageRating: 4.5,
+        popularity: 42,
+      });
     });
   });
 

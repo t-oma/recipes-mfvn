@@ -2,6 +2,7 @@ import type {
   Difficulty,
   Image,
   Minutes,
+  RecipeStats,
   RecipeSummary,
   RecipeWithComputed,
 } from "@recipes/shared";
@@ -32,9 +33,8 @@ export type RecipeView = RecipeSummaryView & {
   servings: number;
   isPublic: boolean;
   image: Image;
+  stats: RecipeStats;
   userRating?: number | null;
-  averageRating?: number | null;
-  ratingCount?: number | null;
   createdAt: Date | string;
   updatedAt: Date | string;
 };
@@ -67,8 +67,14 @@ export function toRecipe(
     },
     isFavorited,
     userRating: view.userRating ?? null,
-    averageRating: view.averageRating ?? null,
-    ratingCount: view.ratingCount ?? 0,
+    stats: {
+      favoritesCount: view.stats.favoritesCount ?? 0,
+      commentsCount: view.stats.commentsCount ?? 0,
+      ratingCount: view.stats.ratingCount ?? 0,
+      ratingSum: view.stats.ratingSum ?? 0,
+      averageRating: view.stats.averageRating ?? null,
+      popularity: view.stats.popularity ?? 0,
+    },
     createdAt: new Date(view.createdAt).toISOString(),
     updatedAt: new Date(view.updatedAt).toISOString(),
   };
