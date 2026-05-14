@@ -8,12 +8,26 @@ import type { RecipeModelType } from "./recipe.model.js";
 import type { RecipeRepository } from "./recipe.repository.js";
 import { RECIPE_POPULARITY_WEIGHTS } from "./recipe.repository.js";
 
-export function computePopularity(stats: Omit<RecipeStats, "popularity">) {
+export function computeAverageRating(
+  stats: Pick<RecipeStats, "ratingCount" | "ratingSum">,
+): number | null {
+  if (stats.ratingCount <= 0) {
+    return null;
+  }
+
+  return Number((stats.ratingSum / stats.ratingCount).toFixed(1));
+}
+
+export function computePopularity(
+  stats: Omit<RecipeStats, "popularity" | "averageRating">,
+) {
+  const averageRating = computeAverageRating(stats);
+
   return (
     stats.favoritesCount * RECIPE_POPULARITY_WEIGHTS.favorites +
     stats.commentsCount * RECIPE_POPULARITY_WEIGHTS.comments +
     stats.ratingCount * RECIPE_POPULARITY_WEIGHTS.ratings +
-    (stats.averageRating ?? 0) * RECIPE_POPULARITY_WEIGHTS.averageRating
+    (averageRating ?? 0) * RECIPE_POPULARITY_WEIGHTS.averageRating
   );
 }
 
@@ -108,7 +122,6 @@ export async function rebuildRecipeStats(
       commentsCount,
       ratingCount,
       ratingSum,
-      averageRating,
     });
 
     return {
