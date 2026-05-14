@@ -1,5 +1,4 @@
 import type { RecipeComputed, RecipeQuery, RequireKeys } from "@recipes/shared";
-import type { PipelineStage } from "mongoose";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
 import type {
