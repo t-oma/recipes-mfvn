@@ -24,6 +24,13 @@ import type {
   RecipeDocumentPopulated,
 } from "./recipe.model.js";
 
+export const RECIPE_POPULARITY_WEIGHTS = {
+  favorites: 3,
+  comments: 2,
+  ratings: 1,
+  averageRating: 5,
+} as const;
+
 export type RecipeStatsDelta = {
   favoritesCount?: number;
   commentsCount?: number;
@@ -139,10 +146,30 @@ export class RecipeRepository extends BaseRepository<
   private buildPopularityExpression() {
     return {
       $add: [
-        { $multiply: [{ $ifNull: ["$stats.favoritesCount", 0] }, 3] },
-        { $multiply: [{ $ifNull: ["$stats.commentsCount", 0] }, 2] },
-        { $ifNull: ["$stats.ratingCount", 0] },
-        { $multiply: [{ $ifNull: ["$stats.averageRating", 0] }, 5] },
+        {
+          $multiply: [
+            { $ifNull: ["$stats.favoritesCount", 0] },
+            RECIPE_POPULARITY_WEIGHTS.favorites,
+          ],
+        },
+        {
+          $multiply: [
+            { $ifNull: ["$stats.commentsCount", 0] },
+            RECIPE_POPULARITY_WEIGHTS.comments,
+          ],
+        },
+        {
+          $multiply: [
+            { $ifNull: ["$stats.ratingCount", 0] },
+            RECIPE_POPULARITY_WEIGHTS.ratings,
+          ],
+        },
+        {
+          $multiply: [
+            { $ifNull: ["$stats.averageRating", 0] },
+            RECIPE_POPULARITY_WEIGHTS.averageRating,
+          ],
+        },
       ],
     };
   }

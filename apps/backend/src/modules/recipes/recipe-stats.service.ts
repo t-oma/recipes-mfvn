@@ -6,13 +6,14 @@ import type { FavoriteModelType } from "@/modules/favorites/favorite.model.js";
 import type { RecipeRatingModelType } from "@/modules/recipe-ratings/recipe-rating.model.js";
 import type { RecipeModelType } from "./recipe.model.js";
 import type { RecipeRepository } from "./recipe.repository.js";
+import { RECIPE_POPULARITY_WEIGHTS } from "./recipe.repository.js";
 
 export function computePopularity(stats: Omit<RecipeStats, "popularity">) {
   return (
-    stats.favoritesCount * 3 +
-    stats.commentsCount * 2 +
-    stats.ratingCount * 1 +
-    (stats.averageRating ?? 0) * 5
+    stats.favoritesCount * RECIPE_POPULARITY_WEIGHTS.favorites +
+    stats.commentsCount * RECIPE_POPULARITY_WEIGHTS.comments +
+    stats.ratingCount * RECIPE_POPULARITY_WEIGHTS.ratings +
+    (stats.averageRating ?? 0) * RECIPE_POPULARITY_WEIGHTS.averageRating
   );
 }
 
