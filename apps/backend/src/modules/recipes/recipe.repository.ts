@@ -73,6 +73,11 @@ export class RecipeRepository extends BaseRepository<
     const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
       query;
 
+    const sortWithPopularityReplaced = sort.replace(
+      "popularity",
+      "stats.popularity",
+    );
+
     const pipeline = [
       stages.match<RecipeDocument>({
         ...byVisibility(initiator),
@@ -90,7 +95,7 @@ export class RecipeRepository extends BaseRepository<
 
       stages.paginated(
         {
-          sort,
+          sort: sortWithPopularityReplaced,
           page,
           limit,
         },
