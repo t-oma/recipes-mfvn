@@ -319,6 +319,277 @@ describe("RecipeRepository", () => {
     });
   });
 
+  describe("applyFavoritesDelta", () => {
+    it("should increment favoritesCount and recalculate popularity", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+      });
+
+      const result = await repository.applyFavoritesDelta(
+        recipe._id.toString(),
+        1,
+      );
+
+      expect(result?.stats.favoritesCount).toBe(1);
+      expect(result?.stats.popularity).toBe(3);
+    });
+
+    it("should decrement favoritesCount", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+        stats: {
+          favoritesCount: 2,
+          commentsCount: 0,
+          ratingCount: 0,
+          ratingSum: 0,
+          averageRating: null,
+          popularity: 6,
+        },
+      });
+
+      const result = await repository.applyFavoritesDelta(
+        recipe._id.toString(),
+        -1,
+      );
+
+      expect(result?.stats.favoritesCount).toBe(1);
+      expect(result?.stats.popularity).toBe(3);
+    });
+
+    it("should not allow favoritesCount to go below zero", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+      });
+
+      const result = await repository.applyFavoritesDelta(
+        recipe._id.toString(),
+        -1,
+      );
+
+      expect(result?.stats.favoritesCount).toBe(0);
+      expect(result?.stats.popularity).toBe(0);
+    });
+  });
+
+  describe("applyCommentsDelta", () => {
+    it("should increment commentsCount and recalculate popularity", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+      });
+
+      const result = await repository.applyCommentsDelta(
+        recipe._id.toString(),
+        1,
+      );
+
+      expect(result?.stats.commentsCount).toBe(1);
+      expect(result?.stats.popularity).toBe(2);
+    });
+
+    it("should not allow commentsCount to go below zero", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+      });
+
+      const result = await repository.applyCommentsDelta(
+        recipe._id.toString(),
+        -1,
+      );
+
+      expect(result?.stats.commentsCount).toBe(0);
+    });
+  });
+
+  describe("applyRatingCreated", () => {
+    it("should add first rating and compute averageRating", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+      });
+
+      const result = await repository.applyRatingCreated(
+        recipe._id.toString(),
+        4,
+      );
+
+      expect(result?.stats.ratingCount).toBe(1);
+      expect(result?.stats.ratingSum).toBe(4);
+      expect(result?.stats.averageRating).toBe(4);
+      expect(result?.stats.popularity).toBe(21);
+    });
+
+    it("should add second rating and update average", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 1,
+          ratingSum: 4,
+          averageRating: 4,
+          popularity: 21,
+        },
+      });
+
+      const result = await repository.applyRatingCreated(
+        recipe._id.toString(),
+        5,
+      );
+
+      expect(result?.stats.ratingCount).toBe(2);
+      expect(result?.stats.ratingSum).toBe(9);
+      expect(result?.stats.averageRating).toBe(4.5);
+      expect(result?.stats.popularity).toBe(24.5);
+    });
+  });
+
+  describe("applyRatingUpdated", () => {
+    it("should update rating sum and average", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 2,
+          ratingSum: 9,
+          averageRating: 4.5,
+          popularity: 24.5,
+        },
+      });
+
+      const result = await repository.applyRatingUpdated(
+        recipe._id.toString(),
+        4,
+        5,
+      );
+
+      expect(result?.stats.ratingCount).toBe(2);
+      expect(result?.stats.ratingSum).toBe(10);
+      expect(result?.stats.averageRating).toBe(5);
+      expect(result?.stats.popularity).toBe(27);
+    });
+  });
+
+  describe("applyRatingDeleted", () => {
+    it("should remove rating and update average", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 2,
+          ratingSum: 9,
+          averageRating: 4.5,
+          popularity: 24.5,
+        },
+      });
+
+      const result = await repository.applyRatingDeleted(
+        recipe._id.toString(),
+        5,
+      );
+
+      expect(result?.stats.ratingCount).toBe(1);
+      expect(result?.stats.ratingSum).toBe(4);
+      expect(result?.stats.averageRating).toBe(4);
+      expect(result?.stats.popularity).toBe(21);
+    });
+
+    it("should set averageRating to null when last rating is deleted", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 1,
+          ratingSum: 4,
+          averageRating: 4,
+          popularity: 21,
+        },
+      });
+
+      const result = await repository.applyRatingDeleted(
+        recipe._id.toString(),
+        4,
+      );
+
+      expect(result?.stats.ratingCount).toBe(0);
+      expect(result?.stats.ratingSum).toBe(0);
+      expect(result?.stats.averageRating).toBeNull();
+      expect(result?.stats.popularity).toBe(0);
+    });
+  });
+
+  describe("combined stats update", () => {
+    it("should recalculate popularity correctly after multiple deltas", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+        stats: {
+          favoritesCount: 2,
+          commentsCount: 1,
+          ratingCount: 3,
+          ratingSum: 12,
+          averageRating: 4,
+          popularity: 0,
+        },
+      });
+
+      const result = await repository.applyFavoritesDelta(
+        recipe._id.toString(),
+        1,
+      );
+
+      expect(result?.stats.favoritesCount).toBe(3);
+      expect(result?.stats.commentsCount).toBe(1);
+      expect(result?.stats.ratingCount).toBe(3);
+      expect(result?.stats.averageRating).toBe(4);
+      expect(result?.stats.popularity).toBe(34);
+    });
+  });
+
   describe("inherited BaseRepository methods", () => {
     it("should create and findById a recipe", async () => {
       const author = await createDbUser();
