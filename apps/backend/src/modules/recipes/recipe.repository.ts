@@ -70,9 +70,39 @@ export class RecipeRepository extends BaseRepository<
   }: QueryMethodParams<RecipeQuery>): Promise<
     [Array<RecipeDocumentPopulated & RecipeComputed>, number]
   > {
-    const result = await this.aggregate<
-      PaginatedStageResult<RecipeDocumentPopulated & RecipeComputed>
-    >(buildSearchPipeline({ query, initiator }));
+    const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
+      query;
+
+    const pipeline = [
+      stages.match<RecipeDocument>({
+        ...byVisibility(initiator),
+        ...(search && { $text: { $search: search } }),
+        ...(categoryId && { category: toObjectId(categoryId) }),
+        ...(difficulty && { difficulty }),
+      }),
+      stages.unset<RecipeDocument>("__v"),
+
+      withFavorited(initiator.id),
+      withUserRating(initiator.id),
+      stages.match<RecipeDocument>({
+        ...(isFavorited !== undefined && { isFavorited }),
+      }),
+
+      stages.paginated(
+        {
+          sort,
+          page,
+          limit,
+        },
+        ...withCategories(),
+        ...withAuthor(),
+      ),
+    ].flat();
+
+    const result =
+      await this.aggregate<
+        PaginatedStageResult<RecipeDocumentPopulated & RecipeComputed>
+      >(pipeline);
 
     return extractPaginatedResult(result);
   }
@@ -81,9 +111,21 @@ export class RecipeRepository extends BaseRepository<
     id: string,
     { initiator }: InitiatedMethodParams<OptionalInitiator>,
   ): Promise<(RecipeDocumentPopulated & RecipeComputed) | undefined> {
+    const pipeline = [
+      stages.match<RecipeDocument>({
+        _id: toObjectId(id),
+        ...byVisibility(initiator),
+      }),
+      { $unset: "__v" },
+      withCategories(),
+      withAuthor(),
+      withFavorited(initiator.id),
+      withUserRating(initiator.id),
+    ].flat();
+
     const result = await this.aggregate<
       RecipeDocumentPopulated & RecipeComputed
-    >(buildFindByIdPipeline(id, { initiator }));
+    >(pipeline);
 
     return result[0];
   }
@@ -218,55 +260,4 @@ export class RecipeRepository extends BaseRepository<
       )
       .lean();
   }
-}
-
-export function buildSearchPipeline({
-  query,
-  initiator,
-}: QueryMethodParams<RecipeQuery>) {
-  const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
-    query;
-
-  return [
-    stages.match<RecipeDocument>({
-      ...byVisibility(initiator),
-      ...(search && { $text: { $search: search } }),
-      ...(categoryId && { category: toObjectId(categoryId) }),
-      ...(difficulty && { difficulty }),
-    }),
-    stages.unset<RecipeDocument>("__v"),
-
-    withFavorited(initiator.id),
-    withUserRating(initiator.id),
-    stages.match<RecipeDocument>({
-      ...(isFavorited !== undefined && { isFavorited }),
-    }),
-
-    stages.paginated(
-      {
-        sort,
-        page,
-        limit,
-      },
-      ...withCategories(),
-      ...withAuthor(),
-    ),
-  ].flat();
-}
-
-export function buildFindByIdPipeline(
-  id: string,
-  { initiator }: InitiatedMethodParams<OptionalInitiator>,
-): PipelineStage[] {
-  return [
-    stages.match<RecipeDocument>({
-      _id: toObjectId(id),
-      ...byVisibility(initiator),
-    }),
-    { $unset: "__v" },
-    withCategories(),
-    withAuthor(),
-    withFavorited(initiator.id),
-    withUserRating(initiator.id),
-  ].flat();
 }
