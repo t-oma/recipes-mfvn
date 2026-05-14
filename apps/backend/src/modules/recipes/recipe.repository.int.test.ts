@@ -6,6 +6,7 @@ import {
   createDbRecipeRating,
   createDbUser,
 } from "@/__tests__/db-factories.js";
+import { noInitiator } from "@/__tests__/helpers.js";
 import { RecipeModel } from "./recipe.model.js";
 import { RecipeRepository } from "./recipe.repository.js";
 
@@ -258,6 +259,120 @@ describe("RecipeRepository", () => {
 
       expect(total).toBe(2);
       expect(recipes).toHaveLength(1);
+    });
+
+    it("should sort by popularity descending", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Low",
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 0,
+          ratingSum: 0,
+          averageRating: null,
+          popularity: 5,
+        },
+      });
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "High",
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 0,
+          ratingSum: 0,
+          averageRating: null,
+          popularity: 50,
+        },
+      });
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Medium",
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 0,
+          ratingSum: 0,
+          averageRating: null,
+          popularity: 20,
+        },
+      });
+
+      const [recipes] = await repository.aggregateSearch({
+        query: { page: 1, limit: 10, sort: "-popularity" },
+        initiator: noInitiator(),
+      });
+
+      expect(recipes).toHaveLength(3);
+      expect(recipes[0]?.title).toBe("High");
+      expect(recipes[1]?.title).toBe("Medium");
+      expect(recipes[2]?.title).toBe("Low");
+    });
+
+    it("should sort by popularity ascending", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Low",
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 0,
+          ratingSum: 0,
+          averageRating: null,
+          popularity: 5,
+        },
+      });
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "High",
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 0,
+          ratingSum: 0,
+          averageRating: null,
+          popularity: 50,
+        },
+      });
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Medium",
+        isPublic: true,
+        stats: {
+          favoritesCount: 0,
+          commentsCount: 0,
+          ratingCount: 0,
+          ratingSum: 0,
+          averageRating: null,
+          popularity: 20,
+        },
+      });
+
+      const [recipes] = await repository.aggregateSearch({
+        query: { page: 1, limit: 10, sort: "popularity" },
+        initiator: noInitiator(),
+      });
+
+      expect(recipes).toHaveLength(3);
+      expect(recipes[0]?.title).toBe("Low");
+      expect(recipes[1]?.title).toBe("Medium");
+      expect(recipes[2]?.title).toBe("High");
     });
   });
 
