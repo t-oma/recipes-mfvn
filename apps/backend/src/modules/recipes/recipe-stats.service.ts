@@ -33,7 +33,18 @@ export function computePopularity(
 
 export type RecipeStatsService = ReturnType<typeof createRecipeStatsService>;
 
-export function createRecipeStatsService(recipeRepository: RecipeRepository) {
+type RecipeRepositoryPort = Pick<
+  RecipeRepository,
+  | "applyFavoritesDelta"
+  | "applyCommentsDelta"
+  | "applyRatingCreated"
+  | "applyRatingUpdated"
+  | "applyRatingDeleted"
+>;
+
+export function createRecipeStatsService(
+  recipeRepository: RecipeRepositoryPort,
+) {
   return {
     async onFavoriteCreated(recipeId: string) {
       return recipeRepository.applyFavoritesDelta(recipeId, 1);
