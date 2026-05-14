@@ -146,30 +146,22 @@ export class RecipeRepository extends BaseRepository<
   private buildPopularityExpression() {
     return {
       $add: [
-        {
-          $multiply: [
-            { $ifNull: ["$stats.favoritesCount", 0] },
-            RECIPE_POPULARITY_WEIGHTS.favorites,
-          ],
-        },
-        {
-          $multiply: [
-            { $ifNull: ["$stats.commentsCount", 0] },
-            RECIPE_POPULARITY_WEIGHTS.comments,
-          ],
-        },
-        {
-          $multiply: [
-            { $ifNull: ["$stats.ratingCount", 0] },
-            RECIPE_POPULARITY_WEIGHTS.ratings,
-          ],
-        },
-        {
-          $multiply: [
-            { $ifNull: ["$stats.averageRating", 0] },
-            RECIPE_POPULARITY_WEIGHTS.averageRating,
-          ],
-        },
+        stages.multiply(
+          { $ifNull: ["$stats.favoritesCount", 0] },
+          RECIPE_POPULARITY_WEIGHTS.favorites,
+        ),
+        stages.multiply(
+          { $ifNull: ["$stats.commentsCount", 0] },
+          RECIPE_POPULARITY_WEIGHTS.comments,
+        ),
+        stages.multiply(
+          { $ifNull: ["$stats.ratingCount", 0] },
+          RECIPE_POPULARITY_WEIGHTS.ratings,
+        ),
+        stages.multiply(
+          { $ifNull: ["$stats.averageRating", 0] },
+          RECIPE_POPULARITY_WEIGHTS.averageRating,
+        ),
       ],
     };
   }
@@ -187,77 +179,37 @@ export class RecipeRepository extends BaseRepository<
       .findOneAndUpdate(
         { _id: toObjectId(recipeId) },
         [
-          {
-            $set: {
-              "stats.favoritesCount": {
-                $max: [
-                  0,
+          stages.set({
+            "stats.favoritesCount": stages.max(0, {
+              $add: [{ $ifNull: ["$stats.favoritesCount", 0] }, favoritesDelta],
+            }),
+            "stats.commentsCount": stages.max(0, {
+              $add: [{ $ifNull: ["$stats.commentsCount", 0] }, commentsDelta],
+            }),
+            "stats.ratingCount": stages.max(0, {
+              $add: [{ $ifNull: ["$stats.ratingCount", 0] }, ratingCountDelta],
+            }),
+            "stats.ratingSum": stages.max(0, {
+              $add: [{ $ifNull: ["$stats.ratingSum", 0] }, ratingSumDelta],
+            }),
+          }),
+          stages.set({
+            "stats.averageRating": stages.cond(
+              { $gt: ["$stats.ratingCount", 0] },
+              {
+                $round: [
                   {
-                    $add: [
-                      { $ifNull: ["$stats.favoritesCount", 0] },
-                      favoritesDelta,
-                    ],
+                    $divide: ["$stats.ratingSum", "$stats.ratingCount"],
                   },
+                  1,
                 ],
               },
-              "stats.commentsCount": {
-                $max: [
-                  0,
-                  {
-                    $add: [
-                      { $ifNull: ["$stats.commentsCount", 0] },
-                      commentsDelta,
-                    ],
-                  },
-                ],
-              },
-              "stats.ratingCount": {
-                $max: [
-                  0,
-                  {
-                    $add: [
-                      { $ifNull: ["$stats.ratingCount", 0] },
-                      ratingCountDelta,
-                    ],
-                  },
-                ],
-              },
-              "stats.ratingSum": {
-                $max: [
-                  0,
-                  {
-                    $add: [
-                      { $ifNull: ["$stats.ratingSum", 0] },
-                      ratingSumDelta,
-                    ],
-                  },
-                ],
-              },
-            },
-          },
-          {
-            $set: {
-              "stats.averageRating": {
-                $cond: [
-                  { $gt: ["$stats.ratingCount", 0] },
-                  {
-                    $round: [
-                      {
-                        $divide: ["$stats.ratingSum", "$stats.ratingCount"],
-                      },
-                      1,
-                    ],
-                  },
-                  null,
-                ],
-              },
-            },
-          },
-          {
-            $set: {
-              "stats.popularity": this.buildPopularityExpression(),
-            },
-          },
+              null,
+            ),
+          }),
+          stages.set({
+            "stats.popularity": this.buildPopularityExpression(),
+          }),
         ],
         {
           returnDocument: "after",
