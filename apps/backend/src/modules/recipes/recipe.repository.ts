@@ -136,6 +136,17 @@ export class RecipeRepository extends BaseRepository<
     ];
   }
 
+  private buildPopularityExpression() {
+    return {
+      $add: [
+        { $multiply: [{ $ifNull: ["$stats.favoritesCount", 0] }, 3] },
+        { $multiply: [{ $ifNull: ["$stats.commentsCount", 0] }, 2] },
+        { $ifNull: ["$stats.ratingCount", 0] },
+        { $multiply: [{ $ifNull: ["$stats.averageRating", 0] }, 5] },
+      ],
+    };
+  }
+
   private async applyStatsDelta(
     recipeId: string,
     delta: RecipeStatsDelta,
@@ -217,16 +228,7 @@ export class RecipeRepository extends BaseRepository<
           },
           {
             $set: {
-              "stats.popularity": {
-                $add: [
-                  { $multiply: ["$stats.favoritesCount", 3] },
-                  { $multiply: ["$stats.commentsCount", 2] },
-                  "$stats.ratingCount",
-                  {
-                    $multiply: [{ $ifNull: ["$stats.averageRating", 0] }, 5],
-                  },
-                ],
-              },
+              "stats.popularity": this.buildPopularityExpression(),
             },
           },
         ],
