@@ -44,7 +44,15 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
           query: request.query,
           initiator: { id: request.user?.userId, role: request.user?.role },
         });
-        return reply.send(result);
+
+        reply.headers({
+          "Cache-Control": "public, max-age=0, must-revalidate",
+          "X-Cache": result.hit ? "HIT" : "MISS",
+          "X-Cache-Key": result.key,
+          "X-Cache-TTL": result.ttl,
+        });
+
+        return reply.send(result.value);
       },
     )
     .post(
