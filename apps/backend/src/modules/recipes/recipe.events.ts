@@ -8,7 +8,7 @@ export function registerRecipeEventHandlers(
   bus: TypedEmitter,
   deps: {
     recipeStats: RecipeStatsService;
-    recipeCache: CacheService;
+    recipeCache: Pick<CacheService, "delete" | "deletePattern">;
     log: Logger;
   },
 ) {
@@ -16,7 +16,9 @@ export function registerRecipeEventHandlers(
     try {
       await deps.recipeStats.onFavoriteCreated(recipeId);
       await deps.recipeCache.delete(recipeCacheOptions.keys.byId(recipeId));
-      await deps.recipeCache.delete(recipeCacheOptions.keys.listPattern());
+      await deps.recipeCache.deletePattern(
+        recipeCacheOptions.keys.listPattern(),
+      );
     } catch (err) {
       deps.log.error(
         { err, recipeId, event: "favorite:created" },
@@ -28,7 +30,9 @@ export function registerRecipeEventHandlers(
     try {
       await deps.recipeStats.onFavoriteDeleted(recipeId);
       await deps.recipeCache.delete(recipeCacheOptions.keys.byId(recipeId));
-      await deps.recipeCache.delete(recipeCacheOptions.keys.listPattern());
+      await deps.recipeCache.deletePattern(
+        recipeCacheOptions.keys.listPattern(),
+      );
     } catch (err) {
       deps.log.error(
         { err, recipeId, event: "favorite:deleted" },
@@ -40,7 +44,9 @@ export function registerRecipeEventHandlers(
     try {
       await deps.recipeStats.onCommentCreated(recipeId);
       await deps.recipeCache.delete(recipeCacheOptions.keys.byId(recipeId));
-      await deps.recipeCache.delete(recipeCacheOptions.keys.listPattern());
+      await deps.recipeCache.deletePattern(
+        recipeCacheOptions.keys.listPattern(),
+      );
     } catch (err) {
       deps.log.error(
         { err, recipeId, event: "comment:created" },
@@ -52,7 +58,9 @@ export function registerRecipeEventHandlers(
     try {
       await deps.recipeStats.onCommentDeleted(recipeId);
       await deps.recipeCache.delete(recipeCacheOptions.keys.byId(recipeId));
-      await deps.recipeCache.delete(recipeCacheOptions.keys.listPattern());
+      await deps.recipeCache.deletePattern(
+        recipeCacheOptions.keys.listPattern(),
+      );
     } catch (err) {
       deps.log.error(
         { err, recipeId, event: "comment:deleted" },
@@ -64,7 +72,9 @@ export function registerRecipeEventHandlers(
     try {
       await deps.recipeStats.onRatingCreated(recipeId, value);
       await deps.recipeCache.delete(recipeCacheOptions.keys.byId(recipeId));
-      await deps.recipeCache.delete(recipeCacheOptions.keys.listPattern());
+      await deps.recipeCache.deletePattern(
+        recipeCacheOptions.keys.listPattern(),
+      );
     } catch (err) {
       deps.log.error(
         { err, recipeId, event: "recipe-rating:created" },
@@ -78,7 +88,9 @@ export function registerRecipeEventHandlers(
       try {
         await deps.recipeStats.onRatingUpdated(recipeId, previousValue, value);
         await deps.recipeCache.delete(recipeCacheOptions.keys.byId(recipeId));
-        await deps.recipeCache.delete(recipeCacheOptions.keys.listPattern());
+        await deps.recipeCache.deletePattern(
+          recipeCacheOptions.keys.listPattern(),
+        );
       } catch (err) {
         deps.log.error(
           { err, recipeId, event: "recipe-rating:updated" },
@@ -91,7 +103,9 @@ export function registerRecipeEventHandlers(
     try {
       await deps.recipeStats.onRatingDeleted(recipeId, value);
       await deps.recipeCache.delete(recipeCacheOptions.keys.byId(recipeId));
-      await deps.recipeCache.delete(recipeCacheOptions.keys.listPattern());
+      await deps.recipeCache.deletePattern(
+        recipeCacheOptions.keys.listPattern(),
+      );
     } catch (err) {
       deps.log.error(
         { err, recipeId, event: "recipe-rating:deleted" },
