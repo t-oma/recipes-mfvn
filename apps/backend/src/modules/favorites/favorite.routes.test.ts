@@ -30,7 +30,7 @@ describe("favoriteRoutes", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    app = createTestApp();
+    app = await createTestApp();
     await app.register(favoriteRoutes, {
       service: mockFavoriteService,
       prefix: "/api/recipes",

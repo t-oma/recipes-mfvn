@@ -28,7 +28,7 @@ describe("userRoutes", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    app = createTestApp();
+    app = await createTestApp();
     await app.register(userRoutes, {
       service: mockUserService,
       prefix: "/api/users",

@@ -28,7 +28,7 @@ describe("recipeRatingRoutes", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    app = createTestApp();
+    app = await createTestApp();
     await app.register(recipeRatingRoutes, {
       service: mockRecipeRatingService,
       prefix: "/api/recipes",

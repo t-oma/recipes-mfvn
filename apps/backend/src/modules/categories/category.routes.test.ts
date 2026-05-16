@@ -48,7 +48,7 @@ describe("categoryRoutes", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    app = createTestApp();
+    app = await createTestApp();
     await app.register(categoryRoutes, {
       service: mockCategoryService,
       prefix: "/api/categories",
@@ -69,9 +69,11 @@ describe("categoryRoutes", () => {
             hasPrev: false,
           },
         },
-        hit: false,
-        key: "categories:list:sort=name:page=1:limit=10",
-        ttl: 3600,
+        cache: {
+          status: "miss",
+          key: "categories:list:sort=name:page=1:limit=10",
+          ttl: 3600,
+        },
       });
 
       const response = await app.inject({
