@@ -7,7 +7,10 @@ import type {
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { EmptyObject } from "@/common/base.repository.js";
-import type { CacheService } from "@/common/cache/cache.service.js";
+import type {
+  CachedResult,
+  CacheService,
+} from "@/common/cache/cache.service.js";
 import { ForbiddenError, NotFoundError } from "@/common/errors.js";
 import type { TypedEmitter } from "@/common/events.js";
 import type {
@@ -29,11 +32,11 @@ import type { RecipeRepository } from "./recipe.repository.js";
 export interface RecipeService {
   findAll(
     params: QueryMethodParams<RecipeQuery>,
-  ): Promise<Paginated<RecipeWithComputed>>;
+  ): Promise<CachedResult<Paginated<RecipeWithComputed>>>;
   findById(
     id: string,
     params: InitiatedMethodParams<OptionalInitiator>,
-  ): Promise<RecipeWithComputed>;
+  ): Promise<CachedResult<RecipeWithComputed>>;
   create(
     params: CreateMethodParams<CreateRecipeBody>,
   ): Promise<RecipeWithComputed>;
@@ -58,7 +61,7 @@ type FavoriteRepositoryPort = Pick<FavoriteRepository, "exists">;
 type CategoryRepositoryPort = Pick<CategoryRepository, "exists" | "modelName">;
 type CacheServicePort = Pick<
   CacheService,
-  "get" | "set" | "delete" | "deletePattern"
+  "getOrSet" | "delete" | "deletePattern"
 >;
 type TypedEmitterPort = Pick<TypedEmitter, "emit">;
 
@@ -72,71 +75,82 @@ export function createRecipeService(
 ): RecipeService {
   return {
     findAll: async ({ query, initiator }) => {
-      const { page, limit, isFavorited } = query;
-
-      if (isFavorited && !initiator.id) {
-        return withPagination([], 0, page, limit);
+      if (query.isFavorited === true && !initiator.id) {
+        return {
+          value: withPagination([], 0, query.page, query.limit),
+          cache: {
+            status: "bypass",
+            reason: "not-applicable",
+          },
+        };
       }
 
-      const isAuthenticated = !!initiator.id;
+      const canUseSharedCache = !initiator.id;
+      const cacheKey = recipeCache.keys.list(query);
 
-      if (!isAuthenticated) {
-        const cacheKey = recipeCache.keys.list(query);
+      const load = async () => {
+        const [recipes, total] = await repository.aggregateSearch({
+          query,
+          initiator,
+        });
 
-        const cached = await cache.get<Paginated<RecipeWithComputed>>(cacheKey);
-        if (cached !== undefined) {
-          return cached;
-        }
+        return withPagination(
+          recipes.map((recipe) => toRecipe(recipe, recipe.isFavorited)),
+          total,
+          query.page,
+          query.limit,
+        );
+      };
+
+      if (!canUseSharedCache) {
+        return {
+          value: await load(),
+          cache: {
+            status: "bypass",
+            reason: "authenticated",
+          },
+        };
       }
 
-      const [recipes, total] = await repository.aggregateSearch({
-        query,
-        initiator,
-      });
-
-      const result = withPagination(
-        recipes.map((recipe) => toRecipe(recipe, recipe.isFavorited)),
-        total,
-        page,
-        limit,
+      return cache.getOrSet<Paginated<RecipeWithComputed>>(
+        cacheKey,
+        load,
+        recipeCache.ttl.list,
       );
-
-      if (!isAuthenticated) {
-        const cacheKey = recipeCache.keys.list(query);
-        await cache.set(cacheKey, result, recipeCache.ttl.list);
-      }
-
-      return result;
     },
 
     findById: async (id, { initiator }) => {
       assertValidId(id, "Recipe");
 
-      const isAuthenticated = !!initiator.id;
+      const canUseSharedCache = !initiator.id;
+      const cacheKey = recipeCache.keys.byId(id);
 
-      if (!isAuthenticated) {
-        const cacheKey = recipeCache.keys.byId(id);
-        const cached = await cache.get<RecipeWithComputed>(cacheKey);
-        if (cached !== undefined) {
-          return cached;
+      const load = async () => {
+        const recipe = await repository.aggregateById(id, {
+          initiator,
+        });
+        if (!recipe) {
+          throw new NotFoundError("Recipe not found");
         }
+
+        return toRecipe(recipe, recipe.isFavorited);
+      };
+
+      if (!canUseSharedCache) {
+        return {
+          value: await load(),
+          cache: {
+            status: "bypass",
+            reason: "authenticated",
+          },
+        };
       }
 
-      const recipe = await repository.aggregateById(id, {
-        initiator,
-      });
-      if (!recipe) {
-        throw new NotFoundError("Recipe not found");
-      }
-
-      const result = toRecipe(recipe, recipe.isFavorited);
-
-      if (!isAuthenticated) {
-        const cacheKey = recipeCache.keys.byId(id);
-        await cache.set(cacheKey, result, recipeCache.ttl.byId);
-      }
-
-      return result;
+      return cache.getOrSet<RecipeWithComputed>(
+        cacheKey,
+        load,
+        recipeCache.ttl.byId,
+      );
     },
 
     create: async ({ data, initiator }) => {
