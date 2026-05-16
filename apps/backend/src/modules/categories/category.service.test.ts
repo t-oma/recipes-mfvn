@@ -6,6 +6,7 @@ import {
   initiator,
   noInitiator,
 } from "@/__tests__/helpers.js";
+import type { CachedGetResult } from "@/common/cache/cache.service.js";
 import { ConflictError, NotFoundError } from "@/common/errors.js";
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
@@ -20,12 +21,17 @@ describe("categoryService", () => {
     count: vi.fn(),
   };
   const mockCache = {
-    getOrSet: vi.fn(async (key, factory, ttl) => ({
-      value: await factory(),
-      hit: false,
-      key,
-      ttl: ttl ?? 0,
-    })),
+    getOrSet: vi.fn(
+      // biome-ignore lint/suspicious/noExplicitAny: test
+      async (key, factory, ttl): Promise<CachedGetResult<any>> => ({
+        value: await factory(),
+        cache: {
+          status: "miss",
+          key,
+          ttl: ttl ?? 0,
+        },
+      }),
+    ),
     deletePattern: vi.fn(),
   };
   const mockBus = {
@@ -68,7 +74,7 @@ describe("categoryService", () => {
       expect(result.value.items[0]?.recipeCount).toBe(5);
       expect(result.value.items[1]?.recipeCount).toBe(0);
       expect(result.value.pagination.total).toBe(2);
-      expect(result.hit).toBe(false);
+      expect(result.cache.status).toBe("miss");
       expect(mockCache.getOrSet).toHaveBeenCalledWith(
         categoryCache.keys.list(query),
         expect.any(Function),
@@ -87,7 +93,7 @@ describe("categoryService", () => {
 
       expect(result.value.items).toEqual([]);
       expect(result.value.pagination.total).toBe(0);
-      expect(result.hit).toBe(false);
+      expect(result.cache.status).toBe("miss");
     });
 
     it("should return cached result on second call", async () => {
@@ -113,9 +119,11 @@ describe("categoryService", () => {
       vi.clearAllMocks();
       mockCache.getOrSet.mockResolvedValue({
         value: withPagination(docs, 1, 1, 10),
-        hit: true,
-        key: categoryCache.keys.list(query),
-        ttl: categoryCache.ttl.list,
+        cache: {
+          status: "hit",
+          key: categoryCache.keys.list(query),
+          ttl: categoryCache.ttl.list,
+        },
       });
 
       const result = await service.findAll({
@@ -126,7 +134,7 @@ describe("categoryService", () => {
       expect(mockCategoryRepository.findMany).not.toHaveBeenCalled();
       expect(result.value.items).toHaveLength(1);
       expect(result.value.pagination.total).toBe(1);
-      expect(result.hit).toBe(true);
+      expect(result.cache.status).toBe("hit");
       expect(mockCache.getOrSet).toHaveBeenCalledWith(
         categoryCache.keys.list(query),
         expect.any(Function),

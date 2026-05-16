@@ -40,19 +40,19 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
         },
       },
       async (request, reply) => {
-        const result = await service.findAll({
+        const { value, cache } = await service.findAll({
           query: request.query,
           initiator: { id: request.user?.userId, role: request.user?.role },
         });
 
         reply.headers({
           "Cache-Control": "public, max-age=0, must-revalidate",
-          "X-Cache": result.hit ? "HIT" : "MISS",
-          "X-Cache-Key": result.key,
-          "X-Cache-TTL": result.ttl,
+          "X-Cache": cache.status.toUpperCase(),
+          "X-Cache-Key": cache.key,
+          "X-Cache-TTL": cache.ttl,
         });
 
-        return reply.send(result.value);
+        return reply.send(value);
       },
     )
     .post(

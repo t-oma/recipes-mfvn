@@ -7,7 +7,7 @@ import type {
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type {
-  CacheGetResult,
+  CachedGetResult,
   CacheService,
 } from "@/common/cache/cache.service.js";
 import { ConflictError, NotFoundError } from "@/common/errors.js";
@@ -25,7 +25,7 @@ import { toCategory } from "./category.mapper.js";
 export interface CategoryService {
   findAll(
     params: QueryMethodParams<CategoryQuery>,
-  ): Promise<CacheGetResult<Paginated<CategoryWithComputed>>>;
+  ): Promise<CachedGetResult<Paginated<CategoryWithComputed>>>;
   create(params: CreateMethodParams<CreateCategoryBody>): Promise<Category>;
   deleteById(id: string, params: DeleteMethodParams): Promise<void>;
 }

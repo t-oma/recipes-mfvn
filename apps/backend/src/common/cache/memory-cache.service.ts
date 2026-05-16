@@ -42,13 +42,27 @@ export function createMemoryCache(
     ) {
       const cached = await this.get<T>(key);
       if (cached !== undefined) {
-        return { value: cached, hit: true, key, ttl: ttlSeconds ?? 0 };
+        return {
+          value: cached,
+          cache: {
+            status: "hit",
+            key,
+            ttl: ttlSeconds ?? 0,
+          },
+        };
       }
 
       const value = await factory();
 
       await this.set(key, value, ttlSeconds);
-      return { value, hit: false, key, ttl: ttlSeconds ?? 0 };
+      return {
+        value,
+        cache: {
+          status: "miss",
+          key,
+          ttl: ttlSeconds ?? 0,
+        },
+      };
     },
 
     async delete(key: string) {

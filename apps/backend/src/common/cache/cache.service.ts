@@ -33,7 +33,7 @@ export interface CacheService {
     key: string,
     factory: () => Promise<T>,
     ttlSeconds?: number,
-  ): Promise<CacheGetResult<T>>;
+  ): Promise<CachedGetResult<T>>;
 
   /**
    * Deletes the entry with the given key.
@@ -58,22 +58,33 @@ export interface CacheService {
   close(): Promise<void>;
 }
 
-export type CacheGetResult<T> = {
-  value: T;
-  hit: boolean;
+export type CacheHitMeta = {
+  status: "hit";
   key: string;
   ttl: number;
 };
+export type CacheMissMeta = {
+  status: "miss";
+  key: string;
+  ttl: number;
+};
+export type CacheBypassReason =
+  | "authenticated"
+  | "personalized"
+  | "disabled"
+  | "not-applicable";
+export type CacheBypassMeta = {
+  status: "bypass";
+  reason: CacheBypassReason;
+};
+export type CacheMeta = CacheHitMeta | CacheMissMeta | CacheBypassMeta;
 
-export function isCacheGetResult<T>(
-  value: unknown,
-): value is CacheGetResult<T> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "value" in value &&
-    "hit" in value &&
-    "key" in value &&
-    "ttl" in value
-  );
-}
+export type CachedResult<T> = {
+  value: T;
+  cache: CacheMeta;
+};
+
+export type CachedGetResult<T> = {
+  value: T;
+  cache: Exclude<CacheMeta, CacheBypassMeta>;
+};
