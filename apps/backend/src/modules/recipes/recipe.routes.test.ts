@@ -90,7 +90,7 @@ describe("recipeRoutes", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    app = createTestApp();
+    app = await createTestApp();
     await app.register(recipeRoutes, {
       service: mockRecipeService,
       commentService: mockCommentService,
@@ -100,7 +100,14 @@ describe("recipeRoutes", () => {
 
   describe("GET /api/recipes", () => {
     it("should return paginated recipes for unauthenticated user", async () => {
-      mockRecipeService.findAll.mockResolvedValue(paginatedResult);
+      mockRecipeService.findAll.mockResolvedValue({
+        value: paginatedResult,
+        cache: {
+          status: "miss",
+          key: "recipes:list:page=1:limit=10:sort=-createdAt",
+          ttl: 120,
+        },
+      });
 
       const page = 1;
       const limit = 10;
@@ -116,11 +123,19 @@ describe("recipeRoutes", () => {
       });
       const body = JSON.parse(response.payload);
       expect(body.items).toHaveLength(paginatedResult.items.length);
+      expect(response.headers["x-cache"]).toBe("MISS");
+      expect(response.headers["x-cache-ttl"]).toBe("120");
     });
 
     it("should return paginated recipes for authenticated user", async () => {
       verifyToken.mockReturnValue(testJwtPayload);
-      mockRecipeService.findAll.mockResolvedValue(paginatedResult);
+      mockRecipeService.findAll.mockResolvedValue({
+        value: paginatedResult,
+        cache: {
+          status: "bypass",
+          reason: "authenticated",
+        },
+      });
 
       const response = await app.inject({
         method: "GET",
@@ -136,6 +151,9 @@ describe("recipeRoutes", () => {
           role: testJwtPayload.role,
         },
       });
+      expect(response.headers["x-cache"]).toBe("BYPASS");
+      expect(response.headers["x-cache-bypass"]).toBe("authenticated");
+      expect(response.headers["cache-control"]).toBe("no-store");
     });
 
     it("should return 400 for invalid query params", async () => {
@@ -152,7 +170,14 @@ describe("recipeRoutes", () => {
 
   describe("GET /api/recipes/:id", () => {
     it("should return recipe by id", async () => {
-      mockRecipeService.findById.mockResolvedValue(validRecipe);
+      mockRecipeService.findById.mockResolvedValue({
+        value: validRecipe,
+        cache: {
+          status: "miss",
+          key: `recipes:id:${recipeId}`,
+          ttl: 600,
+        },
+      });
 
       const response = await app.inject({
         method: "GET",
@@ -165,6 +190,8 @@ describe("recipeRoutes", () => {
       });
       const body = JSON.parse(response.payload);
       expect(body.title).toBe("Test Recipe");
+      expect(response.headers["x-cache"]).toBe("MISS");
+      expect(response.headers["x-cache-ttl"]).toBe("600");
     });
 
     it("should return 400 for invalid id", async () => {

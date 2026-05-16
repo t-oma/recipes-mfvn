@@ -55,8 +55,7 @@ describe("recipeService", () => {
     modelName: "Category",
   };
   const mockCache = {
-    get: vi.fn(),
-    set: vi.fn(),
+    getOrSet: vi.fn(),
     delete: vi.fn(),
     deletePattern: vi.fn(),
   };
@@ -78,6 +77,17 @@ describe("recipeService", () => {
   });
 
   describe("findAll", () => {
+    beforeEach(() => {
+      mockCache.getOrSet.mockImplementation(async (key, factory, ttl) => ({
+        value: await factory(),
+        cache: {
+          status: "miss" as const,
+          key,
+          ttl: ttl ?? 0,
+        },
+      }));
+    });
+
     it("should return paginated recipes", async () => {
       const populated = populateRecipeDoc(createRecipeDoc());
       mockRecipeRepository.aggregateSearch.mockResolvedValue([[populated], 1]);
@@ -92,10 +102,15 @@ describe("recipeService", () => {
         initiator: noInitiator(),
       });
 
-      expect(result.items).toHaveLength(1);
-      expect(result.items[0]?.title).toBe("Test Recipe");
-      expect(result.pagination.total).toBe(1);
-      expect(mockCache.get).toHaveBeenCalledWith(recipeCache.keys.list(query));
+      expect(result.value.items).toHaveLength(1);
+      expect(result.value.items[0]?.title).toBe("Test Recipe");
+      expect(result.value.pagination.total).toBe(1);
+      expect(result.cache.status).toBe("miss");
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
+        recipeCache.keys.list(query),
+        expect.any(Function),
+        recipeCache.ttl.list,
+      );
     });
 
     it("should return empty when aggregate returns empty result", async () => {
@@ -111,8 +126,9 @@ describe("recipeService", () => {
         initiator: noInitiator(),
       });
 
-      expect(result.items).toEqual([]);
-      expect(result.pagination.total).toBe(0);
+      expect(result.value.items).toEqual([]);
+      expect(result.value.pagination.total).toBe(0);
+      expect(result.cache.status).toBe("miss");
     });
 
     it("should return empty when isFavorited filter is set but no initiator", async () => {
@@ -127,9 +143,13 @@ describe("recipeService", () => {
         initiator: noInitiator(),
       });
 
-      expect(result.items).toEqual([]);
+      expect(result.value.items).toEqual([]);
+      expect(result.cache.status).toBe("bypass");
+      if (result.cache.status === "bypass") {
+        expect(result.cache.reason).toBe("not-applicable");
+      }
       expect(mockRecipeRepository.aggregateSearch).not.toHaveBeenCalled();
-      expect(mockCache.get).not.toHaveBeenCalled();
+      expect(mockCache.getOrSet).not.toHaveBeenCalled();
     });
 
     it("should return rating data from aggregation", async () => {
@@ -156,9 +176,9 @@ describe("recipeService", () => {
         initiator: noInitiator(),
       });
 
-      expect(result.items[0]?.userRating).toBe(4);
-      expect(result.items[0]?.stats.averageRating).toBe(4.2);
-      expect(result.items[0]?.stats.ratingCount).toBe(15);
+      expect(result.value.items[0]?.userRating).toBe(4);
+      expect(result.value.items[0]?.stats.averageRating).toBe(4.2);
+      expect(result.value.items[0]?.stats.ratingCount).toBe(15);
     });
 
     it("should return null ratings when recipe has no ratings", async () => {
@@ -175,13 +195,24 @@ describe("recipeService", () => {
         initiator: noInitiator(),
       });
 
-      expect(result.items[0]?.userRating).toBeNull();
-      expect(result.items[0]?.stats.averageRating).toBeNull();
-      expect(result.items[0]?.stats.ratingCount).toBe(0);
+      expect(result.value.items[0]?.userRating).toBeNull();
+      expect(result.value.items[0]?.stats.averageRating).toBeNull();
+      expect(result.value.items[0]?.stats.ratingCount).toBe(0);
     });
   });
 
   describe("findById", () => {
+    beforeEach(() => {
+      mockCache.getOrSet.mockImplementation(async (key, factory, ttl) => ({
+        value: await factory(),
+        cache: {
+          status: "miss" as const,
+          key,
+          ttl: ttl ?? 0,
+        },
+      }));
+    });
+
     it("should return recipe by ID", async () => {
       const populated = populateRecipeDoc(createRecipeDoc());
       mockRecipeRepository.aggregateById.mockResolvedValue(populated);
@@ -191,8 +222,13 @@ describe("recipeService", () => {
         initiator: noInitiator(),
       });
 
-      expect(result.title).toBe("Test Recipe");
-      expect(mockCache.get).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+      expect(result.value.title).toBe("Test Recipe");
+      expect(result.cache.status).toBe("miss");
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
+        recipeCache.keys.byId(id),
+        expect.any(Function),
+        recipeCache.ttl.byId,
+      );
     });
 
     it("should return cached recipe on second call for unauthenticated user", async () => {
@@ -201,18 +237,34 @@ describe("recipeService", () => {
 
       const id = createObjectId().toString();
       await service.findById(id, { initiator: noInitiator() });
-      expect(mockCache.get).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
+        recipeCache.keys.byId(id),
+        expect.any(Function),
+        recipeCache.ttl.byId,
+      );
 
       vi.clearAllMocks();
-      mockCache.get.mockResolvedValue(populated);
+      mockCache.getOrSet.mockResolvedValue({
+        value: populated,
+        cache: {
+          status: "hit" as const,
+          key: recipeCache.keys.byId(id),
+          ttl: recipeCache.ttl.byId,
+        },
+      });
 
       const result = await service.findById(id, {
         initiator: noInitiator(),
       });
 
       expect(mockRecipeRepository.aggregateById).not.toHaveBeenCalled();
-      expect(result.title).toBe("Test Recipe");
-      expect(mockCache.get).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+      expect(result.value.title).toBe("Test Recipe");
+      expect(result.cache.status).toBe("hit");
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
+        recipeCache.keys.byId(id),
+        expect.any(Function),
+        recipeCache.ttl.byId,
+      );
     });
 
     it("should throw BadRequestError for invalid ID", async () => {
@@ -225,7 +277,6 @@ describe("recipeService", () => {
 
     it("should throw NotFoundError when recipe not found", async () => {
       mockRecipeRepository.aggregateById.mockResolvedValue(undefined);
-      mockCache.get.mockResolvedValue(undefined);
 
       const id = createObjectId().toString();
       await expect(
@@ -233,7 +284,11 @@ describe("recipeService", () => {
           initiator: noInitiator(),
         }),
       ).rejects.toThrow(NotFoundError);
-      expect(mockCache.get).toHaveBeenCalledWith(recipeCache.keys.byId(id));
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
+        recipeCache.keys.byId(id),
+        expect.any(Function),
+        recipeCache.ttl.byId,
+      );
     });
 
     it("should return rating data from aggregation", async () => {
@@ -255,9 +310,9 @@ describe("recipeService", () => {
         initiator: noInitiator(),
       });
 
-      expect(result.userRating).toBe(5);
-      expect(result.stats.averageRating).toBe(3.8);
-      expect(result.stats.ratingCount).toBe(42);
+      expect(result.value.userRating).toBe(5);
+      expect(result.value.stats.averageRating).toBe(3.8);
+      expect(result.value.stats.ratingCount).toBe(42);
     });
   });
 
