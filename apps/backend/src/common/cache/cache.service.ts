@@ -61,4 +61,19 @@ export interface CacheService {
 export type CacheGetResult<T> = {
   value: T;
   hit: boolean;
+  key: string;
+  ttl: number;
 };
+
+export function isCacheGetResult<T>(
+  value: unknown,
+): value is CacheGetResult<T> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "value" in value &&
+    "hit" in value &&
+    "key" in value &&
+    "ttl" in value
+  );
+}
