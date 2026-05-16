@@ -3,24 +3,21 @@ import type { CacheService } from "./cache.service.js";
 
 export interface MemoryCacheOptions {
   maxSize?: number;
-  defaultTTL?: number;
 }
 
 /**
  * Creates a new memory cache service.
  *
  * @param options.maxSize - The maximum number of items in the cache. Defaults to 1000.
- * @param options.defaultTTL - The default TTL for cache items in seconds. If not set, items do not expire.
  * @returns A new memory cache service.
  */
 export function createMemoryCache(
   options: MemoryCacheOptions = {},
 ): CacheService {
-  const { maxSize = 1000, defaultTTL } = options;
+  const { maxSize = 1000 } = options;
 
   const cache = new LRUCache<string, NonNullable<unknown>>({
     max: maxSize,
-    ttl: (defaultTTL ?? 0) * 1000,
     updateAgeOnGet: true,
   });
 
@@ -36,9 +33,6 @@ export function createMemoryCache(
     ): Promise<void> {
       if (ttlSeconds) {
         cache.set(key, value, { ttl: ttlSeconds * 1000 });
-        return;
-      } else if (defaultTTL) {
-        cache.set(key, value, { ttl: defaultTTL * 1000 });
         return;
       }
 

@@ -17,7 +17,7 @@ export interface CacheService {
    * Sets the value of the entry with the given key.
    *
    * @param key - The key of the entry to set.
-   * @param ttlSeconds - The time-to-live (TTL) in seconds for the entry. If not provided, the entry will not expire. If the cache service has a default TTL value set, that value will be used. If both parameters are specified, this parameter will be used.
+   * @param ttlSeconds - The time-to-live (TTL) in seconds for the entry. If not provided, the entry will not expire.
    */
   set<T extends {}>(key: string, value: T, ttlSeconds?: number): Promise<void>;
 

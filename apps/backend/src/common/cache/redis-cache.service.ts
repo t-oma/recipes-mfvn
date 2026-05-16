@@ -4,7 +4,6 @@ import type { CacheService } from "./cache.service.js";
 
 export interface RedisCacheOptions {
   url: string;
-  defaultTTL?: number;
   keyPrefix?: string;
 }
 
@@ -12,7 +11,7 @@ export function createRedisCache(
   options: RedisCacheOptions,
   log: Logger,
 ): CacheService {
-  const { url, defaultTTL, keyPrefix = "" } = options;
+  const { url, keyPrefix = "" } = options;
 
   const redis = new Redis(url, {
     maxRetriesPerRequest: 3,
@@ -49,9 +48,6 @@ export function createRedisCache(
     ): Promise<void> {
       if (ttlSeconds) {
         await redis.setex(prefixed(key), ttlSeconds, JSON.stringify(value));
-        return;
-      } else if (defaultTTL) {
-        await redis.setex(prefixed(key), defaultTTL, JSON.stringify(value));
         return;
       }
 
