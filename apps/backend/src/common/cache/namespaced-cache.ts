@@ -5,23 +5,27 @@ export function createNamespacedCache(
   cache: CacheService,
 ): CacheService {
   return {
-    async get<T extends {}>(key: string): Promise<T | undefined> {
+    async get<T extends {}>(key: string) {
       return cache.get<T>(`${prefix}:${key}`);
     },
 
-    async set<T extends {}>(
-      key: string,
-      value: T,
-      ttlSeconds?: number,
-    ): Promise<void> {
+    async set<T extends {}>(key: string, value: T, ttlSeconds?: number) {
       return cache.set(`${prefix}:${key}`, value, ttlSeconds);
     },
 
-    async delete(key: string): Promise<void> {
+    async getOrSet<T extends {}>(
+      key: string,
+      factory: () => Promise<T>,
+      ttlSeconds?: number,
+    ) {
+      return cache.getOrSet(`${prefix}:${key}`, factory, ttlSeconds);
+    },
+
+    async delete(key: string) {
       return cache.delete(`${prefix}:${key}`);
     },
 
-    async deletePattern(pattern: string): Promise<void> {
+    async deletePattern(pattern: string) {
       return cache.deletePattern(`${prefix}:${pattern}`);
     },
 

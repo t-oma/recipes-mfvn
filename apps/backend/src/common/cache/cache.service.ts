@@ -22,6 +22,20 @@ export interface CacheService {
   set<T extends {}>(key: string, value: T, ttlSeconds?: number): Promise<void>;
 
   /**
+   * Gets the value of the entry with the given key, or sets it using the provided factory function if it doesn't exist.
+   *
+   * @param key - The key of the entry to get or set.
+   * @param factory - The function to use to set the value if it doesn't exist.
+   * @param ttlSeconds - The time-to-live (TTL) in seconds for the entry. If not provided, the entry will not expire.
+   * @returns The value of the entry with the given key, or the result of the factory function.
+   */
+  getOrSet<T extends {}>(
+    key: string,
+    factory: () => Promise<T>,
+    ttlSeconds?: number,
+  ): Promise<CacheGetResult<T>>;
+
+  /**
    * Deletes the entry with the given key.
    */
   delete(key: string): Promise<void>;
@@ -43,3 +57,8 @@ export interface CacheService {
    */
   close(): Promise<void>;
 }
+
+export type CacheGetResult<T> = {
+  value: T;
+  hit: boolean;
+};

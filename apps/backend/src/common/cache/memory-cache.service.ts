@@ -22,15 +22,11 @@ export function createMemoryCache(
   });
 
   return {
-    async get<T extends {}>(key: string): Promise<T | undefined> {
+    async get<T extends {}>(key: string) {
       return cache.get(key) as T | undefined;
     },
 
-    async set<T extends {}>(
-      key: string,
-      value: T,
-      ttlSeconds?: number,
-    ): Promise<void> {
+    async set<T extends {}>(key: string, value: T, ttlSeconds?: number) {
       if (ttlSeconds) {
         cache.set(key, value, { ttl: ttlSeconds * 1000 });
         return;
@@ -39,11 +35,27 @@ export function createMemoryCache(
       cache.set(key, value);
     },
 
-    async delete(key: string): Promise<void> {
+    async getOrSet<T extends {}>(
+      key: string,
+      factory: () => Promise<T>,
+      ttlSeconds?: number,
+    ) {
+      const cached = await this.get<T>(key);
+      if (cached !== undefined) {
+        return { value: cached, hit: true };
+      }
+
+      const value = await factory();
+
+      await this.set(key, value, ttlSeconds);
+      return { value, hit: false };
+    },
+
+    async delete(key: string) {
       cache.delete(key);
     },
 
-    async deletePattern(pattern: string): Promise<void> {
+    async deletePattern(pattern: string) {
       const regex = new RegExp(
         `^${pattern.replace(/\*/g, ".*").replace(/\?/g, ".")}$`,
       );
@@ -54,11 +66,11 @@ export function createMemoryCache(
       }
     },
 
-    async flush(): Promise<void> {
+    async flush() {
       cache.clear();
     },
 
-    async close(): Promise<void> {
+    async close() {
       await this.flush();
       // Nothing to close for in-memory cache
     },

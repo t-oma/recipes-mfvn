@@ -35,17 +35,13 @@ export function createRedisCache(
   }
 
   return {
-    async get<T extends {}>(key: string): Promise<T | undefined> {
+    async get<T extends {}>(key: string) {
       const raw = await redis.get(prefixed(key));
       if (raw === null) return undefined;
       return JSON.parse(raw) as T;
     },
 
-    async set<T extends {}>(
-      key: string,
-      value: T,
-      ttlSeconds?: number,
-    ): Promise<void> {
+    async set<T extends {}>(key: string, value: T, ttlSeconds?: number) {
       if (ttlSeconds) {
         await redis.setex(prefixed(key), ttlSeconds, JSON.stringify(value));
         return;
@@ -54,11 +50,27 @@ export function createRedisCache(
       await redis.set(prefixed(key), JSON.stringify(value));
     },
 
-    async delete(key: string): Promise<void> {
+    async getOrSet<T extends {}>(
+      key: string,
+      factory: () => Promise<T>,
+      ttlSeconds?: number,
+    ) {
+      const cached = await this.get<T>(key);
+      if (cached !== undefined) {
+        return { value: cached, hit: true };
+      }
+
+      const value = await factory();
+
+      await this.set(key, value, ttlSeconds);
+      return { value, hit: false };
+    },
+
+    async delete(key: string) {
       await redis.del(prefixed(key));
     },
 
-    async deletePattern(pattern: string): Promise<void> {
+    async deletePattern(pattern: string) {
       const fullPattern = prefixed(pattern);
       let cursor = "0";
 
