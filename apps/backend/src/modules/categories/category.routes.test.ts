@@ -58,15 +58,20 @@ describe("categoryRoutes", () => {
   describe("GET /api/categories", () => {
     it("should return paginated categories", async () => {
       mockCategoryService.findAll.mockResolvedValue({
-        items: [{ ...validCategory, recipeCount: 5 }],
-        pagination: {
-          page: 1,
-          limit: 10,
-          total: 1,
-          totalPages: 1,
-          hasNext: false,
-          hasPrev: false,
+        value: {
+          items: [{ ...validCategory, recipeCount: 5 }],
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: 1,
+            totalPages: 1,
+            hasNext: false,
+            hasPrev: false,
+          },
         },
+        hit: false,
+        key: "categories:list:sort=name:page=1:limit=10",
+        ttl: 3600,
       });
 
       const response = await app.inject({
@@ -78,6 +83,8 @@ describe("categoryRoutes", () => {
       const body = JSON.parse(response.payload);
       expect(body.items).toHaveLength(1);
       expect(body.items[0].name).toBe("Desserts");
+      expect(response.headers["x-cache"]).toBe("MISS");
+      expect(response.headers["x-cache-ttl"]).toBe("3600");
     });
 
     it("should return 400 for invalid query", async () => {
