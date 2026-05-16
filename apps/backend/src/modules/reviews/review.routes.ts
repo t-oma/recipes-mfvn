@@ -39,8 +39,9 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
         },
       },
       async (_request, reply) => {
-        const testimonials = await service.findFeatured();
-        return reply.send(testimonials);
+        const { value, cache } = await service.findFeatured();
+        reply.applyCacheHeaders(cache);
+        return reply.send(value);
       },
     )
     .get(
@@ -55,8 +56,9 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
         },
       },
       async (_request, reply) => {
-        const stats = await service.getStats();
-        return reply.send(stats);
+        const { value, cache } = await service.getStats();
+        reply.applyCacheHeaders(cache);
+        return reply.send(value);
       },
     )
     .post(

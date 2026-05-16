@@ -53,7 +53,14 @@ describe("reviewRoutes", () => {
 
   describe("GET /api/reviews/testimonials", () => {
     it("should return featured testimonials", async () => {
-      mockReviewService.findFeatured.mockResolvedValue([validReview]);
+      mockReviewService.findFeatured.mockResolvedValue({
+        value: [validReview],
+        cache: {
+          status: "miss",
+          key: "reviews:featured",
+          ttl: 3600,
+        },
+      });
 
       const response = await app.inject({
         method: "GET",
@@ -64,15 +71,24 @@ describe("reviewRoutes", () => {
       const body = JSON.parse(response.payload);
       expect(body).toHaveLength(1);
       expect(body[0].text).toBe("Great platform!");
+      expect(response.headers["x-cache"]).toBe("MISS");
+      expect(response.headers["x-cache-ttl"]).toBe("3600");
     });
   });
 
   describe("GET /api/reviews/stats", () => {
     it("should return review statistics", async () => {
       mockReviewService.getStats.mockResolvedValue({
-        totalReviews: 42,
-        averageRating: 4.5,
-        happyCooksCount: 38,
+        value: {
+          totalReviews: 42,
+          averageRating: 4.5,
+          happyCooksCount: 38,
+        },
+        cache: {
+          status: "miss",
+          key: "reviews:stats",
+          ttl: 300,
+        },
       });
 
       const response = await app.inject({
@@ -84,6 +100,8 @@ describe("reviewRoutes", () => {
       const body = JSON.parse(response.payload);
       expect(body.totalReviews).toBe(42);
       expect(body.averageRating).toBe(4.5);
+      expect(response.headers["x-cache"]).toBe("MISS");
+      expect(response.headers["x-cache-ttl"]).toBe("300");
     });
   });
 

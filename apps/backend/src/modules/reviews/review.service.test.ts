@@ -27,8 +27,16 @@ describe("reviewService", () => {
     exists: vi.fn(),
     modelName: "User",
   };
+  const mockCache = {
+    getOrSet: vi.fn(),
+    deletePattern: vi.fn(),
+  };
 
-  const service = createReviewService(mockReviewRepository, mockUserRepository);
+  const service = createReviewService(
+    mockReviewRepository,
+    mockUserRepository,
+    mockCache,
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -63,6 +71,7 @@ describe("reviewService", () => {
       });
       expect(result.text).toBe("Love it!");
       expect(result.rating).toBe(5);
+      expect(mockCache.deletePattern).toHaveBeenCalledWith("*");
     });
 
     it("should throw ConflictError when user already has a review", async () => {
@@ -99,6 +108,17 @@ describe("reviewService", () => {
   });
 
   describe("findFeatured", () => {
+    beforeEach(() => {
+      mockCache.getOrSet.mockImplementation(async (key, factory, ttl) => ({
+        value: await factory(),
+        cache: {
+          status: "miss" as const,
+          key,
+          ttl: ttl ?? 0,
+        },
+      }));
+    });
+
     it("should return featured reviews", async () => {
       const authorId = createObjectId();
       const reviews = [
@@ -112,8 +132,9 @@ describe("reviewService", () => {
       const result = await service.findFeatured();
 
       expect(mockReviewRepository.findFeatured).toHaveBeenCalledWith(6);
-      expect(result).toHaveLength(1);
-      expect(result[0]?.author.name).toBe("Bob");
+      expect(result.value).toHaveLength(1);
+      expect(result.value[0]?.author.name).toBe("Bob");
+      expect(result.cache.status).toBe("miss");
     });
 
     it("should return empty array when no featured reviews", async () => {
@@ -121,7 +142,42 @@ describe("reviewService", () => {
 
       const result = await service.findFeatured();
 
-      expect(result).toEqual([]);
+      expect(result.value).toEqual([]);
+      expect(result.cache.status).toBe("miss");
+    });
+
+    it("should return cached result on second call", async () => {
+      const authorId = createObjectId();
+      const reviews = [
+        {
+          ...createReviewDoc({ author: authorId }),
+          author: { _id: authorId, name: "Bob", email: "bob@test.com" },
+        },
+      ];
+      mockReviewRepository.findFeatured.mockResolvedValue(reviews);
+
+      await service.findFeatured();
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
+        "featured",
+        expect.any(Function),
+        3600,
+      );
+
+      vi.clearAllMocks();
+      mockCache.getOrSet.mockResolvedValue({
+        value: reviews,
+        cache: {
+          status: "hit" as const,
+          key: "featured",
+          ttl: 3600,
+        },
+      });
+
+      const result = await service.findFeatured();
+
+      expect(mockReviewRepository.findFeatured).not.toHaveBeenCalled();
+      expect(result.value).toHaveLength(1);
+      expect(result.cache.status).toBe("hit");
     });
   });
 
@@ -166,6 +222,7 @@ describe("reviewService", () => {
         text: "Updated text",
       });
       expect(result.text).toBe("Updated text");
+      expect(mockCache.deletePattern).toHaveBeenCalledWith("*");
     });
 
     it("should allow admin to update any review", async () => {
@@ -185,6 +242,7 @@ describe("reviewService", () => {
       });
 
       expect(result.text).toBe("Admin update");
+      expect(mockCache.deletePattern).toHaveBeenCalledWith("*");
     });
 
     it("should throw BadRequestError for invalid review ID", async () => {
@@ -242,6 +300,7 @@ describe("reviewService", () => {
         isFeatured: true,
       });
       expect(result.isFeatured).toBe(true);
+      expect(mockCache.deletePattern).toHaveBeenCalledWith("*");
     });
 
     it("should throw ForbiddenError when not admin", async () => {
@@ -278,6 +337,7 @@ describe("reviewService", () => {
       });
 
       expect(mockReviewRepository.deleteDocument).toHaveBeenCalledWith(review);
+      expect(mockCache.deletePattern).toHaveBeenCalledWith("*");
     });
 
     it("should allow admin to delete any review", async () => {
@@ -289,6 +349,7 @@ describe("reviewService", () => {
       });
 
       expect(mockReviewRepository.deleteDocument).toHaveBeenCalledWith(review);
+      expect(mockCache.deletePattern).toHaveBeenCalledWith("*");
     });
 
     it("should throw BadRequestError for invalid review ID", async () => {
@@ -320,6 +381,17 @@ describe("reviewService", () => {
   });
 
   describe("getStats", () => {
+    beforeEach(() => {
+      mockCache.getOrSet.mockImplementation(async (key, factory, ttl) => ({
+        value: await factory(),
+        cache: {
+          status: "miss" as const,
+          key,
+          ttl: ttl ?? 0,
+        },
+      }));
+    });
+
     it("should return review statistics", async () => {
       const stats = {
         totalReviews: 42,
@@ -330,7 +402,45 @@ describe("reviewService", () => {
 
       const result = await service.getStats();
 
-      expect(result).toEqual(stats);
+      expect(result.value).toEqual(stats);
+      expect(result.cache.status).toBe("miss");
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
+        "stats",
+        expect.any(Function),
+        300,
+      );
+    });
+
+    it("should return cached stats on second call", async () => {
+      const stats = {
+        totalReviews: 10,
+        averageRating: 4.0,
+        happyCooksCount: 8,
+      };
+      mockReviewRepository.aggregateStats.mockResolvedValue(stats);
+
+      await service.getStats();
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
+        "stats",
+        expect.any(Function),
+        300,
+      );
+
+      vi.clearAllMocks();
+      mockCache.getOrSet.mockResolvedValue({
+        value: stats,
+        cache: {
+          status: "hit" as const,
+          key: "stats",
+          ttl: 300,
+        },
+      });
+
+      const result = await service.getStats();
+
+      expect(mockReviewRepository.aggregateStats).not.toHaveBeenCalled();
+      expect(result.value).toEqual(stats);
+      expect(result.cache.status).toBe("hit");
     });
   });
 });
