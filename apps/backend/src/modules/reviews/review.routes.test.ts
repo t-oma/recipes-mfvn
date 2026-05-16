@@ -44,7 +44,7 @@ describe("reviewRoutes", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    app = createTestApp();
+    app = await createTestApp();
     await app.register(reviewRoutes, {
       service: mockReviewService,
       prefix: "/api/reviews",

@@ -17,9 +17,23 @@ export interface CacheService {
    * Sets the value of the entry with the given key.
    *
    * @param key - The key of the entry to set.
-   * @param ttlSeconds - The time-to-live (TTL) in seconds for the entry. If not provided, the entry will not expire. If the cache service has a default TTL value set, that value will be used. If both parameters are specified, this parameter will be used.
+   * @param ttlSeconds - The time-to-live (TTL) in seconds for the entry. If not provided, the entry will not expire.
    */
   set<T extends {}>(key: string, value: T, ttlSeconds?: number): Promise<void>;
+
+  /**
+   * Gets the value of the entry with the given key, or sets it using the provided factory function if it doesn't exist.
+   *
+   * @param key - The key of the entry to get or set.
+   * @param factory - The function to use to set the value if it doesn't exist.
+   * @param ttlSeconds - The time-to-live (TTL) in seconds for the entry. If not provided, the entry will not expire.
+   * @returns The value of the entry with the given key, or the result of the factory function.
+   */
+  getOrSet<T extends {}>(
+    key: string,
+    factory: () => Promise<T>,
+    ttlSeconds?: number,
+  ): Promise<CachedGetResult<T>>;
 
   /**
    * Deletes the entry with the given key.
@@ -43,3 +57,34 @@ export interface CacheService {
    */
   close(): Promise<void>;
 }
+
+export type CacheHitMeta = {
+  status: "hit";
+  key: string;
+  ttl: number;
+};
+export type CacheMissMeta = {
+  status: "miss";
+  key: string;
+  ttl: number;
+};
+export type CacheBypassReason =
+  | "authenticated"
+  | "personalized"
+  | "disabled"
+  | "not-applicable";
+export type CacheBypassMeta = {
+  status: "bypass";
+  reason: CacheBypassReason;
+};
+export type CacheMeta = CacheHitMeta | CacheMissMeta | CacheBypassMeta;
+
+export type CachedResult<T> = {
+  value: T;
+  cache: CacheMeta;
+};
+
+export type CachedGetResult<T> = {
+  value: T;
+  cache: Exclude<CacheMeta, CacheBypassMeta>;
+};

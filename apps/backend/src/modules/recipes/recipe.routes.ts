@@ -48,11 +48,13 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         onRequest: optionalAuth,
       },
       async (request, reply) => {
-        const result = await service.findAll({
+        const { value, cache } = await service.findAll({
           query: request.query,
           initiator: { id: request.user?.userId, role: request.user?.role },
         });
-        return reply.send(result);
+
+        reply.applyCacheHeaders(cache);
+        return reply.send(value);
       },
     )
     .get(
@@ -69,10 +71,12 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         onRequest: optionalAuth,
       },
       async (request, reply) => {
-        const recipe = await service.findById(request.params.id, {
+        const { value, cache } = await service.findById(request.params.id, {
           initiator: { id: request.user?.userId, role: request.user?.role },
         });
-        return reply.send(recipe);
+
+        reply.applyCacheHeaders(cache);
+        return reply.send(value);
       },
     )
     .post(

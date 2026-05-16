@@ -6,6 +6,7 @@ import {
   initiator,
   noInitiator,
 } from "@/__tests__/helpers.js";
+import type { CachedGetResult } from "@/common/cache/cache.service.js";
 import { ConflictError, NotFoundError } from "@/common/errors.js";
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
@@ -20,8 +21,17 @@ describe("categoryService", () => {
     count: vi.fn(),
   };
   const mockCache = {
-    get: vi.fn(),
-    set: vi.fn(),
+    getOrSet: vi.fn(
+      // biome-ignore lint/suspicious/noExplicitAny: test
+      async (key, factory, ttl): Promise<CachedGetResult<any>> => ({
+        value: await factory(),
+        cache: {
+          status: "miss",
+          key,
+          ttl: ttl ?? 0,
+        },
+      }),
+    ),
     deletePattern: vi.fn(),
   };
   const mockBus = {
@@ -59,13 +69,16 @@ describe("categoryService", () => {
       });
 
       expect(mockCategoryRepository.findMany).toHaveBeenCalledWith(query);
-      expect(result.items).toHaveLength(2);
-      expect(result.items[0]?.name).toBe("Desserts");
-      expect(result.items[0]?.recipeCount).toBe(5);
-      expect(result.items[1]?.recipeCount).toBe(0);
-      expect(result.pagination.total).toBe(2);
-      expect(mockCache.get).toHaveBeenCalledWith(
+      expect(result.value.items).toHaveLength(2);
+      expect(result.value.items[0]?.name).toBe("Desserts");
+      expect(result.value.items[0]?.recipeCount).toBe(5);
+      expect(result.value.items[1]?.recipeCount).toBe(0);
+      expect(result.value.pagination.total).toBe(2);
+      expect(result.cache.status).toBe("miss");
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
         categoryCache.keys.list(query),
+        expect.any(Function),
+        categoryCache.ttl.list,
       );
     });
 
@@ -78,8 +91,9 @@ describe("categoryService", () => {
         initiator: noInitiator(),
       });
 
-      expect(result.items).toEqual([]);
-      expect(result.pagination.total).toBe(0);
+      expect(result.value.items).toEqual([]);
+      expect(result.value.pagination.total).toBe(0);
+      expect(result.cache.status).toBe("miss");
     });
 
     it("should return cached result on second call", async () => {
@@ -96,11 +110,21 @@ describe("categoryService", () => {
         query,
         initiator: noInitiator(),
       });
-      expect(mockCache.get).toHaveBeenCalledWith(
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
         categoryCache.keys.list(query),
+        expect.any(Function),
+        categoryCache.ttl.list,
       );
+
       vi.clearAllMocks();
-      mockCache.get.mockResolvedValue(withPagination(docs, 1, 1, 10));
+      mockCache.getOrSet.mockResolvedValue({
+        value: withPagination(docs, 1, 1, 10),
+        cache: {
+          status: "hit",
+          key: categoryCache.keys.list(query),
+          ttl: categoryCache.ttl.list,
+        },
+      });
 
       const result = await service.findAll({
         query,
@@ -108,10 +132,13 @@ describe("categoryService", () => {
       });
 
       expect(mockCategoryRepository.findMany).not.toHaveBeenCalled();
-      expect(result.items).toHaveLength(1);
-      expect(result.pagination.total).toBe(1);
-      expect(mockCache.get).toHaveBeenCalledWith(
+      expect(result.value.items).toHaveLength(1);
+      expect(result.value.pagination.total).toBe(1);
+      expect(result.cache.status).toBe("hit");
+      expect(mockCache.getOrSet).toHaveBeenCalledWith(
         categoryCache.keys.list(query),
+        expect.any(Function),
+        categoryCache.ttl.list,
       );
     });
   });

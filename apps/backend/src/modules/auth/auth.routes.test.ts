@@ -20,7 +20,7 @@ describe("authRoutes", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    app = createTestApp();
+    app = await createTestApp();
     await app.register(authRoutes, {
       service: mockAuthService,
       prefix: "/api/auth",

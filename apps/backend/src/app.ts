@@ -9,6 +9,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
+import cacheHeadersPlugin from "@/common/cache/cache-headers.plugin.js";
 import { createCacheService } from "@/common/cache/create-cache.service.js";
 import { createEventBus } from "@/common/events.js";
 import type { Logger } from "@/common/logger.js";
@@ -60,6 +61,9 @@ export async function buildApp(log: Logger) {
   // Swagger
   app.register(fastifySwagger, swaggerOptions);
   app.register(fastifySwaggerUi, swaggerUiOptions);
+
+  // Cache headers helpers
+  app.register(cacheHeadersPlugin);
 
   // Health check
   app.get("/health", async () => ({ status: "ok" }));

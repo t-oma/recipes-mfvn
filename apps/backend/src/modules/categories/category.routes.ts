@@ -40,11 +40,13 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
         },
       },
       async (request, reply) => {
-        const result = await service.findAll({
+        const { value, cache } = await service.findAll({
           query: request.query,
           initiator: { id: request.user?.userId, role: request.user?.role },
         });
-        return reply.send(result);
+
+        reply.applyCacheHeaders(cache);
+        return reply.send(value);
       },
     )
     .post(

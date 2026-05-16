@@ -3,53 +3,73 @@ import type { CacheService } from "./cache.service.js";
 
 export interface MemoryCacheOptions {
   maxSize?: number;
-  defaultTTL?: number;
 }
 
 /**
  * Creates a new memory cache service.
  *
  * @param options.maxSize - The maximum number of items in the cache. Defaults to 1000.
- * @param options.defaultTTL - The default TTL for cache items in seconds. If not set, items do not expire.
  * @returns A new memory cache service.
  */
 export function createMemoryCache(
   options: MemoryCacheOptions = {},
 ): CacheService {
-  const { maxSize = 1000, defaultTTL } = options;
+  const { maxSize = 1000 } = options;
 
   const cache = new LRUCache<string, NonNullable<unknown>>({
     max: maxSize,
-    ttl: (defaultTTL ?? 0) * 1000,
     updateAgeOnGet: true,
   });
 
   return {
-    async get<T extends {}>(key: string): Promise<T | undefined> {
+    async get<T extends {}>(key: string) {
       return cache.get(key) as T | undefined;
     },
 
-    async set<T extends {}>(
-      key: string,
-      value: T,
-      ttlSeconds?: number,
-    ): Promise<void> {
+    async set<T extends {}>(key: string, value: T, ttlSeconds?: number) {
       if (ttlSeconds) {
         cache.set(key, value, { ttl: ttlSeconds * 1000 });
-        return;
-      } else if (defaultTTL) {
-        cache.set(key, value, { ttl: defaultTTL * 1000 });
         return;
       }
 
       cache.set(key, value);
     },
 
-    async delete(key: string): Promise<void> {
+    async getOrSet<T extends {}>(
+      key: string,
+      factory: () => Promise<T>,
+      ttlSeconds?: number,
+    ) {
+      const cached = await this.get<T>(key);
+      if (cached !== undefined) {
+        return {
+          value: cached,
+          cache: {
+            status: "hit",
+            key,
+            ttl: ttlSeconds ?? 0,
+          },
+        };
+      }
+
+      const value = await factory();
+
+      await this.set(key, value, ttlSeconds);
+      return {
+        value,
+        cache: {
+          status: "miss",
+          key,
+          ttl: ttlSeconds ?? 0,
+        },
+      };
+    },
+
+    async delete(key: string) {
       cache.delete(key);
     },
 
-    async deletePattern(pattern: string): Promise<void> {
+    async deletePattern(pattern: string) {
       const regex = new RegExp(
         `^${pattern.replace(/\*/g, ".*").replace(/\?/g, ".")}$`,
       );
@@ -60,11 +80,11 @@ export function createMemoryCache(
       }
     },
 
-    async flush(): Promise<void> {
+    async flush() {
       cache.clear();
     },
 
-    async close(): Promise<void> {
+    async close() {
       await this.flush();
       // Nothing to close for in-memory cache
     },
