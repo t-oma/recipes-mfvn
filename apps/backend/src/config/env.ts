@@ -25,6 +25,7 @@ const envSchema = z
       .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
     CACHE_BACKEND: z.enum(["memory", "redis"]).default("memory"),
     REDIS_URL: z.string().optional(),
+    REBUILD_STATS_CRON: z.string().default("0 * * * *"),
   })
   .refine(
     (values) => {
