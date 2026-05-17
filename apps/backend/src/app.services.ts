@@ -50,6 +50,7 @@ export interface AppServices {
 
   recipeCache: CacheService;
   categoryCache: CacheService;
+  reviewCache: CacheService;
 
   log: Logger;
 }
@@ -69,6 +70,7 @@ export function createServices(
 
   const recipeCache = createNamespacedCache("recipes", cache);
   const categoryCache = createNamespacedCache("categories", cache);
+  const reviewCache = createNamespacedCache("reviews", cache);
 
   const passwordService = createBcryptPasswordService(env.BCRYPT_SALT_ROUNDS);
 
@@ -110,7 +112,11 @@ export function createServices(
     bus,
   );
   const recipeStatsService = createRecipeStatsService(recipeRepository);
-  const reviewService = createReviewService(reviewRepository, userRepository);
+  const reviewService = createReviewService(
+    reviewRepository,
+    userRepository,
+    reviewCache,
+  );
   const authService = createAuthService(userRepository, passwordService, log);
 
   return {
@@ -126,6 +132,7 @@ export function createServices(
 
     recipeCache,
     categoryCache,
+    reviewCache,
 
     log,
   };
