@@ -5,10 +5,14 @@ import vue from "@vitejs/plugin-vue";
 import Components from "unplugin-vue-components/vite";
 import { defineConfig } from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";
+import vueRouter from "vue-router/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    vueRouter({
+      exclude: ["**/_[^/]*/**"],
+    }),
     vue(),
     vueDevTools(),
     tailwindcss(),
