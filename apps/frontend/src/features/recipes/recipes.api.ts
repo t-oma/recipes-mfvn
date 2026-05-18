@@ -5,7 +5,7 @@ import type {
   RecipeWithComputed,
   UpdateRecipeBody,
 } from "@recipes/shared";
-import { apiClient } from "@/common/api/client";
+import { apiClient } from "@/shared/api/client";
 
 /**
  * Retrieve recipes with the given filters.

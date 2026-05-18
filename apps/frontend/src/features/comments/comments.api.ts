@@ -3,7 +3,7 @@ import type {
   Paginated,
   PaginationQuery,
 } from "@recipes/shared";
-import { apiClient } from "@/common/api/client";
+import { apiClient } from "@/shared/api/client";
 
 /**
  * Get comments for the recipe with the given id.

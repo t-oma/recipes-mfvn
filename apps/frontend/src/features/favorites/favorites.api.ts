@@ -1,5 +1,5 @@
 import type { Paginated, Recipe } from "@recipes/shared";
-import { apiClient } from "@/common/api/client";
+import { apiClient } from "@/shared/api/client";
 
 /**
  * Check if recipe with the given id is favorited by the current user.

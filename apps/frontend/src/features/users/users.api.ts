@@ -4,7 +4,7 @@ import type {
   PaginationQuery,
   Recipe,
 } from "@recipes/shared";
-import { apiClient } from "@/common/api/client";
+import { apiClient } from "@/shared/api/client";
 
 /**
  * Get recipes favorited by the current user.

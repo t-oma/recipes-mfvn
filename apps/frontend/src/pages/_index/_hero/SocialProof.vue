@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Rating from "@/common/ui/Rating.vue";
 import { useReviewStats } from "@/features/reviews/reviews.queries";
+import Rating from "@/shared/ui/Rating.vue";
 
 const { data: stats, isLoading } = useReviewStats();
 </script>
