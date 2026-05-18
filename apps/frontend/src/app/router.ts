@@ -10,4 +10,10 @@ if (import.meta.hot) {
   handleHotUpdate(router);
 }
 
+declare module "vue-router" {
+  interface RouteMeta {
+    layout?: "default" | "no-layout";
+  }
+}
+
 export default router;

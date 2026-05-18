@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import DefaultLayout from "@/common/ui/DefaultLayout.vue";
 import Section from "@/common/ui/Section.vue";
 import SectionHeader from "@/common/ui/SectionHeader.vue";
 import { useCategories } from "@/features/categories/categories.queries";
@@ -12,12 +10,10 @@ import Hero from "./_index/Hero.vue";
 import NewsletterCTA from "./_index/NewsletterCTA.vue";
 import TodaysPick from "./_index/TodaysPick.vue";
 
-const isLoaded = ref(false);
-
-onMounted(() => {
-  requestAnimationFrame(() => {
-    isLoaded.value = true;
-  });
+definePage({
+  meta: {
+    layout: "default",
+  },
 });
 
 const CATEGORIES_LIMIT = 6;
@@ -75,7 +71,7 @@ const featuredRecipes = [
 </script>
 
 <template>
-  <DefaultLayout>
+  <main>
     <Hero />
 
     <Section id="categories" bg="bg-white">
@@ -165,5 +161,5 @@ const featuredRecipes = [
     <Section id="newsletter" bg="bg-white">
       <NewsletterCTA />
     </Section>
-  </DefaultLayout>
+  </main>
 </template>
