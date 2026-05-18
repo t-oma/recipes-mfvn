@@ -12,7 +12,10 @@
     "test:e2e": "playwright test",
     "test:ui": "vitest --ui --coverage",
     "build-only": "vite build",
-    "typecheck": "vue-tsc --build"
+    "typecheck": "vue-tsc --build",
+    "check": "biome check src/",
+    "check:fix": "biome check --write src/",
+    "lint": "pnpm typecheck && pnpm check"
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
