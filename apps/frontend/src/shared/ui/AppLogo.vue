@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { APP_NAME } from "@/shared/constants";
+
 const { theme = "light" } = defineProps<{
   theme?: "light" | "dark";
 }>();
@@ -18,7 +20,7 @@ const { theme = "light" } = defineProps<{
         'text-stone-900': theme === 'light',
       }"
     >
-      Savory
+      {{ APP_NAME }}
     </span>
   </div>
 </template>

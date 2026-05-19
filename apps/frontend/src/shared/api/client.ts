@@ -1,22 +1,6 @@
+import { ApiError } from "./errors";
+
 const TOKEN_KEY = "auth_token";
-
-export class ApiError extends Error {
-  code: string;
-
-  constructor(
-    public status: number,
-    public statusText: string,
-    public body: {
-      error: string;
-      code: string;
-      status: number;
-      details?: unknown;
-    },
-  ) {
-    super(body.error || `API Error ${status}: ${statusText}`);
-    this.code = body.code || "UNKNOWN_ERROR";
-  }
-}
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);

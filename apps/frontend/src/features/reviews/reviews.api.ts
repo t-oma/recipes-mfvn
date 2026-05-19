@@ -1,5 +1,5 @@
 import type { Review, ReviewStats } from "@recipes/shared";
-import { apiClient } from "@/common/api/client";
+import { apiClient } from "@/shared/api/client";
 
 /**
  * Get featured testimonials for the home page.

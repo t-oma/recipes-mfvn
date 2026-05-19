@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
-import { getToken, removeToken, setToken } from "@/common/api/client";
+import { getToken, removeToken, setToken } from "@/shared/api/client";
 import {
   getCurrentUser,
   login as loginApi,

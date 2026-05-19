@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Section from "@/common/ui/Section.vue";
-import SectionHeader from "@/common/ui/SectionHeader.vue";
 import { useCategories } from "@/features/categories/categories.queries";
 import CategoriesGrid from "@/features/categories/views/CategoriesGrid.vue";
 import { useTestimonials } from "@/features/reviews/reviews.queries";
 import ReviewCard from "@/features/reviews/views/ReviewCard.vue";
+import Section from "@/shared/ui/Section.vue";
+import SectionHeader from "@/shared/ui/SectionHeader.vue";
 import FeaturedRecipe from "./_index/featured-recipes/FeaturedRecipe.vue";
 import Hero from "./_index/Hero.vue";
 import NewsletterCTA from "./_index/NewsletterCTA.vue";

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import WavyDivider from "@/common/ui/WavyDivider.vue";
+import WavyDivider from "@/shared/ui/WavyDivider.vue";
 import HeroRecipe from "./_hero/HeroRecipe.vue";
 import SocialProof from "./_hero/SocialProof.vue";
 

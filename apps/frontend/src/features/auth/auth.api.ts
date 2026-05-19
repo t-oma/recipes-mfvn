@@ -4,7 +4,7 @@ import type {
   RegisterBody,
   User,
 } from "@recipes/shared";
-import { apiClient } from "@/common/api/client";
+import { apiClient } from "@/shared/api/client";
 
 export function register(body: RegisterBody): Promise<AuthResponse> {
   return apiClient<AuthResponse>("/api/auth/register", {

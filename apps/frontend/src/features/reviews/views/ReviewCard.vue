@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Rating from "@/common/ui/Rating.vue";
+import Rating from "@/shared/ui/Rating.vue";
 
 const props = defineProps<{
   text: string;
