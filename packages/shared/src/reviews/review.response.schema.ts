@@ -1,12 +1,7 @@
 import { z } from "zod";
+import { persistenceFieldsSchema } from "../common/persistence.schema.js";
 import { userSummarySchema } from "../users/user.schema.js";
 import { createReviewInputSchema } from "./review.input.schema.js";
-
-export const reviewPersistenceSchema = z.object({
-  id: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
 
 export const reviewsStatsSchema = z.object({
   totalReviews: z.number().int().nonnegative(),
@@ -15,12 +10,11 @@ export const reviewsStatsSchema = z.object({
 });
 
 export const reviewDetailsSchema = createReviewInputSchema
-  .extend(reviewPersistenceSchema.shape)
+  .extend(persistenceFieldsSchema.shape)
   .extend({
     author: userSummarySchema,
     isFeatured: z.boolean(),
   });
 
-export type ReviewPersistence = z.infer<typeof reviewPersistenceSchema>;
 export type ReviewsStats = z.infer<typeof reviewsStatsSchema>;
 export type ReviewDetails = z.infer<typeof reviewDetailsSchema>;

@@ -28,7 +28,7 @@ export * from "./reviews/review.response.schema.js";
 export * from "./reviews/review.schema.js";
 
 export * from "./common/image.schema.js";
-export type * from "./common/image.schema.js";
+export * from "./common/persistence.schema.js";
 
 export * from "./pagination.js";
 export * from "./utils.js";
