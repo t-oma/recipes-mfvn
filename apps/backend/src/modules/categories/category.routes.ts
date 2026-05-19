@@ -2,7 +2,7 @@ import {
   categoryComputedSchema,
   categoryQuerySchema,
   categorySchema,
-  createCategorySchema,
+  createCategoryInputSchema,
   paginatedSchema,
 } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
@@ -53,7 +53,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
       "/",
       {
         schema: {
-          body: createCategorySchema,
+          body: createCategoryInputSchema,
           response: {
             201: categorySchema,
           },

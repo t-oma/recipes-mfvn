@@ -1,20 +1,11 @@
 import { z } from "zod";
-import { imageSchema } from "../common/image.schema.js";
+import { persistenceFieldsSchema } from "../common/persistence.schema.js";
 import { createSortSchema, paginationQuerySchema } from "../query.js";
+import type { Prettify } from "../utils.js";
+import { createCategoryInputSchema } from "./category.input.schema.js";
 
-export const createCategorySchema = z.object({
-  name: z.string().trim().min(2).max(50),
-  slug: z.string().trim().min(2).max(50).optional(),
-  description: z.string().trim().max(200).optional(),
-  image: imageSchema,
-});
-
-export const categorySchema = createCategorySchema
-  .extend({
-    id: z.string(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-  })
+export const categorySchema = createCategoryInputSchema
+  .extend(persistenceFieldsSchema.shape)
   .required({
     slug: true,
   });
@@ -35,3 +26,11 @@ export const categoryQuerySchema = z
     sort: createSortSchema(["name", "recipeCount"]).default("name"),
   })
   .extend(paginationQuerySchema.shape);
+
+export type Category = z.infer<typeof categorySchema>;
+export type CategoryComputed = z.infer<typeof categoryComputedSchema>;
+export type CategorySummary = z.infer<typeof categorySummarySchema>;
+
+export type CategoryWithComputed = Prettify<Category & CategoryComputed>;
+
+export type CategoryQuery = z.infer<typeof categoryQuerySchema>;

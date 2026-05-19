@@ -2,7 +2,7 @@ import type {
   Category,
   CategoryQuery,
   CategoryWithComputed,
-  CreateCategoryBody,
+  CreateCategoryInput,
   Paginated,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
@@ -26,7 +26,7 @@ export interface CategoryService {
   findAll(
     params: QueryMethodParams<CategoryQuery>,
   ): Promise<CachedGetResult<Paginated<CategoryWithComputed>>>;
-  create(params: CreateMethodParams<CreateCategoryBody>): Promise<Category>;
+  create(params: CreateMethodParams<CreateCategoryInput>): Promise<Category>;
   deleteById(id: string, params: DeleteMethodParams): Promise<void>;
 }
 
