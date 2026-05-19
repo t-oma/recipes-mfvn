@@ -1,9 +1,10 @@
 import type {
-  CreateRecipeBody,
+  CreateRecipeInput,
   Paginated,
+  RecipeDetails,
+  RecipeListItem,
   RecipeQuery,
-  RecipeWithComputed,
-  UpdateRecipeBody,
+  UpdateRecipeInput,
 } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
@@ -14,7 +15,7 @@ import { apiClient } from "@/shared/api/client";
  * @returns Paginated list of recipes.
  */
 export function getRecipes(filters: Partial<RecipeQuery> = {}) {
-  return apiClient<Paginated<RecipeWithComputed>>("/api/recipes", {
+  return apiClient<Paginated<RecipeListItem>>("/api/recipes", {
     query: {
       page: filters.page,
       limit: filters.limit,
@@ -34,7 +35,7 @@ export function getRecipes(filters: Partial<RecipeQuery> = {}) {
  * @returns Recipe.
  */
 export function getRecipe(id: string) {
-  return apiClient<RecipeWithComputed>(`/api/recipes/${id}`);
+  return apiClient<RecipeDetails>(`/api/recipes/${id}`);
 }
 
 /**
@@ -43,8 +44,8 @@ export function getRecipe(id: string) {
  * @param body - recipe data.
  * @returns Created recipe.
  */
-export function createRecipe(body: CreateRecipeBody) {
-  return apiClient<RecipeWithComputed>("/api/recipes", {
+export function createRecipe(body: CreateRecipeInput) {
+  return apiClient<RecipeDetails>("/api/recipes", {
     method: "POST",
     body,
   });
@@ -57,8 +58,8 @@ export function createRecipe(body: CreateRecipeBody) {
  * @param body - recipe data.
  * @returns Updated recipe.
  */
-export function updateRecipe(id: string, body: UpdateRecipeBody) {
-  return apiClient<RecipeWithComputed>(`/api/recipes/${id}`, {
+export function updateRecipe(id: string, body: UpdateRecipeInput) {
+  return apiClient<RecipeDetails>(`/api/recipes/${id}`, {
     method: "PATCH",
     body,
   });

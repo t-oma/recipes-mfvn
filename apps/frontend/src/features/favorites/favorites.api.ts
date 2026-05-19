@@ -1,4 +1,4 @@
-import type { Paginated, Recipe } from "@recipes/shared";
+import type { Paginated, RecipeListItem } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
 /**
@@ -50,8 +50,8 @@ export function removeFavorite(id: string): Promise<{ favorited: false }> {
 export function getUserFavorites(
   _user: string,
   { page = 1, limit = 20 },
-): Promise<Paginated<Recipe>> {
-  return apiClient<Paginated<Recipe>>("/api/users/me/favorites", {
+): Promise<Paginated<RecipeListItem>> {
+  return apiClient<Paginated<RecipeListItem>>("/api/users/me/favorites", {
     query: { page, limit },
   });
 }

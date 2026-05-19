@@ -1,4 +1,4 @@
-import type { RecipeQuery, UpdateRecipeBody } from "@recipes/shared";
+import type { RecipeQuery, UpdateRecipeInput } from "@recipes/shared";
 import {
   useInfiniteQuery,
   useMutation,
@@ -100,7 +100,7 @@ export function useUpdateRecipe() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, body }: { id: string; body: UpdateRecipeBody }) =>
+    mutationFn: ({ id, body }: { id: string; body: UpdateRecipeInput }) =>
       updateRecipe(id, body),
 
     onSuccess: (recipe) => {
