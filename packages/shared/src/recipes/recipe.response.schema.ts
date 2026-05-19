@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { categorySummarySchema } from "../categories/category.schema.js";
-import { userSummarySchema } from "../users/user.schema.js";
+import { persistenceFieldsSchema } from "../common/persistence.schema.js";
+import { userSummarySchema } from "../users/user.response.schema.js";
 import { createRecipeInputSchema } from "./recipe.input.schema.js";
-import { recipePersistenceSchema, recipeStatsSchema } from "./recipe.schema.js";
+import { recipeStatsSchema } from "./recipe.schema.js";
 
 export const recipeComputedSchema = z.object({
   isFavorited: z.boolean(),
@@ -10,7 +11,7 @@ export const recipeComputedSchema = z.object({
 });
 
 export const recipeSummarySchema = createRecipeInputSchema
-  .extend(recipePersistenceSchema.shape)
+  .extend(persistenceFieldsSchema.shape)
   .pick({
     id: true,
     title: true,
@@ -24,14 +25,14 @@ export const recipeListItemSchema = createRecipeInputSchema
     servings: true,
     difficulty: true,
   })
-  .extend(recipePersistenceSchema.pick({ id: true }).shape)
+  .extend(persistenceFieldsSchema.pick({ id: true }).shape)
   .extend(recipeComputedSchema.shape)
   .extend({ stats: recipeStatsSchema })
   .extend({ category: categorySummarySchema })
   .extend({ author: userSummarySchema });
 
 export const recipeDetailsSchema = createRecipeInputSchema
-  .extend(recipePersistenceSchema.shape)
+  .extend(persistenceFieldsSchema.shape)
   .extend(recipeComputedSchema.shape)
   .extend({ stats: recipeStatsSchema })
   .extend({ category: categorySummarySchema })

@@ -1,4 +1,4 @@
-import { recipeRatingBodySchema } from "@recipes/shared";
+import { recipeRatingInputSchema } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
@@ -23,7 +23,7 @@ export const recipeRatingRoutes: FastifyPluginAsync<
       {
         schema: {
           params: recipeParamsSchema,
-          body: recipeRatingBodySchema,
+          body: recipeRatingInputSchema,
           response: {
             200: z.object({ value: z.number().int().min(1).max(5) }),
           },

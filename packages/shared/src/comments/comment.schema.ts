@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { paginationQuerySchema } from "../query.js";
 import { recipeSummarySchema } from "../recipes/recipe.response.schema.js";
-import { userSummarySchema } from "../users/user.schema.js";
+import { userSummarySchema } from "../users/user.response.schema.js";
 
 export const createCommentSchema = z.object({
   text: z.string().trim().min(1).max(2000),

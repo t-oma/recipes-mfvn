@@ -1,14 +1,14 @@
-import type { AuthResponse, LoginBody, RegisterBody } from "@recipes/shared";
+import type { AuthResponse, LoginInput, RegisterInput } from "@recipes/shared";
 import { ConflictError, UnauthorizedError } from "@/common/errors.js";
 import type { Logger } from "@/common/logger.js";
 import type { PasswordService } from "@/common/passwords/password.service.js";
 import { signToken } from "@/common/utils/jwt.js";
-import { toUser } from "@/modules/users/user.mapper.js";
+import { toUserDetails } from "@/modules/users/user.mapper.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
 
 export interface AuthService {
-  register(data: RegisterBody): Promise<AuthResponse>;
-  login(data: LoginBody): Promise<AuthResponse>;
+  register(data: RegisterInput): Promise<AuthResponse>;
+  login(data: LoginInput): Promise<AuthResponse>;
 }
 
 type UserRepositoryPort = Pick<UserRepository, "findOne" | "exists" | "create">;
@@ -47,7 +47,7 @@ export function createAuthService(
       );
 
       return {
-        user: toUser(user),
+        user: toUserDetails(user),
         token,
       };
     },
@@ -76,7 +76,7 @@ export function createAuthService(
       );
 
       return {
-        user: toUser(user),
+        user: toUserDetails(user),
         token,
       };
     },

@@ -3,7 +3,7 @@ import type {
   Paginated,
   PaginationQuery,
   RecipeListItem,
-  User,
+  UserDetails,
 } from "@recipes/shared";
 import { NotFoundError } from "@/common/errors.js";
 import type {
@@ -12,11 +12,11 @@ import type {
 } from "@/common/types/methods.js";
 import type { CommentService } from "@/modules/comments/comment.service.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
-import { toUser } from "./user.mapper.js";
+import { toUserDetails } from "./user.mapper.js";
 import type { UserRepository } from "./user.repository.js";
 
 export interface UserService {
-  getCurrentUser(userId: string): Promise<User>;
+  getCurrentUser(userId: string): Promise<UserDetails>;
   getFavorites(
     userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,
@@ -43,7 +43,7 @@ export function createUserService(
         throw new NotFoundError("User not found");
       }
 
-      return toUser(user);
+      return toUserDetails(user);
     },
     getFavorites: async (userId, params) => {
       return favoriteService.findByUser(userId, params);

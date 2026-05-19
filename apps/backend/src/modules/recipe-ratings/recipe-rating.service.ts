@@ -1,4 +1,4 @@
-import type { RecipeRatingBody } from "@recipes/shared";
+import type { RecipeRatingInput } from "@recipes/shared";
 import { NotFoundError } from "@/common/errors.js";
 import type { TypedEmitter } from "@/common/events.js";
 import type {
@@ -13,7 +13,7 @@ import type { RecipeRatingRepository } from "./recipe-rating.repository.js";
 export interface RecipeRatingService {
   rate(
     recipeId: string,
-    params: CreateMethodParams<RecipeRatingBody>,
+    params: CreateMethodParams<RecipeRatingInput>,
   ): Promise<{ value: number }>;
   remove(recipeId: string, params: DeleteMethodParams): Promise<void>;
 }
