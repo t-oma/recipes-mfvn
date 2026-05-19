@@ -3,8 +3,7 @@ import {
   commentSchema,
   favoriteQuerySchema,
   paginatedSchema,
-  recipeComputedSchema,
-  recipeSchema,
+  recipeListItemSchema,
   userSchema,
 } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
@@ -51,9 +50,7 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
         schema: {
           querystring: favoriteQuerySchema,
           response: {
-            200: paginatedSchema(
-              recipeSchema.extend(recipeComputedSchema.shape),
-            ),
+            200: paginatedSchema(recipeListItemSchema),
           },
           tags: ["Users"],
           summary: "Get current user's favorite recipes",

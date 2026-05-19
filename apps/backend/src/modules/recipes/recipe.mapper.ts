@@ -2,9 +2,10 @@ import type {
   Difficulty,
   Image,
   Minutes,
+  RecipeDetails,
+  RecipeListItem,
   RecipeStats,
   RecipeSummary,
-  RecipeWithComputed,
 } from "@recipes/shared";
 import type { CategorySummaryView } from "@/modules/categories/category.mapper.js";
 import { toCategorySummary } from "@/modules/categories/category.mapper.js";
@@ -22,19 +23,22 @@ export type RecipeSummaryView = {
   title: string;
 };
 
-export type RecipeView = RecipeSummaryView & {
+export type RecipeListItemView = RecipeSummaryView & {
+  stats: RecipeStats;
+  userRating?: number | null;
+  image: Image;
+  category: CategorySummaryView;
+  author: UserSummaryView;
+  cookingTime: Minutes;
+  servings: number;
+  difficulty: Difficulty;
+};
+
+export type RecipeView = RecipeListItemView & {
   description: string;
   ingredients: IngredientView[];
   instructions: string[];
-  category: CategorySummaryView;
-  author: UserSummaryView;
-  difficulty: Difficulty;
-  cookingTime: Minutes;
-  servings: number;
   isPublic: boolean;
-  image: Image;
-  stats: RecipeStats;
-  userRating?: number | null;
   createdAt: Date | string;
   updatedAt: Date | string;
 };
@@ -46,35 +50,44 @@ export function toRecipeSummary(view: RecipeSummaryView): RecipeSummary {
   };
 }
 
-export function toRecipe(
-  view: RecipeView,
+export function toRecipeListItem(
+  view: RecipeListItemView,
   isFavorited: boolean,
-): RecipeWithComputed {
+): RecipeListItem {
   return {
     ...toRecipeSummary(view),
-    description: view.description,
-    ingredients: view.ingredients,
-    instructions: view.instructions,
-    category: toCategorySummary(view.category),
-    author: toUserSummary(view.author),
-    difficulty: view.difficulty,
-    cookingTime: view.cookingTime,
-    servings: view.servings,
-    isPublic: view.isPublic,
+    userRating: view.userRating ?? null,
     image: {
       ...view.image,
       alt: view.image.alt ?? view.title,
     },
+    difficulty: view.difficulty,
+    cookingTime: view.cookingTime,
+    servings: view.servings,
     isFavorited,
-    userRating: view.userRating ?? null,
+    category: toCategorySummary(view.category),
+    author: toUserSummary(view.author),
     stats: {
-      favoritesCount: view.stats.favoritesCount ?? 0,
-      commentsCount: view.stats.commentsCount ?? 0,
-      ratingCount: view.stats.ratingCount ?? 0,
-      ratingSum: view.stats.ratingSum ?? 0,
-      averageRating: view.stats.averageRating ?? null,
-      popularity: view.stats.popularity ?? 0,
+      favoritesCount: view.stats?.favoritesCount ?? 0,
+      commentsCount: view.stats?.commentsCount ?? 0,
+      ratingCount: view.stats?.ratingCount ?? 0,
+      ratingSum: view.stats?.ratingSum ?? 0,
+      averageRating: view.stats?.averageRating ?? null,
+      popularity: view.stats?.popularity ?? 0,
     },
+  };
+}
+
+export function toRecipeDetails(
+  view: RecipeView,
+  isFavorited: boolean,
+): RecipeDetails {
+  return {
+    ...toRecipeListItem(view, isFavorited),
+    description: view.description,
+    ingredients: view.ingredients,
+    instructions: view.instructions,
+    isPublic: view.isPublic,
     createdAt: new Date(view.createdAt).toISOString(),
     updatedAt: new Date(view.updatedAt).toISOString(),
   };

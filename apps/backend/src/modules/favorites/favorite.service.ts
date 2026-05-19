@@ -1,7 +1,7 @@
 import type {
   Paginated,
   PaginationQuery,
-  RecipeWithComputed,
+  RecipeListItem,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { TypedEmitter } from "@/common/events.js";
@@ -11,7 +11,7 @@ import type {
   QueryMethodParams,
 } from "@/common/types/methods.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
-import { toRecipe } from "@/modules/recipes/recipe.mapper.js";
+import { toRecipeListItem } from "@/modules/recipes/recipe.mapper.js";
 import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
 import type { FavoriteRepository } from "./favorite.repository.js";
@@ -28,7 +28,7 @@ export interface FavoriteService {
   findByUser(
     userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,
-  ): Promise<Paginated<RecipeWithComputed>>;
+  ): Promise<Paginated<RecipeListItem>>;
   isFavorited(
     recipeId: string,
     params: InitiatedMethodParams,
@@ -95,7 +95,9 @@ export function createFavoriteService(
         initiator,
       });
 
-      const result = favoriteRecipes.map((recipe) => toRecipe(recipe, true));
+      const result = favoriteRecipes.map((recipe) =>
+        toRecipeListItem(recipe, true),
+      );
 
       return withPagination(result, total, query.page, query.limit);
     },

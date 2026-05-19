@@ -1,4 +1,4 @@
-import type { PaginationQuery, Recipe } from "@recipes/shared";
+import type { PaginationQuery, RecipeDetails } from "@recipes/shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
@@ -24,7 +24,7 @@ export function useAddFavorite() {
     mutationFn: addFavorite,
 
     onSuccess: (_, id) => {
-      queryClient.setQueryData<Recipe>(recipeKeys.detail(id), (old) =>
+      queryClient.setQueryData<RecipeDetails>(recipeKeys.detail(id), (old) =>
         old ? { ...old, isFavorited: true } : old,
       );
       queryClient.invalidateQueries({ queryKey: recipeKeys.all });
@@ -45,7 +45,7 @@ export function useRemoveFavorite() {
     mutationFn: removeFavorite,
 
     onSuccess: (_, id) => {
-      queryClient.setQueryData<Recipe>(recipeKeys.detail(id), (old) =>
+      queryClient.setQueryData<RecipeDetails>(recipeKeys.detail(id), (old) =>
         old ? { ...old, isFavorited: false } : old,
       );
       queryClient.invalidateQueries({ queryKey: recipeKeys.all });

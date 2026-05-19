@@ -28,6 +28,12 @@ export type FavoriteCreateInput = RequireKeys<
 >;
 export type FavoriteUpdateInput = UpdateInput<FavoriteDocument>;
 
+type RecipeDocumentListItem = Omit<
+  RecipeDocumentPopulated,
+  "description" | "ingredients" | "instructions" | "createdAt" | "updatedAt"
+> &
+  RecipeComputed;
+
 export class FavoriteRepository extends BaseRepository<
   FavoriteDocument,
   FavoriteCreateInput,
@@ -36,7 +42,7 @@ export class FavoriteRepository extends BaseRepository<
   async findByUser(
     userId: string,
     { query, initiator }: QueryMethodParams,
-  ): Promise<[Array<RecipeDocumentPopulated & RecipeComputed>, number]> {
+  ): Promise<[RecipeDocumentListItem[], number]> {
     const pipeline = [
       stages.match<FavoriteDocument>({
         user: toObjectId(userId),
@@ -53,7 +59,7 @@ export class FavoriteRepository extends BaseRepository<
     const result =
       await this.aggregate<
         PaginatedStageResult<{
-          recipe: RecipeDocumentPopulated & RecipeComputed;
+          recipe: RecipeDocumentListItem;
         }>
       >(pipeline);
 
@@ -78,7 +84,14 @@ function withRecipe(
         stages.match<RecipeDocument>({
           ...byVisibility(initiator),
         }),
-        stages.unset<RecipeDocument>("__v"),
+        stages.project({
+          __v: 0,
+          description: 0,
+          ingredients: 0,
+          instructions: 0,
+          createdAt: 0,
+          updatedAt: 0,
+        }),
         withCategories(),
         withAuthor(),
         withUserRating(initiator.id),

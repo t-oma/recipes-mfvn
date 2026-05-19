@@ -1,9 +1,10 @@
 import type {
-  CreateRecipeBody,
+  CreateRecipeInput,
   Paginated,
+  RecipeDetails,
+  RecipeListItem,
   RecipeQuery,
-  RecipeWithComputed,
-  UpdateRecipeBody,
+  UpdateRecipeInput,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { EmptyObject } from "@/common/base.repository.js";
@@ -26,24 +27,22 @@ import type { CategoryRepository } from "@/modules/categories/category.repositor
 import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
-import { toRecipe } from "./recipe.mapper.js";
+import { toRecipeDetails, toRecipeListItem } from "./recipe.mapper.js";
 import type { RecipeRepository } from "./recipe.repository.js";
 
 export interface RecipeService {
   findAll(
     params: QueryMethodParams<RecipeQuery>,
-  ): Promise<CachedResult<Paginated<RecipeWithComputed>>>;
+  ): Promise<CachedResult<Paginated<RecipeListItem>>>;
   findById(
     id: string,
     params: InitiatedMethodParams<OptionalInitiator>,
-  ): Promise<CachedResult<RecipeWithComputed>>;
-  create(
-    params: CreateMethodParams<CreateRecipeBody>,
-  ): Promise<RecipeWithComputed>;
+  ): Promise<CachedResult<RecipeDetails>>;
+  create(params: CreateMethodParams<CreateRecipeInput>): Promise<RecipeDetails>;
   update(
     id: string,
-    params: UpdateMethodParams<UpdateRecipeBody>,
-  ): Promise<RecipeWithComputed>;
+    params: UpdateMethodParams<UpdateRecipeInput>,
+  ): Promise<RecipeDetails>;
   delete(id: string, params: DeleteMethodParams): Promise<void>;
 }
 
@@ -95,7 +94,7 @@ export function createRecipeService(
         });
 
         return withPagination(
-          recipes.map((recipe) => toRecipe(recipe, recipe.isFavorited)),
+          recipes.map((recipe) => toRecipeListItem(recipe, recipe.isFavorited)),
           total,
           query.page,
           query.limit,
@@ -112,7 +111,7 @@ export function createRecipeService(
         };
       }
 
-      return cache.getOrSet<Paginated<RecipeWithComputed>>(
+      return cache.getOrSet<Paginated<RecipeListItem>>(
         cacheKey,
         load,
         recipeCache.ttl.list,
@@ -133,7 +132,7 @@ export function createRecipeService(
           throw new NotFoundError("Recipe not found");
         }
 
-        return toRecipe(recipe, recipe.isFavorited);
+        return toRecipeDetails(recipe, recipe.isFavorited);
       };
 
       if (!canUseSharedCache) {
@@ -146,7 +145,7 @@ export function createRecipeService(
         };
       }
 
-      return cache.getOrSet<RecipeWithComputed>(
+      return cache.getOrSet<RecipeDetails>(
         cacheKey,
         load,
         recipeCache.ttl.byId,
@@ -168,7 +167,7 @@ export function createRecipeService(
       await cache.deletePattern(recipeCache.keys.listPattern());
       bus.emit("recipe:created", { recipeId: recipe._id.toHexString() });
 
-      return toRecipe(recipe, false);
+      return toRecipeDetails(recipe, false);
     },
 
     update: async (id, { data, initiator }) => {
@@ -197,7 +196,7 @@ export function createRecipeService(
       ]);
       bus.emit("recipe:updated", { recipeId: id });
 
-      return toRecipe(updated, isFavorited);
+      return toRecipeDetails(updated, isFavorited);
     },
 
     delete: async (id, { initiator }) => {

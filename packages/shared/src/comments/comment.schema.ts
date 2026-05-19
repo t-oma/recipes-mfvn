@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { paginationQuerySchema } from "../query.js";
-import { recipeSummarySchema } from "../recipes/recipe.schema.js";
+import { recipeSummarySchema } from "../recipes/recipe.response.schema.js";
 import { userSummarySchema } from "../users/user.schema.js";
 
 export const createCommentSchema = z.object({
