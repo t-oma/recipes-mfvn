@@ -22,8 +22,7 @@ export * from "./recipes/ingredient.schema.js";
 export * from "./favorites/favorite.schema.js";
 export type * from "./favorites/favorite.types.js";
 
-export * from "./recipe-rating/recipe-rating.schema.js";
-export type * from "./recipe-rating/recipe-rating.types.js";
+export * from "./recipe-rating/recipe-rating.input.schema.js";
 
 export * from "./reviews/review.input.schema.js";
 export * from "./reviews/review.response.schema.js";
