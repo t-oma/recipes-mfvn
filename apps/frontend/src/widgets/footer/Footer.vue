@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { APP_NAME } from "@/shared/constants";
 import AppLogo from "@/shared/ui/AppLogo.vue";
 import FooterSocials from "./ui/FooterSocials.vue";
 </script>
@@ -46,7 +47,7 @@ import FooterSocials from "./ui/FooterSocials.vue";
       <div
         class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-stone-800 pt-8 text-sm md:flex-row"
       >
-        <p>&copy; 2026 Savory. All rights reserved.</p>
+        <p>&copy; 2026 {{ APP_NAME }}. All rights reserved.</p>
         <div class="flex gap-6">
           <a href="#" class="transition-colors hover:text-white">
             Privacy Policy
