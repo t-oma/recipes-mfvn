@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { createObjectId, createReviewDoc } from "@/__tests__/helpers.js";
-import { toReview } from "./review.mapper.js";
+import { toReviewDetails } from "./review.mapper.js";
 
-describe("toReview", () => {
+describe("toReviewDetails", () => {
   it("should map ReviewDocument to Review DTO", () => {
     const doc = {
       ...createReviewDoc({ text: "Amazing platform!", isFeatured: true }),
@@ -13,7 +13,7 @@ describe("toReview", () => {
       },
     };
 
-    const result = toReview(doc);
+    const result = toReviewDetails(doc);
 
     expect(result.text).toBe("Amazing platform!");
     expect(result.isFeatured).toBe(true);

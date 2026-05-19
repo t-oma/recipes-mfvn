@@ -1,10 +1,10 @@
 import type {
-  CreateReviewBody,
+  CreateReviewInput,
   Paginated,
-  Review,
+  ReviewDetails,
   ReviewQuery,
-  ReviewStats,
-  UpdateReviewBody,
+  ReviewsStats,
+  UpdateReviewInput,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { EmptyObject } from "@/common/base.repository.js";
@@ -27,24 +27,26 @@ import type {
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
 import { reviewCache } from "./review.cache.js";
-import { toReview } from "./review.mapper.js";
+import { toReviewDetails } from "./review.mapper.js";
 import type { ReviewRepository } from "./review.repository.js";
 
 export interface ReviewService {
-  create(params: CreateMethodParams<CreateReviewBody>): Promise<Review>;
-  findFeatured(): Promise<CachedGetResult<Review[]>>;
-  findAll(params: QueryMethodParams<ReviewQuery>): Promise<Paginated<Review>>;
+  create(params: CreateMethodParams<CreateReviewInput>): Promise<ReviewDetails>;
+  findFeatured(): Promise<CachedGetResult<ReviewDetails[]>>;
+  findAll(
+    params: QueryMethodParams<ReviewQuery>,
+  ): Promise<Paginated<ReviewDetails>>;
   update(
     id: string,
-    params: UpdateMethodParams<UpdateReviewBody>,
-  ): Promise<Review>;
+    params: UpdateMethodParams<UpdateReviewInput>,
+  ): Promise<ReviewDetails>;
   feature(
     id: string,
     params: InitiatedMethodParams,
     isFeatured: boolean,
-  ): Promise<Review>;
+  ): Promise<ReviewDetails>;
   delete(id: string, params: DeleteMethodParams): Promise<void>;
-  getStats(): Promise<CachedGetResult<ReviewStats>>;
+  getStats(): Promise<CachedGetResult<ReviewsStats>>;
 }
 
 type ReviewRepositoryPort = Pick<
@@ -86,15 +88,15 @@ export function createReviewService(
 
       await cache.deletePattern(reviewCache.keys.allPattern());
 
-      return toReview(review);
+      return toReviewDetails(review);
     },
 
     findFeatured: async () => {
-      return cache.getOrSet<Review[]>(
+      return cache.getOrSet<ReviewDetails[]>(
         reviewCache.keys.featured(),
         async () => {
           const reviews = await repository.findFeatured(6);
-          return reviews.map(toReview);
+          return reviews.map(toReviewDetails);
         },
         reviewCache.ttl.featured,
       );
@@ -107,7 +109,7 @@ export function createReviewService(
       });
 
       return withPagination(
-        reviews.map(toReview),
+        reviews.map(toReviewDetails),
         total,
         query.page,
         query.limit,
@@ -130,7 +132,7 @@ export function createReviewService(
 
       const updated = await repository.save(review, data);
       await cache.deletePattern(reviewCache.keys.allPattern());
-      return toReview(updated);
+      return toReviewDetails(updated);
     },
 
     feature: async (id, { initiator }, isFeatured) => {
@@ -149,7 +151,7 @@ export function createReviewService(
 
       const updated = await repository.save(review, { isFeatured });
       await cache.deletePattern(reviewCache.keys.allPattern());
-      return toReview(updated);
+      return toReviewDetails(updated);
     },
 
     delete: async (id, { initiator }) => {
@@ -171,7 +173,7 @@ export function createReviewService(
     },
 
     getStats: async () => {
-      return cache.getOrSet<ReviewStats>(
+      return cache.getOrSet<ReviewsStats>(
         reviewCache.keys.stats(),
         async () => repository.aggregateStats(),
         reviewCache.ttl.stats,
