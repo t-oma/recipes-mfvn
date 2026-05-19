@@ -3,7 +3,7 @@ import { ConflictError, UnauthorizedError } from "@/common/errors.js";
 import type { Logger } from "@/common/logger.js";
 import type { PasswordService } from "@/common/passwords/password.service.js";
 import { signToken } from "@/common/utils/jwt.js";
-import { toUser } from "@/modules/users/user.mapper.js";
+import { toUserDetails } from "@/modules/users/user.mapper.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
 
 export interface AuthService {
@@ -47,7 +47,7 @@ export function createAuthService(
       );
 
       return {
-        user: toUser(user),
+        user: toUserDetails(user),
         token,
       };
     },
@@ -76,7 +76,7 @@ export function createAuthService(
       );
 
       return {
-        user: toUser(user),
+        user: toUserDetails(user),
         token,
       };
     },

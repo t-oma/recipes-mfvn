@@ -2,7 +2,7 @@ import type {
   AuthResponse,
   LoginInput,
   RegisterInput,
-  User,
+  UserDetails,
 } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
@@ -20,6 +20,6 @@ export function login(body: LoginInput): Promise<AuthResponse> {
   });
 }
 
-export function getCurrentUser(): Promise<User> {
-  return apiClient<User>("/api/users/me");
+export function getCurrentUser(): Promise<UserDetails> {
+  return apiClient<UserDetails>("/api/users/me");
 }

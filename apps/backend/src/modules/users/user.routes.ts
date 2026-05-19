@@ -4,7 +4,7 @@ import {
   favoriteQuerySchema,
   paginatedSchema,
   recipeListItemSchema,
-  userSchema,
+  userDetailsSchema,
 } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -29,7 +29,7 @@ export const userRoutes: FastifyPluginAsync<UserPluginOptions> = async (
       {
         schema: {
           response: {
-            200: userSchema,
+            200: userDetailsSchema,
           },
           tags: ["Users"],
           summary: "Get current user",

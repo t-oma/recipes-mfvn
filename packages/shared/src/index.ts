@@ -6,8 +6,7 @@ export * from "./auth/auth.response.schema.js";
 export * from "./categories/category.schema.js";
 export type * from "./categories/category.types.js";
 
-export * from "./users/user.schema.js";
-export type * from "./users/user.types.js";
+export * from "./users/user.response.schema.js";
 
 export * from "./comments/comment.schema.js";
 export type * from "./comments/comment.types.js";

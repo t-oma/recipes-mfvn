@@ -1,4 +1,4 @@
-import type { User, UserSummary } from "@recipes/shared";
+import type { UserDetails, UserSummary } from "@recipes/shared";
 
 export type UserSummaryView = {
   _id: string | { toString(): string };
@@ -6,7 +6,7 @@ export type UserSummaryView = {
   name: string;
 };
 
-export type UserView = UserSummaryView & {
+export type UserDetailsView = UserSummaryView & {
   createdAt: Date | string;
   updatedAt: Date | string;
 };
@@ -19,7 +19,7 @@ export function toUserSummary(view: UserSummaryView): UserSummary {
   };
 }
 
-export function toUser(view: UserView): User {
+export function toUserDetails(view: UserDetailsView): UserDetails {
   return {
     ...toUserSummary(view),
     createdAt: new Date(view.createdAt).toISOString(),

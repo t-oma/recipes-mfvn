@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { userSchema } from "../users/user.schema.js";
+import { userDetailsSchema } from "../users/user.response.schema.js";
 
 export const authResponseSchema = z.object({
-  user: userSchema,
+  user: userDetailsSchema,
   token: z.string(),
 });
 
