@@ -12,11 +12,12 @@ export type * from "./users/user.types.js";
 export * from "./comments/comment.schema.js";
 export type * from "./comments/comment.types.js";
 
+export * from "./recipes/recipe.primitives.schema.js";
+export * from "./recipes/recipe.input.schema.js";
 export * from "./recipes/recipe.schema.js";
-export type * from "./recipes/recipe.types.js";
+export * from "./recipes/recipe.response.schema.js";
 
 export * from "./recipes/ingredient.schema.js";
-export type * from "./recipes/ingredient.types.js";
 
 export * from "./favorites/favorite.schema.js";
 export type * from "./favorites/favorite.types.js";

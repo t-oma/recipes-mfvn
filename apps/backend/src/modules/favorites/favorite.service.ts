@@ -1,7 +1,7 @@
 import type {
   Paginated,
   PaginationQuery,
-  RecipeWithComputed,
+  RecipeDetails,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { TypedEmitter } from "@/common/events.js";
@@ -28,7 +28,7 @@ export interface FavoriteService {
   findByUser(
     userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,
-  ): Promise<Paginated<RecipeWithComputed>>;
+  ): Promise<Paginated<RecipeDetails>>;
   isFavorited(
     recipeId: string,
     params: InitiatedMethodParams,

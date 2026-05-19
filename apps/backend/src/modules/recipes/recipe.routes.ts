@@ -2,12 +2,11 @@ import {
   commentQuerySchema,
   commentSchema,
   createCommentSchema,
-  createRecipeSchema,
+  createRecipeInputSchema,
   paginatedSchema,
-  recipeComputedSchema,
+  recipeDetailsSchema,
   recipeQuerySchema,
-  recipeSchema,
-  updateRecipeSchema,
+  updateRecipeInputSchema,
 } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -38,9 +37,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           querystring: recipeQuerySchema,
           response: {
-            200: paginatedSchema(
-              recipeSchema.extend(recipeComputedSchema.shape),
-            ),
+            200: paginatedSchema(recipeDetailsSchema),
           },
           tags: ["Recipes"],
           summary: "Get all recipes with pagination",
@@ -63,7 +60,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           params: recipeParamsSchema,
           response: {
-            200: recipeSchema.extend(recipeComputedSchema.shape),
+            200: recipeDetailsSchema,
           },
           tags: ["Recipes"],
           summary: "Get recipe by ID",
@@ -83,9 +80,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       "/",
       {
         schema: {
-          body: createRecipeSchema,
+          body: createRecipeInputSchema,
           response: {
-            201: recipeSchema.extend(recipeComputedSchema.shape),
+            201: recipeDetailsSchema,
           },
           tags: ["Recipes"],
           summary: "Create a recipe",
@@ -108,9 +105,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       {
         schema: {
           params: recipeParamsSchema,
-          body: updateRecipeSchema,
+          body: updateRecipeInputSchema,
           response: {
-            200: recipeSchema.extend(recipeComputedSchema.shape),
+            200: recipeDetailsSchema,
           },
           tags: ["Recipes"],
           summary: "Update a recipe",

@@ -1,9 +1,9 @@
 import type {
-  CreateRecipeBody,
+  CreateRecipeInput,
   Paginated,
+  RecipeDetails,
   RecipeQuery,
-  RecipeWithComputed,
-  UpdateRecipeBody,
+  UpdateRecipeInput,
 } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import type { EmptyObject } from "@/common/base.repository.js";
@@ -32,18 +32,16 @@ import type { RecipeRepository } from "./recipe.repository.js";
 export interface RecipeService {
   findAll(
     params: QueryMethodParams<RecipeQuery>,
-  ): Promise<CachedResult<Paginated<RecipeWithComputed>>>;
+  ): Promise<CachedResult<Paginated<RecipeDetails>>>;
   findById(
     id: string,
     params: InitiatedMethodParams<OptionalInitiator>,
-  ): Promise<CachedResult<RecipeWithComputed>>;
-  create(
-    params: CreateMethodParams<CreateRecipeBody>,
-  ): Promise<RecipeWithComputed>;
+  ): Promise<CachedResult<RecipeDetails>>;
+  create(params: CreateMethodParams<CreateRecipeInput>): Promise<RecipeDetails>;
   update(
     id: string,
-    params: UpdateMethodParams<UpdateRecipeBody>,
-  ): Promise<RecipeWithComputed>;
+    params: UpdateMethodParams<UpdateRecipeInput>,
+  ): Promise<RecipeDetails>;
   delete(id: string, params: DeleteMethodParams): Promise<void>;
 }
 
@@ -112,7 +110,7 @@ export function createRecipeService(
         };
       }
 
-      return cache.getOrSet<Paginated<RecipeWithComputed>>(
+      return cache.getOrSet<Paginated<RecipeDetails>>(
         cacheKey,
         load,
         recipeCache.ttl.list,
@@ -146,7 +144,7 @@ export function createRecipeService(
         };
       }
 
-      return cache.getOrSet<RecipeWithComputed>(
+      return cache.getOrSet<RecipeDetails>(
         cacheKey,
         load,
         recipeCache.ttl.byId,

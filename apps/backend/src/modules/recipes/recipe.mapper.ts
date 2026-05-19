@@ -2,9 +2,9 @@ import type {
   Difficulty,
   Image,
   Minutes,
+  RecipeDetails,
   RecipeStats,
   RecipeSummary,
-  RecipeWithComputed,
 } from "@recipes/shared";
 import type { CategorySummaryView } from "@/modules/categories/category.mapper.js";
 import { toCategorySummary } from "@/modules/categories/category.mapper.js";
@@ -49,7 +49,7 @@ export function toRecipeSummary(view: RecipeSummaryView): RecipeSummary {
 export function toRecipe(
   view: RecipeView,
   isFavorited: boolean,
-): RecipeWithComputed {
+): RecipeDetails {
   return {
     ...toRecipeSummary(view),
     description: view.description,
