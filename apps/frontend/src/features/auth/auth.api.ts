@@ -1,19 +1,19 @@
 import type {
   AuthResponse,
-  LoginBody,
-  RegisterBody,
+  LoginInput,
+  RegisterInput,
   User,
 } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
-export function register(body: RegisterBody): Promise<AuthResponse> {
+export function register(body: RegisterInput): Promise<AuthResponse> {
   return apiClient<AuthResponse>("/api/auth/register", {
     method: "POST",
     body,
   });
 }
 
-export function login(body: LoginBody): Promise<AuthResponse> {
+export function login(body: LoginInput): Promise<AuthResponse> {
   return apiClient<AuthResponse>("/api/auth/login", {
     method: "POST",
     body,

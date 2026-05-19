@@ -1,7 +1,7 @@
-// biome-ignore-all assist/source/organizeImports: reason for ignoring
+// biome-ignore-all assist/source/organizeImports: prevent biome from sorting imports
 
-export * from "./auth/auth.schema.js";
-export type * from "./auth/auth.types.js";
+export * from "./auth/auth.input.schema.js";
+export * from "./auth/auth.response.schema.js";
 
 export * from "./categories/category.schema.js";
 export type * from "./categories/category.types.js";
