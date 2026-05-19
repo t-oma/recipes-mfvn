@@ -68,12 +68,12 @@ export function toRecipeListItem(
     category: toCategorySummary(view.category),
     author: toUserSummary(view.author),
     stats: {
-      favoritesCount: view.stats.favoritesCount ?? 0,
-      commentsCount: view.stats.commentsCount ?? 0,
-      ratingCount: view.stats.ratingCount ?? 0,
-      ratingSum: view.stats.ratingSum ?? 0,
-      averageRating: view.stats.averageRating ?? null,
-      popularity: view.stats.popularity ?? 0,
+      favoritesCount: view.stats?.favoritesCount ?? 0,
+      commentsCount: view.stats?.commentsCount ?? 0,
+      ratingCount: view.stats?.ratingCount ?? 0,
+      ratingSum: view.stats?.ratingSum ?? 0,
+      averageRating: view.stats?.averageRating ?? null,
+      popularity: view.stats?.popularity ?? 0,
     },
   };
 }
