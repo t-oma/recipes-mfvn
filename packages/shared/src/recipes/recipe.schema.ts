@@ -6,6 +6,12 @@ import {
 } from "../query.js";
 import { difficultySchema } from "./recipe.primitives.schema.js";
 
+export const recipePersistenceSchema = z.object({
+  id: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
 export const recipeStatsSchema = z.object({
   favoritesCount: z.number().int().nonnegative(),
   commentsCount: z.number().int().nonnegative(),
@@ -27,5 +33,6 @@ export const recipeQuerySchema = z
   .extend(paginationQuerySchema.shape)
   .extend(searchQuerySchema.shape);
 
+export type RecipePersistence = z.infer<typeof recipePersistenceSchema>;
 export type RecipeStats = z.infer<typeof recipeStatsSchema>;
 export type RecipeQuery = z.infer<typeof recipeQuerySchema>;

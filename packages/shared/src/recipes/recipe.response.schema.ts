@@ -2,8 +2,7 @@ import { z } from "zod";
 import { categorySummarySchema } from "../categories/category.schema.js";
 import { userSummarySchema } from "../users/user.schema.js";
 import { createRecipeInputSchema } from "./recipe.input.schema.js";
-import { recipePersistenceSchema } from "./recipe.primitives.schema.js";
-import { recipeStatsSchema } from "./recipe.schema.js";
+import { recipePersistenceSchema, recipeStatsSchema } from "./recipe.schema.js";
 
 export const recipeComputedSchema = z.object({
   isFavorited: z.boolean(),
