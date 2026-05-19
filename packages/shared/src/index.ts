@@ -20,7 +20,6 @@ export * from "./recipes/recipe.response.schema.js";
 export * from "./recipes/ingredient.schema.js";
 
 export * from "./favorites/favorite.schema.js";
-export type * from "./favorites/favorite.types.js";
 
 export * from "./recipe-rating/recipe-rating.input.schema.js";
 
