@@ -1,11 +1,10 @@
 import {
-  createReviewSchema,
+  createReviewInputSchema,
   paginatedSchema,
-  reviewParamsSchema,
+  reviewDetailsSchema,
   reviewQuerySchema,
-  reviewSchema,
-  reviewStatsSchema,
-  updateReviewSchema,
+  reviewsStatsSchema,
+  updateReviewInputSchema,
 } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -15,6 +14,7 @@ import {
   authGuard,
 } from "@/common/middleware/auth.guard.js";
 import { rolesGuard } from "@/common/middleware/role.guard.js";
+import { idParamSchema } from "@/common/schemas.js";
 import type { ReviewService } from "@/modules/reviews/review.service.js";
 
 export interface ReviewModuleOptions {
@@ -32,7 +32,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
       {
         schema: {
           response: {
-            200: z.array(reviewSchema),
+            200: z.array(reviewDetailsSchema),
           },
           tags: ["Reviews"],
           summary: "Get featured testimonials",
@@ -49,7 +49,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
       {
         schema: {
           response: {
-            200: reviewStatsSchema,
+            200: reviewsStatsSchema,
           },
           tags: ["Reviews"],
           summary: "Get review statistics",
@@ -65,9 +65,9 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
       "/",
       {
         schema: {
-          body: createReviewSchema,
+          body: createReviewInputSchema,
           response: {
-            201: reviewSchema,
+            201: reviewDetailsSchema,
           },
           tags: ["Reviews"],
           summary: "Create a review",
@@ -91,7 +91,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
         schema: {
           querystring: reviewQuerySchema,
           response: {
-            200: paginatedSchema(reviewSchema),
+            200: paginatedSchema(reviewDetailsSchema),
           },
           tags: ["Reviews"],
           summary: "Get all reviews",
@@ -113,10 +113,10 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
       "/:id",
       {
         schema: {
-          params: reviewParamsSchema,
-          body: updateReviewSchema,
+          params: z.object({ id: idParamSchema }),
+          body: updateReviewInputSchema,
           response: {
-            200: reviewSchema,
+            200: reviewDetailsSchema,
           },
           tags: ["Reviews"],
           summary: "Update a review",
@@ -138,10 +138,10 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
       "/:id/feature",
       {
         schema: {
-          params: reviewParamsSchema,
+          params: z.object({ id: idParamSchema }),
           body: z.object({ isFeatured: z.boolean() }),
           response: {
-            200: reviewSchema,
+            200: reviewDetailsSchema,
           },
           tags: ["Reviews"],
           summary: "Feature or unfeature a review",
@@ -166,7 +166,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
       "/:id",
       {
         schema: {
-          params: reviewParamsSchema,
+          params: z.object({ id: idParamSchema }),
           tags: ["Reviews"],
           summary: "Delete a review",
           security: [{ bearerAuth: [] }],

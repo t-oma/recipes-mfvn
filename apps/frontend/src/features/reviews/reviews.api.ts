@@ -1,4 +1,4 @@
-import type { Review, ReviewStats } from "@recipes/shared";
+import type { ReviewDetails, ReviewsStats } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
 /**
@@ -7,7 +7,7 @@ import { apiClient } from "@/shared/api/client";
  * @returns List of featured reviews.
  */
 export function getTestimonials() {
-  return apiClient<Review[]>("/api/reviews/testimonials");
+  return apiClient<ReviewDetails[]>("/api/reviews/testimonials");
 }
 
 /**
@@ -16,5 +16,5 @@ export function getTestimonials() {
  * @returns Review stats (total, average rating, happy cooks).
  */
 export function getReviewStats() {
-  return apiClient<ReviewStats>("/api/reviews/stats");
+  return apiClient<ReviewsStats>("/api/reviews/stats");
 }
