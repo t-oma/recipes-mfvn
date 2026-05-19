@@ -1,7 +1,7 @@
 import type { Minutes, RecipeComputed } from "@recipes/shared";
 import { describe, expect, it } from "vitest";
 import { createObjectId, createRecipeDoc } from "@/__tests__/helpers.js";
-import { toRecipe, toRecipeSummary } from "./recipe.mapper.js";
+import { toRecipeDetails, toRecipeSummary } from "./recipe.mapper.js";
 import type { RecipeDocumentPopulated } from "./recipe.model.js";
 
 describe("toRecipeSummary", () => {
@@ -20,7 +20,7 @@ describe("toRecipeSummary", () => {
   });
 });
 
-describe("toRecipe", () => {
+describe("toRecipeDetails", () => {
   it("should map recipe document to Recipe DTO", () => {
     const categoryId = createObjectId();
     const authorId = createObjectId();
@@ -56,7 +56,7 @@ describe("toRecipe", () => {
       },
     } satisfies RecipeDocumentPopulated & RecipeComputed;
 
-    const result = toRecipe(doc, doc.isFavorited);
+    const result = toRecipeDetails(doc, doc.isFavorited);
 
     expect(result.id).toBe(doc._id.toString());
     expect(result.title).toBe("Pasta");
@@ -93,7 +93,7 @@ describe("toRecipe", () => {
       author: { _id: createObjectId(), name: "Auth", email: "a@b.c" },
     };
 
-    const result = toRecipe(doc, false);
+    const result = toRecipeDetails(doc, false);
 
     expect(result.userRating).toBeNull();
     expect(result.stats.averageRating).toBeNull();
@@ -112,7 +112,7 @@ describe("toRecipe", () => {
       author: { _id: createObjectId(), name: "Auth", email: "a@b.c" },
     };
 
-    const result = toRecipe(doc, false);
+    const result = toRecipeDetails(doc, false);
 
     expect(result.isFavorited).toBe(false);
   });
@@ -133,7 +133,7 @@ describe("toRecipe", () => {
       } as never,
     };
 
-    const result = toRecipe(doc, false);
+    const result = toRecipeDetails(doc, false);
 
     expect(result.stats.favoritesCount).toBe(5);
     expect(result.stats.commentsCount).toBe(3);

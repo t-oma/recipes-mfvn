@@ -2,7 +2,7 @@ import type {
   Comment,
   Paginated,
   PaginationQuery,
-  RecipeDetails,
+  RecipeListItem,
   User,
 } from "@recipes/shared";
 import { NotFoundError } from "@/common/errors.js";
@@ -20,7 +20,7 @@ export interface UserService {
   getFavorites(
     userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,
-  ): Promise<Paginated<RecipeDetails>>;
+  ): Promise<Paginated<RecipeListItem>>;
   getComments(
     userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,

@@ -5,6 +5,7 @@ import {
   createRecipeInputSchema,
   paginatedSchema,
   recipeDetailsSchema,
+  recipeListItemSchema,
   recipeQuerySchema,
   updateRecipeInputSchema,
 } from "@recipes/shared";
@@ -37,7 +38,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         schema: {
           querystring: recipeQuerySchema,
           response: {
-            200: paginatedSchema(recipeDetailsSchema),
+            200: paginatedSchema(recipeListItemSchema),
           },
           tags: ["Recipes"],
           summary: "Get all recipes with pagination",

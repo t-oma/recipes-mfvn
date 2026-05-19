@@ -57,6 +57,12 @@ export type RecipeDefaultPopulate = {
   category: Pick<CategoryDocument, "_id" | "name" | "slug" | "image">;
 };
 
+type RecipeDocumentListItem = Omit<
+  RecipeDocumentPopulated,
+  "description" | "ingredients" | "instructions" | "createdAt" | "updatedAt"
+> &
+  RecipeComputed;
+
 export class RecipeRepository extends BaseRepository<
   RecipeDocument,
   RecipeCreateInput,
@@ -67,7 +73,7 @@ export class RecipeRepository extends BaseRepository<
     query,
     initiator,
   }: QueryMethodParams<RecipeQuery>): Promise<
-    [Array<RecipeDocumentPopulated & RecipeComputed>, number]
+    [RecipeDocumentListItem[], number]
   > {
     const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
       query;
@@ -98,15 +104,22 @@ export class RecipeRepository extends BaseRepository<
           page,
           limit,
         },
+        stages.project({
+          description: 0,
+          ingredients: 0,
+          instructions: 0,
+          createdAt: 0,
+          updatedAt: 0,
+        }),
         ...withCategories(),
         ...withAuthor(),
       ),
     ].flat();
 
     const result =
-      await this.aggregate<
-        PaginatedStageResult<RecipeDocumentPopulated & RecipeComputed>
-      >(pipeline);
+      await this.aggregate<PaginatedStageResult<RecipeDocumentListItem>>(
+        pipeline,
+      );
 
     return extractPaginatedResult(result);
   }
