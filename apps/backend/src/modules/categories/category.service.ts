@@ -1,7 +1,6 @@
 import type {
-  Category,
+  CategoryDetails,
   CategoryQuery,
-  CategoryWithComputed,
   CreateCategoryInput,
   Paginated,
 } from "@recipes/shared";
@@ -20,13 +19,15 @@ import type {
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import type { CategoryRepository } from "@/modules/categories/category.repository.js";
 import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
-import { toCategory } from "./category.mapper.js";
+import { toCategoryDetails } from "./category.mapper.js";
 
 export interface CategoryService {
   findAll(
     params: QueryMethodParams<CategoryQuery>,
-  ): Promise<CachedGetResult<Paginated<CategoryWithComputed>>>;
-  create(params: CreateMethodParams<CreateCategoryInput>): Promise<Category>;
+  ): Promise<CachedGetResult<Paginated<CategoryDetails>>>;
+  create(
+    params: CreateMethodParams<CreateCategoryInput>,
+  ): Promise<CategoryDetails>;
   deleteById(id: string, params: DeleteMethodParams): Promise<void>;
 }
 
@@ -48,13 +49,13 @@ export function createCategoryService(
     findAll: async ({ query }) => {
       const cacheKey = categoryCache.keys.list(query);
 
-      return cache.getOrSet<Paginated<CategoryWithComputed>>(
+      return cache.getOrSet<Paginated<CategoryDetails>>(
         cacheKey,
         async () => {
           const [categories, total] = await repository.findMany(query);
 
           return withPagination(
-            categories.map(toCategory),
+            categories.map(toCategoryDetails),
             total,
             query.page,
             query.limit,
@@ -70,7 +71,7 @@ export function createCategoryService(
       await cache.deletePattern(categoryCache.keys.allPattern());
       bus.emit("category:created", { categoryId: category._id.toHexString() });
 
-      return toCategory(category);
+      return toCategoryDetails(category);
     },
 
     deleteById: async (id) => {

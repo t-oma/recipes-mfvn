@@ -1,7 +1,6 @@
 import {
-  categoryComputedSchema,
+  categoryDetailsSchema,
   categoryQuerySchema,
-  categorySchema,
   createCategoryInputSchema,
   paginatedSchema,
 } from "@recipes/shared";
@@ -31,9 +30,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
         schema: {
           querystring: categoryQuerySchema,
           response: {
-            200: paginatedSchema(
-              categorySchema.extend(categoryComputedSchema.shape),
-            ),
+            200: paginatedSchema(categoryDetailsSchema),
           },
           tags: ["Categories"],
           summary: "Get all categories",
@@ -55,7 +52,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
         schema: {
           body: createCategoryInputSchema,
           response: {
-            201: categorySchema,
+            201: categoryDetailsSchema,
           },
           tags: ["Categories"],
           summary: "Create a category",

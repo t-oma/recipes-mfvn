@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createCategoryDoc } from "@/__tests__/helpers.js";
-import { toCategory, toCategorySummary } from "./category.mapper.js";
+import { toCategoryDetails, toCategorySummary } from "./category.mapper.js";
 
 describe("toCategorySummary", () => {
   it("should map CategorySummaryView to CategorySummary DTO", () => {
@@ -32,7 +32,7 @@ describe("toCategorySummary", () => {
   });
 });
 
-describe("toCategory", () => {
+describe("toCategoryDetails", () => {
   it("should map CategoryDocument to Category DTO", () => {
     const doc = createCategoryDoc({
       name: "Desserts",
@@ -40,7 +40,7 @@ describe("toCategory", () => {
       description: "Sweet dishes",
     });
 
-    const result = toCategory(doc);
+    const result = toCategoryDetails(doc);
 
     expect(result).toEqual({
       id: doc._id.toString(),
@@ -57,7 +57,7 @@ describe("toCategory", () => {
   it("should handle optional description", () => {
     const doc = createCategoryDoc({ description: undefined });
 
-    const result = toCategory(doc);
+    const result = toCategoryDetails(doc);
 
     expect(result.description).toBeUndefined();
   });

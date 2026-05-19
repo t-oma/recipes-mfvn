@@ -1,8 +1,4 @@
-import type {
-  CategorySummary,
-  CategoryWithComputed,
-  Image,
-} from "@recipes/shared";
+import type { CategoryDetails, CategorySummary, Image } from "@recipes/shared";
 
 export type CategorySummaryView = {
   _id: string | { toString(): string };
@@ -11,7 +7,7 @@ export type CategorySummaryView = {
   image: Image;
 };
 
-export type CategiryView = CategorySummaryView & {
+export type CategiryDetailsView = CategorySummaryView & {
   description?: string;
   recipeCount?: number;
   createdAt: Date | string;
@@ -30,7 +26,7 @@ export function toCategorySummary(view: CategorySummaryView): CategorySummary {
   };
 }
 
-export function toCategory(view: CategiryView): CategoryWithComputed {
+export function toCategoryDetails(view: CategiryDetailsView): CategoryDetails {
   return {
     ...toCategorySummary(view),
     description: view.description,
