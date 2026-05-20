@@ -1,14 +1,12 @@
 import type {
+  CategoryListItem,
   CategoryQuery,
-  CategoryWithComputed,
   Paginated,
 } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
-export function getCategories(
-  filters: Partial<CategoryQuery> = {},
-): Promise<Paginated<CategoryWithComputed>> {
-  return apiClient<Paginated<CategoryWithComputed>>("/api/categories", {
+export function getCategories(filters: Partial<CategoryQuery> = {}) {
+  return apiClient<Paginated<CategoryListItem>>("/api/categories", {
     method: "GET",
     query: filters,
   });

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { CategoryWithComputed } from "@recipes/shared";
+import type { CategoryListItem } from "@recipes/shared";
 import Category from "./Category.vue";
 
 const props = defineProps<{
-  categories: CategoryWithComputed[] | undefined;
+  categories: CategoryListItem[] | undefined;
   isLoading: boolean;
   error: Error | null;
 }>();

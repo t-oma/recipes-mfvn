@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { categorySummarySchema } from "../categories/category.schema.js";
+import { categorySummarySchema } from "../categories/category.response.schema.js";
 import { persistenceFieldsSchema } from "../common/persistence.schema.js";
 import { userSummarySchema } from "../users/user.response.schema.js";
 import { createRecipeInputSchema } from "./recipe.input.schema.js";

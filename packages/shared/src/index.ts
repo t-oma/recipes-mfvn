@@ -3,8 +3,9 @@
 export * from "./auth/auth.input.schema.js";
 export * from "./auth/auth.response.schema.js";
 
+export * from "./categories/category.input.schema.js";
 export * from "./categories/category.schema.js";
-export type * from "./categories/category.types.js";
+export * from "./categories/category.response.schema.js";
 
 export * from "./users/user.response.schema.js";
 

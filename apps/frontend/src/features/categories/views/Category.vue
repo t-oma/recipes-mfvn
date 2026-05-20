@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { CategoryWithComputed } from "@recipes/shared";
+import type { CategoryListItem } from "@recipes/shared";
 import { RouterLink } from "vue-router";
 
 const props = defineProps<{
-  category: Pick<CategoryWithComputed, "name" | "recipeCount" | "image">;
+  category: Pick<CategoryListItem, "name" | "recipeCount" | "image">;
 }>();
 </script>
 

@@ -1,6 +1,7 @@
 import type {
+  CategoryDetails,
+  CategoryListItem,
   CategorySummary,
-  CategoryWithComputed,
   Image,
 } from "@recipes/shared";
 
@@ -11,9 +12,12 @@ export type CategorySummaryView = {
   image: Image;
 };
 
-export type CategiryView = CategorySummaryView & {
-  description?: string;
+export type CategoryListItemView = CategorySummaryView & {
   recipeCount?: number;
+};
+
+export type CategiryDetailsView = CategoryListItemView & {
+  description?: string;
   createdAt: Date | string;
   updatedAt: Date | string;
 };
@@ -30,11 +34,19 @@ export function toCategorySummary(view: CategorySummaryView): CategorySummary {
   };
 }
 
-export function toCategory(view: CategiryView): CategoryWithComputed {
+export function toCategoryListItem(
+  view: CategoryListItemView,
+): CategoryListItem {
   return {
     ...toCategorySummary(view),
-    description: view.description,
     recipeCount: view.recipeCount ?? 0,
+  };
+}
+
+export function toCategoryDetails(view: CategiryDetailsView): CategoryDetails {
+  return {
+    ...toCategoryListItem(view),
+    description: view.description,
     createdAt: new Date(view.createdAt).toISOString(),
     updatedAt: new Date(view.updatedAt).toISOString(),
   };

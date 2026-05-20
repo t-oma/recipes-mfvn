@@ -28,6 +28,7 @@ describe("categoryRoutes", () => {
     image: {
       url: "https://example.com/desserts.jpg",
     },
+    recipeCount: 2,
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
   };
