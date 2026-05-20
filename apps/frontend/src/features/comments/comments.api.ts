@@ -1,5 +1,6 @@
 import type {
-  CreateCommentBody,
+  CommentDetails,
+  CreateCommentInput,
   Paginated,
   PaginationQuery,
 } from "@recipes/shared";
@@ -16,8 +17,8 @@ import { apiClient } from "@/shared/api/client";
 export function getRecipeComments(
   id: string,
   { page = 1, limit = 20 }: PaginationQuery,
-): Promise<Paginated<Comment>> {
-  return apiClient<Paginated<Comment>>(`/api/recipes/${id}/comments`, {
+): Promise<Paginated<CommentDetails>> {
+  return apiClient<Paginated<CommentDetails>>(`/api/recipes/${id}/comments`, {
     query: { page, limit },
   });
 }
@@ -31,9 +32,9 @@ export function getRecipeComments(
  */
 export function createRecipeComment(
   id: string,
-  body: CreateCommentBody,
-): Promise<Comment> {
-  return apiClient<Comment>(`/api/recipes/${id}/comments`, {
+  body: CreateCommentInput,
+): Promise<CommentDetails> {
+  return apiClient<CommentDetails>(`/api/recipes/${id}/comments`, {
     method: "POST",
     body,
   });
@@ -63,8 +64,8 @@ export function deleteRecipeComment(commentId: string): Promise<void> {
 export function getUserComments(
   _user: string,
   { page = 1, limit = 20 }: PaginationQuery,
-): Promise<Paginated<Comment>> {
-  return apiClient<Paginated<Comment>>("/api/users/me/comments", {
+): Promise<Paginated<CommentDetails>> {
+  return apiClient<Paginated<CommentDetails>>("/api/users/me/comments", {
     query: { page, limit },
   });
 }

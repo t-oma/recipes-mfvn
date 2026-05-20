@@ -1,10 +1,10 @@
-import type { Comment } from "@recipes/shared";
+import type { CommentDetails } from "@recipes/shared";
 import type { RecipeSummaryView } from "@/modules/recipes/recipe.mapper.js";
 import { toRecipeSummary } from "@/modules/recipes/recipe.mapper.js";
 import type { UserSummaryView } from "@/modules/users/user.mapper.js";
 import { toUserSummary } from "@/modules/users/user.mapper.js";
 
-export type CommentView = {
+export type CommentDetailsView = {
   _id: string | { toString(): string };
   text: string;
   recipe: RecipeSummaryView;
@@ -13,7 +13,7 @@ export type CommentView = {
   updatedAt: Date | string;
 };
 
-export function toComment(view: CommentView): Comment {
+export function toCommentDetails(view: CommentDetailsView): CommentDetails {
   return {
     id: view._id.toString(),
     text: view.text,

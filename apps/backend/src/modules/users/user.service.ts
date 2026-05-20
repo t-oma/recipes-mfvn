@@ -1,5 +1,5 @@
 import type {
-  Comment,
+  CommentDetails,
   Paginated,
   PaginationQuery,
   RecipeListItem,
@@ -24,7 +24,7 @@ export interface UserService {
   getComments(
     userId: string,
     params: QueryMethodParams<PaginationQuery, DefaultInitiator>,
-  ): Promise<Paginated<Comment>>;
+  ): Promise<Paginated<CommentDetails>>;
 }
 
 type UserRepositoryPort = Pick<UserRepository, "findById">;

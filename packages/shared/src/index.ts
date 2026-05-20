@@ -9,8 +9,9 @@ export * from "./categories/category.response.schema.js";
 
 export * from "./users/user.response.schema.js";
 
+export * from "./comments/comment.input.schema.js";
 export * from "./comments/comment.schema.js";
-export type * from "./comments/comment.types.js";
+export * from "./comments/comment.response.schema.js";
 
 export * from "./recipes/recipe.primitives.schema.js";
 export * from "./recipes/recipe.input.schema.js";

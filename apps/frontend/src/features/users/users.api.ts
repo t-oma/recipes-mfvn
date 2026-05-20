@@ -1,5 +1,5 @@
 import type {
-  Comment,
+  CommentDetails,
   Paginated,
   PaginationQuery,
   RecipeListItem,
@@ -16,7 +16,7 @@ import { apiClient } from "@/shared/api/client";
 export function getCurrentUserFavorites({
   page = 1,
   limit = 20,
-}: PaginationQuery): Promise<Paginated<RecipeListItem>> {
+}: PaginationQuery) {
   return apiClient<Paginated<RecipeListItem>>("/api/users/me/favorites", {
     query: { page, limit },
   });
@@ -32,8 +32,8 @@ export function getCurrentUserFavorites({
 export function getCurrentUserComments({
   page = 1,
   limit = 20,
-}: PaginationQuery): Promise<Paginated<Comment>> {
-  return apiClient<Paginated<Comment>>("/api/users/me/comments", {
+}: PaginationQuery) {
+  return apiClient<Paginated<CommentDetails>>("/api/users/me/comments", {
     query: { page, limit },
   });
 }
