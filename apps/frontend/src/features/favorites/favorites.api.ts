@@ -1,4 +1,3 @@
-import type { Paginated, RecipeListItem } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
 /**
@@ -34,24 +33,5 @@ export function addFavorite(id: string): Promise<{ favorited: true }> {
 export function removeFavorite(id: string): Promise<{ favorited: false }> {
   return apiClient<{ favorited: false }>(`/api/recipes/${id}/favorite`, {
     method: "DELETE",
-  });
-}
-
-/**
- * @todo Implement retriving favorites for the user other than the current one.
- *
- * Get recipes favorited by the user.
- *
- * @param user - user id. NOTE: This paramater is ignored for now.
- * @param query.page - page number.
- * @param query.limit - number of items per page.
- * @returns Paginated list of favorites.
- */
-export function getUserFavorites(
-  _user: string,
-  { page = 1, limit = 20 },
-): Promise<Paginated<RecipeListItem>> {
-  return apiClient<Paginated<RecipeListItem>>("/api/users/me/favorites", {
-    query: { page, limit },
   });
 }
