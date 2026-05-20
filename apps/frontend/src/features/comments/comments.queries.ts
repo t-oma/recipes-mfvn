@@ -2,7 +2,7 @@ import type { CreateCommentInput, PaginationQuery } from "@recipes/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
-import { recipeKeys } from "@/features/recipes/recipes.queries";
+import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
 import {
   createRecipeComment,
   deleteRecipeComment,
@@ -15,7 +15,7 @@ const commentKeys = {
   byAuthor: (author: string, query: PaginationQuery) =>
     [...commentKeys.all, author, query] as const,
   lists: (id: string) =>
-    [...recipeKeys.detail(id), ...commentKeys.all] as const,
+    [...recipeKeys.details(id), ...commentKeys.all] as const,
   list: (id: string, query: PaginationQuery) =>
     [...commentKeys.lists(id), query] as const,
 };

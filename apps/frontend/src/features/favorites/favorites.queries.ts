@@ -2,7 +2,7 @@ import type { PaginationQuery, RecipeDetails } from "@recipes/shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
-import { recipeKeys } from "@/features/recipes/recipes.queries";
+import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
 import { addFavorite, getUserFavorites, removeFavorite } from "./favorites.api";
 
 const favoritesKeys = {
@@ -24,7 +24,7 @@ export function useAddFavorite() {
     mutationFn: addFavorite,
 
     onSuccess: (_, id) => {
-      queryClient.setQueryData<RecipeDetails>(recipeKeys.detail(id), (old) =>
+      queryClient.setQueryData<RecipeDetails>(recipeKeys.details(id), (old) =>
         old ? { ...old, isFavorited: true } : old,
       );
       queryClient.invalidateQueries({ queryKey: recipeKeys.all });
@@ -45,7 +45,7 @@ export function useRemoveFavorite() {
     mutationFn: removeFavorite,
 
     onSuccess: (_, id) => {
-      queryClient.setQueryData<RecipeDetails>(recipeKeys.detail(id), (old) =>
+      queryClient.setQueryData<RecipeDetails>(recipeKeys.details(id), (old) =>
         old ? { ...old, isFavorited: false } : old,
       );
       queryClient.invalidateQueries({ queryKey: recipeKeys.all });

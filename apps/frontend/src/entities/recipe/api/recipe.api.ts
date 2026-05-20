@@ -34,7 +34,7 @@ export function getRecipes(filters: Partial<RecipeQuery> = {}) {
  * @param id - recipe id.
  * @returns Recipe.
  */
-export function getRecipe(id: string) {
+export function getRecipeDetails(id: string) {
   return apiClient<RecipeDetails>(`/api/recipes/${id}`);
 }
 
