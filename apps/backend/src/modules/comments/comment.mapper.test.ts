@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { createCommentDoc, createObjectId } from "@/__tests__/helpers.js";
-import { toComment } from "./comment.mapper.js";
+import { toCommentDetails } from "./comment.mapper.js";
 
-describe("toComment", () => {
+describe("toCommentDetails", () => {
   it("should map comment document to Comment DTO with recipe", () => {
     const authorId = createObjectId();
     const recipeId = createObjectId();
@@ -12,7 +12,7 @@ describe("toComment", () => {
       recipe: { _id: recipeId, title: "Pasta" },
     };
 
-    const result = toComment(doc);
+    const result = toCommentDetails(doc);
 
     expect(result.text).toBe("Nice!");
     expect(result.author).toEqual({

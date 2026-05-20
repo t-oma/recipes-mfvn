@@ -1,4 +1,8 @@
-import type { Comment, CreateCommentInput, Paginated } from "@recipes/shared";
+import type {
+  CommentDetails,
+  CreateCommentInput,
+  Paginated,
+} from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import { ForbiddenError, NotFoundError } from "@/common/errors.js";
 import type { TypedEmitter } from "@/common/events.js";
@@ -10,22 +14,22 @@ import type {
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
 import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
-import { toComment } from "./comment.mapper.js";
+import { toCommentDetails } from "./comment.mapper.js";
 import type { CommentRepository } from "./comment.repository.js";
 
 export interface CommentService {
   findByRecipe(
     recipeId: string,
     params: QueryMethodParams,
-  ): Promise<Paginated<Comment>>;
+  ): Promise<Paginated<CommentDetails>>;
   findByAuthor(
     authorId: string,
     params: QueryMethodParams,
-  ): Promise<Paginated<Comment>>;
+  ): Promise<Paginated<CommentDetails>>;
   create(
     recipeId: string,
     params: CreateMethodParams<CreateCommentInput>,
-  ): Promise<Comment>;
+  ): Promise<CommentDetails>;
   delete(commentId: string, params: DeleteMethodParams): Promise<void>;
 }
 
@@ -55,7 +59,7 @@ export function createCommentService(
       });
 
       return withPagination(
-        comments.map(toComment),
+        comments.map(toCommentDetails),
         total,
         query.page,
         query.limit,
@@ -72,7 +76,7 @@ export function createCommentService(
       });
 
       return withPagination(
-        comments.map(toComment),
+        comments.map(toCommentDetails),
         total,
         query.page,
         query.limit,
@@ -97,7 +101,7 @@ export function createCommentService(
         commentId: comment._id.toHexString(),
       });
 
-      return toComment(comment);
+      return toCommentDetails(comment);
     },
 
     delete: async (id, { initiator }) => {

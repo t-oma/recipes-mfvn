@@ -11,6 +11,7 @@ export * from "./users/user.response.schema.js";
 
 export * from "./comments/comment.input.schema.js";
 export * from "./comments/comment.schema.js";
+export * from "./comments/comment.response.schema.js";
 
 export * from "./recipes/recipe.primitives.schema.js";
 export * from "./recipes/recipe.input.schema.js";
