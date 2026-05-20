@@ -16,6 +16,12 @@ export type CategoryCreateInput = RequireKeys<
 >;
 export type CategoryUpdateInput = UpdateInput<CategoryDocument>;
 
+type CategoryDocumentListItem = Omit<
+  CategoryDocument,
+  "description" | "createdAt" | "updatedAt"
+> &
+  CategoryComputed;
+
 export class CategoryRepository extends BaseRepository<
   CategoryDocument,
   CategoryCreateInput,
@@ -23,7 +29,7 @@ export class CategoryRepository extends BaseRepository<
 > {
   async findMany(
     query: CategoryQuery,
-  ): Promise<[Array<CategoryDocument & CategoryComputed>, number]> {
+  ): Promise<[CategoryDocumentListItem[], number]> {
     const pipeline = [
       stages.lookup({
         from: recipesCollectionName,
@@ -33,17 +39,20 @@ export class CategoryRepository extends BaseRepository<
       }),
       stages.addFields({ recipeCount: { $size: "$recipes" } }),
       stages.project({ recipes: 0 }),
-      stages.paginated({
-        sort: query.sort,
-        page: query.page,
-        limit: query.limit,
-      }),
+      stages.paginated(
+        {
+          sort: query.sort,
+          page: query.page,
+          limit: query.limit,
+        },
+        stages.project({ description: 0, createdAt: 0, updatedAt: 0 }),
+      ),
     ].flat();
 
     const result =
-      await this.aggregate<
-        PaginatedStageResult<CategoryDocument & CategoryComputed>
-      >(pipeline);
+      await this.aggregate<PaginatedStageResult<CategoryDocumentListItem>>(
+        pipeline,
+      );
 
     return extractPaginatedResult(result);
   }

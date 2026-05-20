@@ -1,5 +1,6 @@
 import {
   categoryDetailsSchema,
+  categoryListItemSchema,
   categoryQuerySchema,
   createCategoryInputSchema,
   paginatedSchema,
@@ -30,7 +31,7 @@ export const categoryRoutes: FastifyPluginAsync<CategoryModuleOptions> = async (
         schema: {
           querystring: categoryQuerySchema,
           response: {
-            200: paginatedSchema(categoryDetailsSchema),
+            200: paginatedSchema(categoryListItemSchema),
           },
           tags: ["Categories"],
           summary: "Get all categories",

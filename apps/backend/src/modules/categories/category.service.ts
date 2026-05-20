@@ -1,5 +1,6 @@
 import type {
   CategoryDetails,
+  CategoryListItem,
   CategoryQuery,
   CreateCategoryInput,
   Paginated,
@@ -19,12 +20,12 @@ import type {
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import type { CategoryRepository } from "@/modules/categories/category.repository.js";
 import type { RecipeRepository } from "@/modules/recipes/recipe.repository.js";
-import { toCategoryDetails } from "./category.mapper.js";
+import { toCategoryDetails, toCategoryListItem } from "./category.mapper.js";
 
 export interface CategoryService {
   findAll(
     params: QueryMethodParams<CategoryQuery>,
-  ): Promise<CachedGetResult<Paginated<CategoryDetails>>>;
+  ): Promise<CachedGetResult<Paginated<CategoryListItem>>>;
   create(
     params: CreateMethodParams<CreateCategoryInput>,
   ): Promise<CategoryDetails>;
@@ -49,13 +50,13 @@ export function createCategoryService(
     findAll: async ({ query }) => {
       const cacheKey = categoryCache.keys.list(query);
 
-      return cache.getOrSet<Paginated<CategoryDetails>>(
+      return cache.getOrSet<Paginated<CategoryListItem>>(
         cacheKey,
         async () => {
           const [categories, total] = await repository.findMany(query);
 
           return withPagination(
-            categories.map(toCategoryDetails),
+            categories.map(toCategoryListItem),
             total,
             query.page,
             query.limit,
