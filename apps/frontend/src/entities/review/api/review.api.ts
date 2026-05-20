@@ -2,7 +2,7 @@ import type { ReviewDetails, ReviewsStats } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
 /**
- * Get featured testimonials for the home page.
+ * Get featured testimonials.
  *
  * @returns List of featured reviews.
  */
@@ -11,7 +11,7 @@ export function getTestimonials() {
 }
 
 /**
- * Get review statistics for social proof.
+ * Get review statistics.
  *
  * @returns Review stats (total, average rating, happy cooks).
  */

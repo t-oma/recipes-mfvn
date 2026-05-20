@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useReviewStats } from "@/features/reviews/reviews.queries";
+import { useQuery } from "@tanstack/vue-query";
+import { reviewStatsOptions } from "@/entities/review/api/review.queries";
 import Rating from "@/shared/ui/Rating.vue";
 
-const { data: stats, isLoading } = useReviewStats();
+const { data: stats, isLoading } = useQuery(reviewStatsOptions());
 </script>
 
 <template>
@@ -29,10 +30,11 @@ const { data: stats, isLoading } = useReviewStats();
           v-if="isLoading"
           class="inline-block h-4 w-16 animate-pulse rounded bg-stone-200"
         />
+
         <template v-else>
-          <span class="font-semibold text-stone-700"
-            >{{ stats?.happyCooksCount.toLocaleString() }}+</span
-          >
+          <span class="font-semibold text-stone-700">
+            {{ stats?.happyCooksCount.toLocaleString() }}+
+          </span>
           happy cooks
         </template>
       </p>

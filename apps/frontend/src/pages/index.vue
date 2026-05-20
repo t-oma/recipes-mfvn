@@ -2,8 +2,8 @@
 import { useQuery } from "@tanstack/vue-query";
 import { categoryListOptions } from "@/entities/category/api/category.queries";
 import CategoryCard from "@/entities/category/ui/CategoryCard.vue";
-import { useTestimonials } from "@/features/reviews/reviews.queries";
-import ReviewCard from "@/features/reviews/views/ReviewCard.vue";
+import { testimonialsOptions } from "@/entities/review/api/review.queries";
+import ReviewCard from "@/entities/review/ui/ReviewCard.vue";
 import Section from "@/shared/ui/Section.vue";
 import SectionHeader from "@/shared/ui/SectionHeader.vue";
 import FeaturedRecipe from "./_index/featured-recipes/FeaturedRecipe.vue";
@@ -26,8 +26,9 @@ const {
   categoryListOptions({ sort: "-recipeCount", limit: CATEGORIES_LIMIT }),
 );
 
-const { data: testimonials, isLoading: isTestimonialsLoading } =
-  useTestimonials();
+const { data: testimonials, isLoading: isTestimonialsLoading } = useQuery(
+  testimonialsOptions(),
+);
 
 const featuredRecipes = [
   {
