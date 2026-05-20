@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useCategories } from "@/features/categories/categories.queries";
-import CategoriesGrid from "@/features/categories/views/CategoriesGrid.vue";
-import { useTestimonials } from "@/features/reviews/reviews.queries";
-import ReviewCard from "@/features/reviews/views/ReviewCard.vue";
+import { useQuery } from "@tanstack/vue-query";
+import { categoryListOptions } from "@/entities/category/api/category.queries";
+import CategoryCard from "@/entities/category/ui/CategoryCard.vue";
+import { testimonialsOptions } from "@/entities/review/api/review.queries";
+import ReviewCard from "@/entities/review/ui/ReviewCard.vue";
 import Section from "@/shared/ui/Section.vue";
 import SectionHeader from "@/shared/ui/SectionHeader.vue";
 import FeaturedRecipe from "./_index/featured-recipes/FeaturedRecipe.vue";
@@ -21,10 +22,13 @@ const {
   data: categories,
   isLoading: isCategoriesLoading,
   error: categoriesError,
-} = useCategories({ sort: "-recipeCount", limit: CATEGORIES_LIMIT });
+} = useQuery(
+  categoryListOptions({ sort: "-recipeCount", limit: CATEGORIES_LIMIT }),
+);
 
-const { data: testimonials, isLoading: isTestimonialsLoading } =
-  useTestimonials();
+const { data: testimonials, isLoading: isTestimonialsLoading } = useQuery(
+  testimonialsOptions(),
+);
 
 const featuredRecipes = [
   {
@@ -84,11 +88,34 @@ const featuredRecipes = [
         }"
       />
 
-      <CategoriesGrid
-        :categories="categories?.items"
-        :isLoading="isCategoriesLoading"
-        :error="categoriesError"
-      />
+      <div
+        v-if="isCategoriesLoading"
+        class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
+      >
+        <div
+          v-for="n in 6"
+          :key="n"
+          class="aspect-3/4 animate-pulse overflow-hidden rounded-2xl bg-stone-200"
+        />
+      </div>
+
+      <p
+        v-else-if="categoriesError"
+        class="text-sm font-semibold text-stone-500"
+      >
+        {{ categoriesError.message }}
+      </p>
+
+      <div
+        v-else-if="categories"
+        class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
+      >
+        <CategoryCard
+          v-for="category in categories.items"
+          :key="category.id"
+          :category
+        />
+      </div>
     </Section>
 
     <Section id="featured-recipes" bg="bg-stone-50">

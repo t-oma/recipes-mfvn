@@ -9,7 +9,7 @@ const props = defineProps<{
 
 <template>
   <RouterLink
-    to="#"
+    to="#/categories"
     class="group relative block overflow-hidden rounded-2xl shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/15"
   >
     <img

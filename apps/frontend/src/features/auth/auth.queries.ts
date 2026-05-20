@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import {
+  mutationOptions,
+  queryOptions,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/vue-query";
 import { computed } from "vue";
 import { getToken, removeToken, setToken } from "@/shared/api/client";
 import {
@@ -7,57 +12,43 @@ import {
   register as registerApi,
 } from "./auth.api";
 
-const authQueryKeys = {
+const authKeys = {
   all: ["auth"] as const,
-  me: () => [...authQueryKeys.all, "me"] as const,
+  me: () => [...authKeys.all, "me"] as const,
 };
 
-/**
- * Get current user.
- *
- * @returns Current user.
- */
-export function useCurrentUser() {
-  return useQuery({
-    queryKey: authQueryKeys.me(),
+export function currentUserOptions() {
+  return queryOptions({
+    queryKey: authKeys.me(),
     queryFn: getCurrentUser,
     enabled: () => !!getToken(),
     retry: false,
   });
 }
 
-/**
- * Login user.
- *
- * @param body - login body.
- * @returns Login response.
- */
-export function useLogin() {
+export function useCurrentUser() {
+  return useQuery(currentUserOptions());
+}
+
+export function loginOptions() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return mutationOptions({
     mutationFn: loginApi,
     onSuccess: ({ token, user }) => {
       setToken(token);
-      queryClient.setQueryData(authQueryKeys.me(), user);
+      queryClient.setQueryData(authKeys.me(), user);
     },
   });
 }
-
-/**
- * Register user.
- *
- * @param body - register body.
- * @returns Register response.
- */
-export function useRegister() {
+export function registerOptions() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return mutationOptions({
     mutationFn: registerApi,
     onSuccess: ({ token, user }) => {
       setToken(token);
-      queryClient.setQueryData(authQueryKeys.me(), user);
+      queryClient.setQueryData(authKeys.me(), user);
     },
   });
 }
@@ -72,7 +63,7 @@ export function useLogout() {
 
   return () => {
     removeToken();
-    queryClient.setQueryData(authQueryKeys.me(), null);
+    queryClient.setQueryData(authKeys.me(), null);
     queryClient.clear();
   };
 }
