@@ -1,8 +1,8 @@
 import type {
   CommentDetails,
+  CommentQuery,
   CreateCommentInput,
   Paginated,
-  PaginationQuery,
 } from "@recipes/shared";
 import { apiClient } from "@/shared/api/client";
 
@@ -16,7 +16,7 @@ import { apiClient } from "@/shared/api/client";
  */
 export function getRecipeComments(
   id: string,
-  { page = 1, limit = 20 }: PaginationQuery,
+  { page = 1, limit = 20 }: Partial<CommentQuery>,
 ): Promise<Paginated<CommentDetails>> {
   return apiClient<Paginated<CommentDetails>>(`/api/recipes/${id}/comments`, {
     query: { page, limit },
@@ -48,24 +48,5 @@ export function createRecipeComment(
 export function deleteRecipeComment(commentId: string): Promise<void> {
   return apiClient<void>(`/api/recipes/comments/${commentId}`, {
     method: "DELETE",
-  });
-}
-
-/**
- * @todo Implement retriving comments for the user other than the current one.
- *
- * Get comments written by the user.
- *
- * @param user - user id. NOTE: This paramater is ignored for now.
- * @param query.page - page number.
- * @param query.limit - number of items per page.
- * @returns Paginated list of comments.
- */
-export function getUserComments(
-  _user: string,
-  { page = 1, limit = 20 }: PaginationQuery,
-): Promise<Paginated<CommentDetails>> {
-  return apiClient<Paginated<CommentDetails>>("/api/users/me/comments", {
-    query: { page, limit },
   });
 }
