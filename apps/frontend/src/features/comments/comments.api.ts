@@ -1,5 +1,5 @@
 import type {
-  CreateCommentBody,
+  CreateCommentInput,
   Paginated,
   PaginationQuery,
 } from "@recipes/shared";
@@ -31,7 +31,7 @@ export function getRecipeComments(
  */
 export function createRecipeComment(
   id: string,
-  body: CreateCommentBody,
+  body: CreateCommentInput,
 ): Promise<Comment> {
   return apiClient<Comment>(`/api/recipes/${id}/comments`, {
     method: "POST",

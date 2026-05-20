@@ -1,4 +1,4 @@
-import type { Comment, CreateCommentBody, Paginated } from "@recipes/shared";
+import type { Comment, CreateCommentInput, Paginated } from "@recipes/shared";
 import { withPagination } from "@recipes/shared";
 import { ForbiddenError, NotFoundError } from "@/common/errors.js";
 import type { TypedEmitter } from "@/common/events.js";
@@ -24,7 +24,7 @@ export interface CommentService {
   ): Promise<Paginated<Comment>>;
   create(
     recipeId: string,
-    params: CreateMethodParams<CreateCommentBody>,
+    params: CreateMethodParams<CreateCommentInput>,
   ): Promise<Comment>;
   delete(commentId: string, params: DeleteMethodParams): Promise<void>;
 }

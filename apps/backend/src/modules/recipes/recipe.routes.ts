@@ -1,7 +1,7 @@
 import {
   commentQuerySchema,
   commentSchema,
-  createCommentSchema,
+  createCommentInputSchema,
   createRecipeInputSchema,
   paginatedSchema,
   recipeDetailsSchema,
@@ -173,7 +173,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       {
         schema: {
           params: recipeParamsSchema,
-          body: createCommentSchema,
+          body: createCommentInputSchema,
           response: {
             201: commentSchema,
           },

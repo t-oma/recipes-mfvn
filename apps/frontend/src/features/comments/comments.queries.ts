@@ -1,4 +1,4 @@
-import type { CreateCommentBody, PaginationQuery } from "@recipes/shared";
+import type { CreateCommentInput, PaginationQuery } from "@recipes/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
@@ -57,7 +57,7 @@ export function useCreateRecipeComment() {
       body,
     }: {
       recipeId: string;
-      body: CreateCommentBody;
+      body: CreateCommentInput;
     }) => createRecipeComment(recipeId, body),
 
     onSuccess: (_, { recipeId }) => {

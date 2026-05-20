@@ -2,12 +2,9 @@ import { z } from "zod";
 import { paginationQuerySchema } from "../query.js";
 import { recipeSummarySchema } from "../recipes/recipe.response.schema.js";
 import { userSummarySchema } from "../users/user.response.schema.js";
+import { createCommentInputSchema } from "./comment.input.schema.js";
 
-export const createCommentSchema = z.object({
-  text: z.string().trim().min(1).max(2000),
-});
-
-export const commentSchema = createCommentSchema.extend({
+export const commentSchema = createCommentInputSchema.extend({
   id: z.string(),
   recipe: recipeSummarySchema,
   author: userSummarySchema,
@@ -16,3 +13,6 @@ export const commentSchema = createCommentSchema.extend({
 });
 
 export const commentQuerySchema = paginationQuerySchema;
+
+export type Comment = z.infer<typeof commentSchema>;
+export type CommentQuery = z.infer<typeof commentQuerySchema>;
