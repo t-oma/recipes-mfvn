@@ -2,11 +2,12 @@
 import { useQuery } from "@tanstack/vue-query";
 import { categoryListOptions } from "@/entities/category/api/category.queries";
 import CategoryCard from "@/entities/category/ui/CategoryCard.vue";
+import { recipeListOptions } from "@/entities/recipe/api/recipe.queries";
+import RecipeCard from "@/entities/recipe/ui/RecipeCard.vue";
 import { testimonialsOptions } from "@/entities/review/api/review.queries";
 import ReviewCard from "@/entities/review/ui/ReviewCard.vue";
 import Section from "@/shared/ui/Section.vue";
 import SectionHeader from "@/shared/ui/SectionHeader.vue";
-import FeaturedRecipe from "./_index/featured-recipes/FeaturedRecipe.vue";
 import Hero from "./_index/Hero.vue";
 import NewsletterCTA from "./_index/NewsletterCTA.vue";
 import TodaysPick from "./_index/TodaysPick.vue";
@@ -30,48 +31,14 @@ const { data: testimonials, isLoading: isTestimonialsLoading } = useQuery(
   testimonialsOptions(),
 );
 
-const featuredRecipes = [
-  {
-    id: 1,
-    title: "Classic Beef Bourguignon",
-    time: "2 hr",
-    difficulty: "Medium",
-    rating: 4.9,
-    image:
-      "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=600&h=400&fit=crop",
-    tag: "Classic",
-  },
-  {
-    id: 2,
-    title: "Cherry Dumplings",
-    time: "1.5 hr",
-    difficulty: "Easy",
-    rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&h=400&fit=crop",
-    tag: "Popular",
-  },
-  {
-    id: 3,
-    title: "Lemon Ricotta Pancakes",
-    time: "30 min",
-    difficulty: "Easy",
-    rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&h=400&fit=crop",
-    tag: "Quick",
-  },
-  {
-    id: 4,
-    title: "Stuffed Bell Peppers",
-    time: "2.5 hr",
-    difficulty: "Medium",
-    rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=400&fit=crop",
-    tag: "Hearty",
-  },
-];
+const POPULAR_RECIPES_LIMIT = 4;
+const {
+  data: popularRecipes,
+  isLoading: isPopularRecipesLoading,
+  error: popularRecipesError,
+} = useQuery(
+  recipeListOptions({ sort: "-popularity", limit: POPULAR_RECIPES_LIMIT }),
+);
 </script>
 
 <template>
@@ -93,7 +60,7 @@ const featuredRecipes = [
         class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
       >
         <div
-          v-for="n in 6"
+          v-for="n in CATEGORIES_LIMIT"
           :key="n"
           class="aspect-3/4 animate-pulse overflow-hidden rounded-2xl bg-stone-200"
         />
@@ -127,10 +94,30 @@ const featuredRecipes = [
           text: 'All recipes',
         }"
       />
+      <div
+        v-if="isPopularRecipesLoading"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <div
+          v-for="n in POPULAR_RECIPES_LIMIT"
+          :key="n"
+          class="aspect-3/4 animate-pulse overflow-hidden rounded-2xl bg-stone-200"
+        />
+      </div>
 
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <FeaturedRecipe
-          v-for="recipe in featuredRecipes"
+      <p
+        v-else-if="popularRecipesError"
+        class="text-sm font-semibold text-stone-500"
+      >
+        {{ popularRecipesError.message }}
+      </p>
+
+      <div
+        v-else-if="popularRecipes"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <RecipeCard
+          v-for="recipe in popularRecipes.items"
           :key="recipe.id"
           :recipe="recipe"
         />

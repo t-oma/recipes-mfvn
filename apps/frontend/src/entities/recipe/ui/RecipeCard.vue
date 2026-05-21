@@ -59,7 +59,7 @@ const props = defineProps<{
           class="text-terracotta flex items-center gap-1 text-xs font-semibold opacity-0 transition-opacity group-hover:opacity-100"
         >
           View
-          <i class="pi pi-arrow-right text-[10px]" />
+          <i class="pi pi-arrow-right text-[0.75rem]!" />
         </RouterLink>
       </div>
     </div>
