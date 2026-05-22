@@ -8,9 +8,21 @@
   --font-display: "Cormorant Garamond", Georgia, serif;
   --font-body: "DM Sans", system-ui, sans-serif;
 
-  --color-terracotta: #c27a54;
-  --color-terracotta-dark: #a8643f;
   --color-terracotta-light: #d99a78;
+  --color-terracotta: oklch(0.6475 0.1044 48.07); /*     #c27a54 */
+  --color-terracotta-dark: #a8643f;
+
+  --color-terracotta-50: #fcf8f6;
+  --color-terracotta-100: #f0dfd6;
+  --color-terracotta-200: #e5c6b5;
+  --color-terracotta-300: #d9ad95;
+  --color-terracotta-400: #ce9374;
+  --color-terracotta-500: oklch(0.6475 0.1044 48.07); /* #c27a54 */
+  --color-terracotta-600: oklch(0.5962 0.0916 48.67); /* #ac6e4d */
+  --color-terracotta-700: oklch(0.5207 0.0784 47.39); /* #8e5b41 */
+  --color-terracotta-800: oklch(0.4272 0.0645 48.12); /* #6c442f */
+  --color-terracotta-900: #4e3122;
+  --color-terracotta-950: #311f15;
 }
 
 button {
