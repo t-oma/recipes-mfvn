@@ -12,3 +12,7 @@
   --color-terracotta-dark: #a8643f;
   --color-terracotta-light: #d99a78;
 }
+
+button {
+  @apply cursor-pointer;
+}
