@@ -38,7 +38,7 @@ export const recipeRatingRoutes: FastifyPluginAsync<
 
         const result = await service.rate(request.params.id, {
           data: request.body,
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.send(result);
       },
@@ -61,7 +61,7 @@ export const recipeRatingRoutes: FastifyPluginAsync<
         assertAuthenticated(request);
 
         await service.remove(request.params.id, {
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.status(204).send();
       },

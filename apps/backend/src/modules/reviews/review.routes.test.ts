@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
+import { JwtPayload } from "@/common/utils/jwt.js";
 import { reviewRoutes } from "@/modules/reviews/review.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
@@ -35,7 +36,7 @@ describe("reviewRoutes", () => {
   };
 
   const testJwtPayload = {
-    userId,
+    id: userId,
     email: "user@test.com",
     role: "user",
   } as const;
@@ -120,7 +121,7 @@ describe("reviewRoutes", () => {
       expect(response.statusCode).toBe(201);
       expect(mockReviewService.create).toHaveBeenCalledWith({
         data: { text: "Great platform!", rating: 5 },
-        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+        initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
       });
     });
 
@@ -153,10 +154,10 @@ describe("reviewRoutes", () => {
   describe("GET /api/reviews", () => {
     it("should return paginated reviews when admin", async () => {
       verifyToken.mockReturnValue({
-        userId: adminId,
+        id: adminId,
         email: "admin@test.com",
         role: "admin",
-      });
+      } satisfies JwtPayload);
       mockReviewService.findAll.mockResolvedValue({
         items: [validReview],
         pagination: {
@@ -173,7 +174,7 @@ describe("reviewRoutes", () => {
         method: "GET",
         url: "/api/reviews",
         headers: authHeader({
-          userId: adminId,
+          id: adminId,
           email: "admin@test.com",
           role: "admin",
         }),
@@ -224,7 +225,7 @@ describe("reviewRoutes", () => {
       expect(response.statusCode).toBe(200);
       expect(mockReviewService.update).toHaveBeenCalledWith(reviewId, {
         data: { text: "Updated" },
-        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+        initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
       });
     });
 
@@ -255,10 +256,10 @@ describe("reviewRoutes", () => {
   describe("PATCH /api/reviews/:id/feature", () => {
     it("should feature review when admin", async () => {
       verifyToken.mockReturnValue({
-        userId: adminId,
+        id: adminId,
         email: "admin@test.com",
         role: "admin",
-      });
+      } satisfies JwtPayload);
       mockReviewService.feature.mockResolvedValue({
         ...validReview,
         isFeatured: true,
@@ -269,7 +270,7 @@ describe("reviewRoutes", () => {
         url: `/api/reviews/${reviewId}/feature`,
         payload: { isFeatured: true },
         headers: authHeader({
-          userId: adminId,
+          id: adminId,
           email: "admin@test.com",
           role: "admin",
         }),
@@ -320,7 +321,7 @@ describe("reviewRoutes", () => {
 
       expect(response.statusCode).toBe(204);
       expect(mockReviewService.delete).toHaveBeenCalledWith(reviewId, {
-        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+        initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
       });
     });
 

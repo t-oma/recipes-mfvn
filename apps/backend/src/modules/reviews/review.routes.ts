@@ -80,7 +80,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
 
         const review = await service.create({
           data: request.body,
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.status(201).send(review);
       },
@@ -104,7 +104,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
 
         const result = await service.findAll({
           query: request.query,
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.send(result);
       },
@@ -129,7 +129,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
 
         const review = await service.update(request.params.id, {
           data: request.body,
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.send(review);
       },
@@ -155,7 +155,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
         const review = await service.feature(
           request.params.id,
           {
-            initiator: { id: request.user.userId, role: request.user.role },
+            initiator: { id: request.user.id, role: request.user.role },
           },
           request.body.isFeatured,
         );
@@ -177,7 +177,7 @@ export const reviewRoutes: FastifyPluginAsync<ReviewModuleOptions> = async (
         assertAuthenticated(request);
 
         await service.delete(request.params.id, {
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.status(204).send();
       },

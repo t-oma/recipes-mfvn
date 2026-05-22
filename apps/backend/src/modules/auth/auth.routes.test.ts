@@ -154,7 +154,7 @@ describe("authRoutes", () => {
       const response = await app.inject({
         method: "POST",
         url: "/api/auth/login",
-        payload: { email: "wrong@test.com", password: "wrong" },
+        payload: { email: "wrong@test.com", password: "wrong10" },
       });
 
       expect(response.statusCode).toBe(401);

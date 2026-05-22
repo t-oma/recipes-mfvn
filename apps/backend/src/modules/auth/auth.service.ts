@@ -36,7 +36,7 @@ export function createAuthService(
         password,
       });
       const token = signToken({
-        userId: user._id.toString(),
+        id: user._id.toString(),
         email: user.email,
         role: user.role,
       });
@@ -65,7 +65,7 @@ export function createAuthService(
       }
 
       const token = signToken({
-        userId: user._id.toString(),
+        id: user._id.toString(),
         email: user.email,
         role: user.role,
       });

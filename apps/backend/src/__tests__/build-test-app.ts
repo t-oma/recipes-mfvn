@@ -17,5 +17,5 @@ export async function createTestApp() {
 }
 
 export function authHeader(payload: JwtPayload): { authorization: string } {
-  return { authorization: `Bearer fake-token-${payload.userId}` };
+  return { authorization: `Bearer fake-token-${payload.id}` };
 }

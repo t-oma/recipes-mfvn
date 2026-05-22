@@ -81,7 +81,7 @@ describe("recipeRoutes", () => {
   };
 
   const testJwtPayload = {
-    userId,
+    id: userId,
     email: "user@test.com",
     role: "user",
   } as const;
@@ -147,7 +147,7 @@ describe("recipeRoutes", () => {
       expect(mockRecipeService.findAll).toHaveBeenCalledWith({
         query: expect.any(Object),
         initiator: {
-          id: testJwtPayload.userId,
+          id: testJwtPayload.id,
           role: testJwtPayload.role,
         },
       });
@@ -250,7 +250,7 @@ describe("recipeRoutes", () => {
       expect(mockRecipeService.create).toHaveBeenCalledWith({
         data: payload,
         initiator: {
-          id: testJwtPayload.userId,
+          id: testJwtPayload.id,
           role: testJwtPayload.role,
         },
       });
@@ -301,7 +301,7 @@ describe("recipeRoutes", () => {
       expect(mockRecipeService.update).toHaveBeenCalledWith(recipeId, {
         data: { title: "Updated", isPublic: true },
         initiator: {
-          id: testJwtPayload.userId,
+          id: testJwtPayload.id,
           role: testJwtPayload.role,
         },
       });
@@ -345,7 +345,7 @@ describe("recipeRoutes", () => {
       expect(response.statusCode).toBe(204);
       expect(mockRecipeService.delete).toHaveBeenCalledWith(recipeId, {
         initiator: {
-          id: testJwtPayload.userId,
+          id: testJwtPayload.id,
           role: testJwtPayload.role,
         },
       });
@@ -405,7 +405,7 @@ describe("recipeRoutes", () => {
         text: "Great!",
         recipe: { id: recipeId, title: "Test" },
         author: {
-          id: testJwtPayload.userId,
+          id: testJwtPayload.id,
           email: testJwtPayload.email,
           name: "User",
         },
@@ -424,7 +424,7 @@ describe("recipeRoutes", () => {
       expect(mockCommentService.create).toHaveBeenCalledWith(recipeId, {
         data: { text: "Great!" },
         initiator: {
-          id: testJwtPayload.userId,
+          id: testJwtPayload.id,
           role: testJwtPayload.role,
         },
       });
@@ -455,7 +455,7 @@ describe("recipeRoutes", () => {
       expect(response.statusCode).toBe(204);
       expect(mockCommentService.delete).toHaveBeenCalledWith(commentId, {
         initiator: {
-          id: testJwtPayload.userId,
+          id: testJwtPayload.id,
           role: testJwtPayload.role,
         },
       });

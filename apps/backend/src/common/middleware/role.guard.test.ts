@@ -18,7 +18,7 @@ describe("rolesGuard", () => {
   it("should pass when user has the required role", async () => {
     const request = createMockRequest();
     request.user = {
-      userId: "123",
+      id: "123",
       email: "admin@test.com",
       role: "admin",
     };
@@ -32,7 +32,7 @@ describe("rolesGuard", () => {
   it("should throw ForbiddenError when user lacks the required role", async () => {
     const request = createMockRequest({
       user: {
-        userId: "123",
+        id: "123",
         email: "user@test.com",
         role: "user",
       },
@@ -48,7 +48,7 @@ describe("rolesGuard", () => {
   it("should pass when user has any of multiple allowed roles", async () => {
     const request = createMockRequest({
       user: {
-        userId: "123",
+        id: "123",
         email: "user@test.com",
         role: "user",
       },

@@ -65,7 +65,7 @@ describe("auth.guard", () => {
   describe("assertAuthenticated", () => {
     it("should not throw when user is present", () => {
       const request = createMockRequest({
-        user: { userId: "123", email: "test@test.com", role: "user" },
+        user: { id: "123", email: "test@test.com", role: "user" },
       });
 
       expect(() => assertAuthenticated(request)).not.toThrow();
@@ -81,7 +81,7 @@ describe("auth.guard", () => {
   describe("authGuard", () => {
     it("should set request.user on valid token", async () => {
       const payload = {
-        userId: "123",
+        id: "123",
         email: "test@test.com",
         role: "user",
       } satisfies JwtPayload;
@@ -129,7 +129,7 @@ describe("auth.guard", () => {
 
     it("should call authGuard when authorization header is present", async () => {
       const payload = {
-        userId: "123",
+        id: "123",
         email: "test@test.com",
         role: "user",
       } satisfies JwtPayload;

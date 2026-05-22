@@ -12,7 +12,7 @@ vi.mock("@/config/env.js", () => ({
 
 describe("jwt utils", () => {
   const payload = {
-    userId: "507f1f77bcf86cd799439011",
+    id: "507f1f77bcf86cd799439011",
     email: "test@example.com",
     role: "user",
   } satisfies JwtPayload;
@@ -21,7 +21,7 @@ describe("jwt utils", () => {
     it("should return a JWT string", () => {
       const token = signToken(payload);
 
-      expect(typeof token).toBe("string");
+      expect(token).toBeTypeOf("string");
       expect(token.split(".")).toHaveLength(3);
     });
 
@@ -38,7 +38,7 @@ describe("jwt utils", () => {
       const token = signToken(payload);
       const decoded = verifyToken(token);
 
-      expect(decoded.userId).toBe(payload.userId);
+      expect(decoded.id).toBe(payload.id);
       expect(decoded.email).toBe(payload.email);
       expect(decoded.role).toBe(payload.role);
     });
