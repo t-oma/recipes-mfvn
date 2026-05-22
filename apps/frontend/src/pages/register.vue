@@ -158,16 +158,14 @@ function onSubmit({ valid, values }: FormSubmitEvent) {
         </template>
       </FormField>
 
-      <button
+      <Button
         type="submit"
+        :label="isLoading ? 'Creating account...' : 'Create Account'"
+        :loading="isLoading"
         :disabled="isLoading"
-        class="bg-terracotta shadow-terracotta/25 hover:bg-terracotta-dark flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-60"
-      >
-        <i v-if="isLoading" class="pi pi-spinner pi-spin" aria-hidden="true" />
-        <span>
-          {{ isLoading ? "Creating account..." : "Create Account" }}
-        </span>
-      </button>
+        class="font-semibold"
+        fluid
+      />
     </Form>
 
     <p class="mt-8 text-center text-sm text-stone-500">
