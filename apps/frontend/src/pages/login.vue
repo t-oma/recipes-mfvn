@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import type { FormSubmitEvent } from "@primevue/forms";
+import { zodResolver } from "@primevue/forms/resolvers/zod";
+import type { LoginInput } from "@recipes/shared";
+import { loginInputSchema } from "@recipes/shared";
+import { useToast } from "primevue";
+import { reactive, ref } from "vue";
 import AuthPageShell from "@/features/auth/ui/AuthPageShell.vue";
 
 definePage({
@@ -8,16 +13,30 @@ definePage({
   },
 });
 
-const email = ref("");
-const password = ref("");
-const showPassword = ref(false);
-const isLoading = ref(false);
+const toast = useToast();
 
-function onSubmit() {
+const isLoading = ref(false);
+const initialValues = reactive<LoginInput>({
+  email: "",
+  password: "",
+});
+const resolver = zodResolver(loginInputSchema);
+
+function onSubmit({ valid, values }: FormSubmitEvent) {
+  if (!valid) return;
+
+  console.log(values);
+
   // TODO: integrate login mutation
   isLoading.value = true;
   setTimeout(() => {
     isLoading.value = false;
+    toast.add({
+      severity: "success",
+      summary: "Success",
+      detail: "You have successfully logged in.",
+      life: 3000,
+    });
   }, 1200);
 }
 </script>
@@ -31,8 +50,10 @@ function onSubmit() {
     image-src="https://plus.unsplash.com/premium_photo-1672153937750-9ea567e94026?q=80&w=987&auto=format&fit=crop"
     image-alt="A cooking scene with ingredients and kitchen tools"
   >
-    <form class="space-y-5" @submit.prevent="onSubmit">
-      <div>
+    <Toast />
+
+    <Form :resolver :initial-values class="space-y-5" @submit="onSubmit">
+      <FormField v-slot="$field" name="email" class="flex flex-col">
         <label
           for="login-email"
           class="mb-1.5 block text-sm font-medium text-stone-700"
@@ -40,24 +61,29 @@ function onSubmit() {
           Email
         </label>
 
-        <div class="relative">
-          <i
-            class="pi pi-envelope absolute top-1/2 left-3 -translate-y-1/2 text-stone-400"
-            aria-hidden="true"
-          />
-          <input
+        <IconField>
+          <InputIcon class="pi pi-envelope text-stone-400" />
+          <InputText
             id="login-email"
-            v-model="email"
             type="email"
-            required
             autocomplete="email"
             placeholder="you@example.com"
-            class="focus:border-terracotta focus:ring-terracotta/20 w-full rounded-xl border border-stone-200 bg-white py-3 pr-4 pl-10 text-sm text-stone-900 transition-all outline-none placeholder:text-stone-400 focus:ring-2"
+            fluid
           />
-        </div>
-      </div>
+        </IconField>
 
-      <div>
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="pt-1"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+
+      <FormField v-slot="$field" name="password" class="flex flex-col">
         <label
           for="login-password"
           class="mb-1.5 block text-sm font-medium text-stone-700"
@@ -65,35 +91,33 @@ function onSubmit() {
           Password
         </label>
 
-        <div class="relative">
-          <i
-            class="pi pi-lock absolute top-1/2 left-3 -translate-y-1/2 text-stone-400"
-            aria-hidden="true"
-          />
-          <input
-            id="login-password"
-            v-model="password"
-            :type="showPassword ? 'text' : 'password'"
-            required
-            minlength="6"
-            autocomplete="current-password"
+        <IconField>
+          <InputIcon class="pi pi-lock text-stone-400" />
+          <Password
             placeholder="••••••••"
-            class="focus:border-terracotta focus:ring-terracotta/20 w-full rounded-xl border border-stone-200 bg-white py-3 pr-10 pl-10 text-sm text-stone-900 transition-all outline-none placeholder:text-stone-400 focus:ring-2"
+            :feedback="false"
+            toggle-mask
+            fluid
+            :input-props="{
+              id: 'login-password',
+              autocomplete: 'current-password',
+            }"
           />
-          <button
-            type="button"
-            class="absolute top-1/2 right-3 inline-flex -translate-y-1/2 items-center justify-center text-stone-400 hover:text-stone-600"
-            :aria-pressed="showPassword"
-            :aria-label="showPassword ? 'Hide password' : 'Show password'"
-            @click="showPassword = !showPassword"
+        </IconField>
+
+        <template v-if="$field?.invalid">
+          <Message
+            v-for="(error, index) in $field.errors"
+            :key="index"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="pt-1"
           >
-            <i
-              :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
-              aria-hidden="true"
-            />
-          </button>
-        </div>
-      </div>
+            {{ error.message }}
+          </Message>
+        </template>
+      </FormField>
 
       <div class="flex items-center justify-between">
         <label class="flex cursor-pointer items-center gap-2">
@@ -120,7 +144,7 @@ function onSubmit() {
         <i v-if="isLoading" class="pi pi-spinner pi-spin" aria-hidden="true" />
         <span>{{ isLoading ? "Signing in..." : "Sign In" }}</span>
       </button>
-    </form>
+    </Form>
 
     <p class="mt-8 text-center text-sm text-stone-500">
       Don't have an account?
