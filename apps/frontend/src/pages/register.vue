@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import type { FormSubmitEvent } from "@primevue/forms";
+import { zodResolver } from "@primevue/forms/resolvers/zod";
+import type { RegisterInput } from "@recipes/shared";
+import { registerInputSchema } from "@recipes/shared";
+import { useToast } from "primevue";
+import { reactive, ref } from "vue";
 import AuthPageShell from "@/features/auth/ui/AuthPageShell.vue";
 
 definePage({
@@ -8,17 +13,31 @@ definePage({
   },
 });
 
-const name = ref("");
-const email = ref("");
-const password = ref("");
-const showPassword = ref(false);
-const isLoading = ref(false);
+const toast = useToast();
 
-function onSubmit() {
+const isLoading = ref(false);
+const initialValues = reactive<RegisterInput>({
+  email: "",
+  password: "",
+  name: "",
+});
+const resolver = zodResolver(registerInputSchema);
+
+function onSubmit({ valid, values }: FormSubmitEvent) {
+  if (!valid) return;
+
+  console.log(values);
+
   // TODO: integrate register mutation
   isLoading.value = true;
   setTimeout(() => {
     isLoading.value = false;
+    toast.add({
+      severity: "success",
+      summary: "Success",
+      detail: "You have successfully registered.",
+      life: 3000,
+    });
   }, 1200);
 }
 </script>
@@ -32,8 +51,8 @@ function onSubmit() {
     image-src="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?q=80&w=1010&auto=format&fit=crop"
     image-alt="Avocado and Egg Toast"
   >
-    <form class="space-y-5" @submit.prevent="onSubmit">
-      <div>
+    <Form :resolver :initial-values class="space-y-5" @submit="onSubmit">
+      <FormField v-slot="$field" name="name" class="flex flex-col">
         <label
           for="register-name"
           class="mb-1.5 block text-sm font-medium text-stone-700"
@@ -41,26 +60,29 @@ function onSubmit() {
           Full Name
         </label>
 
-        <div class="relative">
-          <i
-            class="pi pi-user absolute top-1/2 left-3 -translate-y-1/2 text-stone-400"
-            aria-hidden="true"
-          />
-          <input
+        <IconField>
+          <InputIcon class="pi pi-user text-stone-400" />
+          <InputText
             id="register-name"
-            v-model="name"
             type="text"
-            required
-            minlength="2"
-            maxlength="100"
             autocomplete="name"
             placeholder="Jane Doe"
-            class="focus:border-terracotta focus:ring-terracotta/20 w-full rounded-xl border border-stone-200 bg-white py-3 pr-4 pl-10 text-sm text-stone-900 transition-all outline-none placeholder:text-stone-400 focus:ring-2"
+            fluid
           />
-        </div>
-      </div>
+        </IconField>
 
-      <div>
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="pt-1"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+
+      <FormField v-slot="$field" name="email" class="flex flex-col">
         <label
           for="register-email"
           class="mb-1.5 block text-sm font-medium text-stone-700"
@@ -68,24 +90,29 @@ function onSubmit() {
           Email
         </label>
 
-        <div class="relative">
-          <i
-            class="pi pi-envelope absolute top-1/2 left-3 -translate-y-1/2 text-stone-400"
-            aria-hidden="true"
-          />
-          <input
+        <IconField>
+          <InputIcon class="pi pi-envelope text-stone-400" />
+          <InputText
             id="register-email"
-            v-model="email"
             type="email"
-            required
             autocomplete="email"
             placeholder="you@example.com"
-            class="focus:border-terracotta focus:ring-terracotta/20 w-full rounded-xl border border-stone-200 bg-white py-3 pr-4 pl-10 text-sm text-stone-900 transition-all outline-none placeholder:text-stone-400 focus:ring-2"
+            fluid
           />
-        </div>
-      </div>
+        </IconField>
 
-      <div>
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="pt-1"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+
+      <FormField v-slot="$field" name="password" class="flex flex-col">
         <label
           for="register-password"
           class="mb-1.5 block text-sm font-medium text-stone-700"
@@ -93,38 +120,43 @@ function onSubmit() {
           Password
         </label>
 
-        <div class="relative">
-          <i
-            class="pi pi-lock absolute top-1/2 left-3 -translate-y-1/2 text-stone-400"
-            aria-hidden="true"
-          />
-          <input
-            id="register-password"
-            v-model="password"
-            :type="showPassword ? 'text' : 'password'"
-            required
-            minlength="6"
-            autocomplete="new-password"
+        <IconField>
+          <InputIcon class="pi pi-lock text-stone-400" />
+          <Password
             placeholder="••••••••"
-            class="focus:border-terracotta focus:ring-terracotta/20 w-full rounded-xl border border-stone-200 bg-white py-3 pr-10 pl-10 text-sm text-stone-900 transition-all outline-none placeholder:text-stone-400 focus:ring-2"
+            :feedback="false"
+            toggle-mask
+            fluid
+            :input-props="{
+              id: 'register-password',
+              autocomplete: 'new-password',
+            }"
           />
-          <button
-            type="button"
-            class="absolute top-1/2 right-3 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-            :aria-pressed="showPassword"
-            :aria-label="showPassword ? 'Hide password' : 'Show password'"
-            @click="showPassword = !showPassword"
-          >
-            <i
-              :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
-              aria-hidden="true"
-            />
-          </button>
-        </div>
-        <p class="mt-1.5 text-xs text-stone-500">
+        </IconField>
+
+        <Message
+          v-if="!$field?.invalid"
+          size="small"
+          severity="secondary"
+          variant="simple"
+          class="pt-1"
+        >
           Must be at least 6 characters
-        </p>
-      </div>
+        </Message>
+
+        <template v-if="$field?.invalid">
+          <Message
+            v-for="(error, index) in $field.errors"
+            :key="index"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="pt-1"
+          >
+            {{ error.message }}
+          </Message>
+        </template>
+      </FormField>
 
       <button
         type="submit"
@@ -136,7 +168,7 @@ function onSubmit() {
           {{ isLoading ? "Creating account..." : "Create Account" }}
         </span>
       </button>
-    </form>
+    </Form>
 
     <p class="mt-8 text-center text-sm text-stone-500">
       Already have an account?
