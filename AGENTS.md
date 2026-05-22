@@ -7,7 +7,7 @@ Monorepo managed by **pnpm workspaces** with TypeScript throughout.
 ```
 apps/
   backend/          # Node.js + Fastify + Mongoose (MongoDB)
-  frontend/         # Placeholder — not yet configured
+  frontend/         # Vue3 + Vite + Vue Query
 packages/
   shared/           # Zod schemas, domain types, utilities
 ```
