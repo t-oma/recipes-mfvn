@@ -48,6 +48,7 @@ const refreshSessionSchema = new Schema<
     tokenHash: {
       type: String,
       required: true,
+      unique: true,
     },
     expiresAt: {
       type: Date,
@@ -88,6 +89,10 @@ const refreshSessionSchema = new Schema<
     collection: "refreshSessions",
   },
 );
+
+refreshSessionSchema.index({ tokenHash: 1 }, { unique: true });
+refreshSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+refreshSessionSchema.index({ familyId: 1 });
 
 export const RefreshSessionModel = model<
   RefreshSessionDocument,
