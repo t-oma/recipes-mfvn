@@ -9,7 +9,8 @@ const envSchema = z
     HOST: z.string().default("0.0.0.0"),
     MONGO_URI: z.string(),
     JWT_SECRET: z.string(),
-    JWT_EXPIRES_IN: z.string().default("7d"),
+    JWT_EXPIRES_IN: z.string().default("15m"),
+    SESSION_EXPIRES_IN_DAYS: z.coerce.number().default(7),
     BCRYPT_SALT_ROUNDS: z.coerce.number().default(10),
     RATE_LIMIT_AUTH_MAX: z.coerce.number().default(5),
     RATE_LIMIT_AUTH_WINDOW: z.string().default("3 minutes"),
@@ -48,6 +49,22 @@ if (!parsed.success) {
     z.treeifyError(parsed.error),
   );
   process.exit(1);
+}
+
+export function getEnvKey<S extends z.ZodType, K extends keyof z.infer<S>>(
+  schema: S,
+  key: K,
+): z.infer<S>[K] {
+  const parsed = schema.safeParse(process.env);
+  if (!parsed.success) {
+    console.error(
+      "❌ Invalid environment variables:",
+      z.treeifyError(parsed.error),
+    );
+    process.exit(1);
+  }
+
+  return parsed.data[key];
 }
 
 export const env = parsed.data;
