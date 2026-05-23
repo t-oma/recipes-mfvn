@@ -54,10 +54,13 @@ export class RefreshSessionRepository extends BaseRepository<
       .findOneAndUpdate(
         { _id: id, rotatedAt: null, replacedBy: null, revokedAt: null },
         {
-          lastUsedAt: new Date(),
-          rotatedAt: new Date(),
-          replacedBy: data.replacedBy,
+          $set: {
+            lastUsedAt: new Date(),
+            rotatedAt: new Date(),
+            replacedBy: data.replacedBy,
+          },
         },
+        { returnDocument: "after", runValidators: true },
       )
       .lean();
   }
@@ -82,9 +85,14 @@ export class RefreshSessionRepository extends BaseRepository<
       userAgent: data.userAgent ?? null,
     });
 
-    await this.markRotated(session._id, {
+    const rotated = await this.markRotated(session._id, {
       replacedBy: newSession._id,
     });
+
+    if (!rotated) {
+      await this.revokeById(newSession._id, "rotation-conflict");
+      return null;
+    }
 
     return newSession;
   }

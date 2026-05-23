@@ -8,6 +8,7 @@ export const revokeReasons = [
   "admin",
   "expired",
   "user-not-found",
+  "rotation-conflict",
 ] as const;
 export type RevokeReason = (typeof revokeReasons)[number];
 
@@ -48,7 +49,6 @@ const refreshSessionSchema = new Schema<
     tokenHash: {
       type: String,
       required: true,
-      unique: true,
     },
     expiresAt: {
       type: Date,

@@ -118,11 +118,14 @@ export function createRefreshSessionService(
       const newRefreshToken = generateOpaqueToken();
       const newRefreshTokenHash = hashToken(newRefreshToken);
 
-      await refreshSessionRepository.rotate(currentSession, {
+      const newSession = await refreshSessionRepository.rotate(currentSession, {
         tokenHash: newRefreshTokenHash,
         ip: ip ?? null,
         userAgent: userAgent ?? null,
       });
+      if (!newSession) {
+        throw new UnauthorizedError("Refresh token rotation conflict");
+      }
 
       const accessToken = signToken({
         id: user._id.toString(),
