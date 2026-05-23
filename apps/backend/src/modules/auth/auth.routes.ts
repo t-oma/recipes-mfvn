@@ -5,6 +5,7 @@ import {
 } from "@recipes/shared";
 import type { FastifyPluginAsync, FastifyReply } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import z from "zod";
 import { UnauthorizedError } from "@/common/errors.js";
 import { env } from "@/config/env.js";
 import type { AuthService } from "@/modules/auth/auth.service.js";
@@ -118,6 +119,27 @@ export const authRoutes: FastifyPluginAsync<AuthModuleOptions> = async (
           token: result.accessToken,
         });
       },
+    )
+    .post(
+      "/logout",
+      {
+        schema: {
+          response: {
+            200: z.object({
+              success: z.literal(true),
+            }),
+          },
+          tags: ["Auth"],
+          summary: "Logout current session",
+        },
+      },
+      async (request, reply) => {
+        const refreshToken = request.cookies[REFRESH_COOKIE_NAME];
+        await refreshSession.logout(refreshToken);
+
+        clearRefreshCookie(reply);
+        return reply.status(200).send({ success: true });
+      },
     );
 };
 
@@ -128,7 +150,7 @@ function setRefreshCookie(
   reply.cookie(REFRESH_COOKIE_NAME, session.token, {
     path: "/",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
     sameSite: "lax",
     expires: session.expiresAt,
   });

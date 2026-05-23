@@ -36,6 +36,7 @@ export interface RefreshSessionService {
     refreshToken: string,
     context: SessionContext,
   ): Promise<RefreshSessionResult>;
+  logout(refreshToken?: string): Promise<void>;
 }
 
 type RefreshSessionRepositoryPort = Pick<
@@ -135,6 +136,22 @@ export function createRefreshSessionService(
         refreshToken: newRefreshToken,
         expiresAt: currentSession.expiresAt,
       };
+    },
+
+    async logout(refreshToken?: string) {
+      if (!refreshToken) {
+        return;
+      }
+
+      const tokenHash = hashToken(refreshToken);
+      const session = await refreshSessionRepository.findByTokenHash(tokenHash);
+      if (!session) {
+        return;
+      }
+
+      if (!session.revokedAt) {
+        return refreshSessionRepository.revokeById(session._id, "logout");
+      }
     },
   };
 }
