@@ -40,7 +40,7 @@ export interface RefreshSessionService {
 
 type RefreshSessionRepositoryPort = Pick<
   RefreshSessionRepository,
-  "findByTokenHash" | "create" | "rotateById" | "revokeById" | "revokeFamily"
+  "findByTokenHash" | "create" | "rotate" | "revokeById" | "revokeFamily"
 >;
 type UserRepositoryPort = Pick<UserRepository, "findById">;
 
@@ -73,7 +73,6 @@ export function createRefreshSessionService(
     },
 
     async refresh(refreshToken, { ip, userAgent }) {
-      console.log(refreshToken);
       const refreshTokenHash = hashToken(refreshToken);
 
       const currentSession =
@@ -117,19 +116,11 @@ export function createRefreshSessionService(
 
       const newRefreshToken = generateOpaqueToken();
       const newRefreshTokenHash = hashToken(newRefreshToken);
-      const expiresAt = currentSession.expiresAt;
 
-      const newSession = await refreshSessionRepository.create({
-        user: currentSession.user,
-        familyId: currentSession.familyId,
+      await refreshSessionRepository.rotate(currentSession, {
         tokenHash: newRefreshTokenHash,
-        expiresAt,
         ip: ip ?? null,
         userAgent: userAgent ?? null,
-      });
-
-      await refreshSessionRepository.rotateById(currentSession._id, {
-        replacedBy: newSession._id,
       });
 
       const accessToken = signToken({
@@ -142,7 +133,7 @@ export function createRefreshSessionService(
         user: toUserDetails(user),
         accessToken,
         refreshToken: newRefreshToken,
-        expiresAt,
+        expiresAt: currentSession.expiresAt,
       };
     },
   };

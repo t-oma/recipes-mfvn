@@ -46,17 +46,47 @@ export class RefreshSessionRepository extends BaseRepository<
     return this.model.findOne({ tokenHash }).lean();
   }
 
-  async rotateById(
+  async markRotated(
     id: Types.ObjectId,
     data: { replacedBy: Types.ObjectId },
   ): Promise<RefreshSessionDocument | null> {
     return this.model
-      .findByIdAndUpdate(id, {
-        lastUsedAt: new Date(),
-        rotatedAt: new Date(),
-        replacedBy: data.replacedBy,
-      })
+      .findOneAndUpdate(
+        { _id: id, rotatedAt: null, replacedBy: null, revokedAt: null },
+        {
+          lastUsedAt: new Date(),
+          rotatedAt: new Date(),
+          replacedBy: data.replacedBy,
+        },
+      )
       .lean();
+  }
+
+  async rotate(
+    session: Pick<
+      RefreshSessionDocument,
+      "_id" | "user" | "familyId" | "expiresAt"
+    >,
+    data: {
+      tokenHash: string;
+      ip?: string | null;
+      userAgent?: string | null;
+    },
+  ): Promise<RefreshSessionDocument | null> {
+    const newSession = await this.create({
+      user: session.user,
+      familyId: session.familyId,
+      tokenHash: data.tokenHash,
+      expiresAt: session.expiresAt,
+      ip: data.ip ?? null,
+      userAgent: data.userAgent ?? null,
+    });
+
+    await this.markRotated(session._id, {
+      replacedBy: newSession._id,
+    });
+
+    return newSession;
   }
 
   async revokeById(id: Types.ObjectId, reason: RevokeReason): Promise<void> {
