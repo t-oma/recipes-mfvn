@@ -66,6 +66,10 @@ const refreshSessionSchema = new Schema<
       enum: [...revokeReasons, null],
       default: null,
     },
+    rotatedAt: {
+      type: Date,
+      default: null,
+    },
     replacedBy: {
       type: String,
       default: null,
