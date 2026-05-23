@@ -41,11 +41,6 @@ export function createAuthService(
         role: user.role,
       });
 
-      log.info(
-        { userId: user._id.toString(), email: user.email },
-        "User registered",
-      );
-
       return {
         user: toUserDetails(user),
         token,
@@ -69,11 +64,6 @@ export function createAuthService(
         email: user.email,
         role: user.role,
       });
-
-      log.info(
-        { userId: user._id.toString(), email: user.email },
-        "User logged in",
-      );
 
       return {
         user: toUserDetails(user),

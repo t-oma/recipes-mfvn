@@ -1,4 +1,5 @@
 import "dotenv/config";
+import fastifyCookie from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
 import fastifyRateLimit from "@fastify/rate-limit";
@@ -57,12 +58,15 @@ export async function buildApp(log: Logger) {
   app.setErrorHandler(errorHandler);
 
   // CORS
-  app.register(fastifyCors, { origin: true });
+  app.register(fastifyCors, { origin: true, credentials: true });
 
   // Security headers
   app.register(fastifyHelmet, {
     contentSecurityPolicy: false,
   });
+
+  // Cookies
+  app.register(fastifyCookie);
 
   // Rate limiting
   app.register(fastifyRateLimit, createRateLimitOptions());
@@ -109,6 +113,7 @@ export async function buildApp(log: Logger) {
   // Routes
   app.register(authRoutes, {
     service: services.auth,
+    refreshSession: services.refreshSession,
     prefix: "/api/auth",
   });
   app.register(userRoutes, {
