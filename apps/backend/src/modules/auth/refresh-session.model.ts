@@ -71,7 +71,7 @@ const refreshSessionSchema = new Schema<
       default: null,
     },
     replacedBy: {
-      type: String,
+      type: Schema.Types.ObjectId,
       default: null,
     },
     userAgent: {
