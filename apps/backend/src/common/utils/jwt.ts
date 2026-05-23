@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import type { Prettify, UserRole } from "@recipes/shared";
 import type { JwtPayload as _JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
@@ -22,4 +23,12 @@ export function verifyToken(token: string): JwtPayload {
   return jwt.verify(token, env.JWT_SECRET, {
     algorithms: ["HS256"],
   }) as JwtPayload;
+}
+
+export function generateOpaqueToken() {
+  return crypto.randomBytes(48).toString("base64url");
+}
+
+export function hashToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
 }
