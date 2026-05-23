@@ -15,6 +15,11 @@ describe("authRoutes", () => {
     register: vi.fn(),
     login: vi.fn(),
   };
+  const mockRefreshSessionService = {
+    create: vi.fn(),
+    refresh: vi.fn(),
+    logout: vi.fn(),
+  };
 
   let app: FastifyInstance;
 
@@ -23,12 +28,14 @@ describe("authRoutes", () => {
     app = await createTestApp();
     await app.register(authRoutes, {
       service: mockAuthService,
+      refreshSession: mockRefreshSessionService,
       prefix: "/api/auth",
     });
   });
 
   describe("POST /api/auth/register", () => {
     it("should register a new user and return 201", async () => {
+      const userId = "507f1f77bcf86cd799439011";
       const payload = {
         email: "new@test.com",
         password: "Password123!",
@@ -36,13 +43,18 @@ describe("authRoutes", () => {
       };
       mockAuthService.register.mockResolvedValue({
         user: {
-          id: "507f1f77bcf86cd799439011",
+          id: userId,
           email: payload.email,
           name: payload.name,
           createdAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
         },
         token: "mock-jwt-token",
+      });
+      const refreshExpiry = new Date(Date.now() + 15 * 60 * 1000);
+      mockRefreshSessionService.create.mockResolvedValue({
+        refreshToken: "mock-refresh-token",
+        expiresAt: refreshExpiry,
       });
 
       const response = await app.inject({
@@ -52,7 +64,17 @@ describe("authRoutes", () => {
       });
 
       expect(response.statusCode).toBe(201);
+      expect(response.headers["set-cookie"]).toContain(
+        "refresh-token=mock-refresh-token",
+      );
       expect(mockAuthService.register).toHaveBeenCalledWith(payload);
+      expect(mockRefreshSessionService.create).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          ip: "127.0.0.1",
+          userAgent: "lightMyRequest",
+        }),
+      );
       const body = JSON.parse(response.payload);
       expect(body.user.email).toBe(payload.email);
       expect(body.token).toBe("mock-jwt-token");
@@ -107,15 +129,21 @@ describe("authRoutes", () => {
 
   describe("POST /api/auth/login", () => {
     it("should login and return 200 with token", async () => {
+      const userId = "507f1f77bcf86cd799439011";
       mockAuthService.login.mockResolvedValue({
         user: {
-          id: "507f1f77bcf86cd799439011",
+          id: userId,
           email: "user@test.com",
           name: "User",
           createdAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
         },
         token: "mock-jwt-token",
+      });
+      const refreshExpiry = new Date(Date.now() + 15 * 60 * 1000);
+      mockRefreshSessionService.create.mockResolvedValue({
+        refreshToken: "mock-refresh-token",
+        expiresAt: refreshExpiry,
       });
 
       const response = await app.inject({
@@ -125,10 +153,20 @@ describe("authRoutes", () => {
       });
 
       expect(response.statusCode).toBe(200);
+      expect(response.headers["set-cookie"]).toContain(
+        "refresh-token=mock-refresh-token",
+      );
       expect(mockAuthService.login).toHaveBeenCalledWith({
         email: "user@test.com",
         password: "correct-password",
       });
+      expect(mockRefreshSessionService.create).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          ip: "127.0.0.1",
+          userAgent: "lightMyRequest",
+        }),
+      );
       const body = JSON.parse(response.payload);
       expect(body.user.email).toBe("user@test.com");
       expect(body.token).toBe("mock-jwt-token");
