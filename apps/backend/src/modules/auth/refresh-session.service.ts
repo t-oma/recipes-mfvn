@@ -1,33 +1,52 @@
 import crypto from "node:crypto";
 import type { UserDetails } from "@recipes/shared";
-import { generateOpaqueToken, hashToken } from "@/common/utils/jwt.js";
+import { AppError, UnauthorizedError } from "@/common/errors.js";
+import {
+  generateOpaqueToken,
+  hashToken,
+  signToken,
+} from "@/common/utils/jwt.js";
 import { env } from "@/config/env.js";
+import { toUserDetails } from "@/modules/users/user.mapper.js";
+import type { UserRepository } from "@/modules/users/user.repository.js";
+import type { RefreshSessionDocument } from "./refresh-session.model.js";
 import type { RefreshSessionRepository } from "./refresh-session.repository.js";
 
-export type CreateSessionContext = {
+type SessionContext = {
   ip?: string | null;
   userAgent?: string | null;
 };
 
-export type CreateSessionResult = {
-  token: string;
+type CreateSessionResult = {
+  refreshToken: string;
   expiresAt: Date;
+};
+
+type RefreshSessionResult = CreateSessionResult & {
+  user: UserDetails;
+  accessToken: string;
 };
 
 export interface RefreshSessionService {
   create(
     userId: UserDetails["id"],
-    context: CreateSessionContext,
+    context: SessionContext,
   ): Promise<CreateSessionResult>;
+  refresh(
+    refreshToken: string,
+    context: SessionContext,
+  ): Promise<RefreshSessionResult>;
 }
 
 type RefreshSessionRepositoryPort = Pick<
   RefreshSessionRepository,
-  "create" | "updateMany" | "rotateById"
+  "findByTokenHash" | "create" | "rotateById" | "revokeById" | "revokeFamily"
 >;
+type UserRepositoryPort = Pick<UserRepository, "findById">;
 
 export function createRefreshSessionService(
   refreshSessionRepository: RefreshSessionRepositoryPort,
+  userRepository: UserRepositoryPort,
 ): RefreshSessionService {
   return {
     async create(userId, { ip, userAgent }) {
@@ -48,9 +67,99 @@ export function createRefreshSessionService(
       });
 
       return {
-        token,
+        refreshToken: token,
+        expiresAt: expiresAt,
+      };
+    },
+
+    async refresh(refreshToken, { ip, userAgent }) {
+      console.log(refreshToken);
+      const refreshTokenHash = hashToken(refreshToken);
+
+      const currentSession =
+        await refreshSessionRepository.findByTokenHash(refreshTokenHash);
+      if (!currentSession) {
+        throw new UnauthorizedError("Invalid refresh token");
+      }
+
+      const sessionState = getRefreshSessionState(currentSession);
+      switch (sessionState) {
+        case "revoked":
+          throw new UnauthorizedError("Refresh session revoked");
+        case "expired":
+          await refreshSessionRepository.revokeById(
+            currentSession._id,
+            "expired",
+          );
+          throw new UnauthorizedError("Refresh token expired");
+        case "reused":
+          await refreshSessionRepository.revokeFamily(
+            currentSession.familyId,
+            "reuse-detected",
+          );
+          throw new UnauthorizedError("Refresh token reuse detected");
+        case "valid":
+          break;
+        default:
+          exhaustiveCheck(sessionState);
+      }
+
+      const user = await userRepository.findById(
+        currentSession.user.toHexString(),
+      );
+      if (!user) {
+        await refreshSessionRepository.revokeFamily(
+          currentSession.familyId,
+          "user-not-found",
+        );
+        throw new UnauthorizedError("User not found");
+      }
+
+      const newRefreshToken = generateOpaqueToken();
+      const newRefreshTokenHash = hashToken(newRefreshToken);
+      const expiresAt = currentSession.expiresAt;
+
+      const newSession = await refreshSessionRepository.create({
+        user: currentSession.user,
+        familyId: currentSession.familyId,
+        tokenHash: newRefreshTokenHash,
+        expiresAt,
+        ip: ip ?? null,
+        userAgent: userAgent ?? null,
+      });
+
+      await refreshSessionRepository.rotateById(currentSession._id, {
+        replacedBy: newSession._id,
+      });
+
+      const accessToken = signToken({
+        id: user._id.toString(),
+        email: user.email,
+        role: user.role,
+      });
+
+      return {
+        user: toUserDetails(user),
+        accessToken,
+        refreshToken: newRefreshToken,
         expiresAt,
       };
     },
   };
+}
+
+export function getRefreshSessionState(
+  session: Pick<
+    RefreshSessionDocument,
+    "revokedAt" | "expiresAt" | "rotatedAt" | "replacedBy"
+  >,
+) {
+  if (session.revokedAt) return "revoked";
+  if (session.expiresAt.getTime() <= Date.now()) return "expired";
+  if (session.rotatedAt || session.replacedBy) return "reused";
+  return "valid";
+}
+
+export function exhaustiveCheck(value: never): never {
+  throw new AppError(`Unhandled value ${value}`);
 }

@@ -127,6 +127,7 @@ export function createServices(
   );
   const refreshSessionService = createRefreshSessionService(
     refreshSessionRepository,
+    userRepository,
   );
   const authService = createAuthService(userRepository, passwordService, log);
 

@@ -5,6 +5,7 @@ import {
 } from "@recipes/shared";
 import type { FastifyPluginAsync, FastifyReply } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import { UnauthorizedError } from "@/common/errors.js";
 import { env } from "@/config/env.js";
 import type { AuthService } from "@/modules/auth/auth.service.js";
 import type { RefreshSessionService } from "./refresh-session.service.js";
@@ -48,7 +49,10 @@ export const authRoutes: FastifyPluginAsync<AuthModuleOptions> = async (
           userAgent: request.headers["user-agent"] ?? null,
         });
 
-        setRefreshCookie(reply, refreshResult);
+        setRefreshCookie(reply, {
+          token: refreshResult.refreshToken,
+          expiresAt: refreshResult.expiresAt,
+        });
         return reply.status(201).send(result);
       },
     )
@@ -77,8 +81,42 @@ export const authRoutes: FastifyPluginAsync<AuthModuleOptions> = async (
           userAgent: request.headers["user-agent"] ?? null,
         });
 
-        setRefreshCookie(reply, refreshResult);
+        setRefreshCookie(reply, {
+          token: refreshResult.refreshToken,
+          expiresAt: refreshResult.expiresAt,
+        });
         return reply.status(200).send(result);
+      },
+    )
+    .post(
+      "/refresh",
+      {
+        schema: {
+          response: {
+            200: authResponseSchema,
+          },
+          tags: ["Auth"],
+          summary: "Refresh a session",
+        },
+      },
+      async (request, reply) => {
+        const refreshToken = request.cookies[REFRESH_COOKIE_NAME];
+        if (!refreshToken)
+          throw new UnauthorizedError("Invalid or expired token");
+
+        const result = await refreshSession.refresh(refreshToken, {
+          ip: request.ip,
+          userAgent: request.headers["user-agent"] ?? null,
+        });
+
+        setRefreshCookie(reply, {
+          token: result.refreshToken,
+          expiresAt: result.expiresAt,
+        });
+        return reply.status(200).send({
+          user: result.user,
+          token: result.accessToken,
+        });
       },
     );
 };
@@ -93,5 +131,14 @@ function setRefreshCookie(
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     expires: session.expiresAt,
+  });
+}
+
+export function clearRefreshCookie(reply: FastifyReply) {
+  reply.clearCookie(REFRESH_COOKIE_NAME, {
+    path: "/",
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: "lax",
   });
 }

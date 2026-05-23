@@ -7,6 +7,7 @@ export const revokeReasons = [
   "reuse-detected",
   "admin",
   "expired",
+  "user-not-found",
 ] as const;
 export type RevokeReason = (typeof revokeReasons)[number];
 
