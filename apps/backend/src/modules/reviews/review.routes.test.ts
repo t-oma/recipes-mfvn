@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
-import { JwtPayload } from "@/common/utils/jwt.js";
+import type { JwtPayload } from "@/common/utils/jwt.js";
 import { reviewRoutes } from "@/modules/reviews/review.routes.js";
 
 const { verifyToken } = vi.hoisted(() => ({
