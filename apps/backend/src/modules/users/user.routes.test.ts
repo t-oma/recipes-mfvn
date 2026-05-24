@@ -19,7 +19,7 @@ describe("userRoutes", () => {
   const userId = "507f1f77bcf86cd799439011";
 
   const testJwtPayload = {
-    userId,
+    id: userId,
     email: "user@test.com",
     role: "user",
   } as const;
@@ -39,7 +39,7 @@ describe("userRoutes", () => {
     it("should return current user when authenticated", async () => {
       verifyToken.mockReturnValue(testJwtPayload);
       mockUserService.getCurrentUser.mockResolvedValue({
-        id: testJwtPayload.userId,
+        id: testJwtPayload.id,
         email: testJwtPayload.email,
         name: "Test User",
         createdAt: "2024-01-01T00:00:00.000Z",
@@ -54,7 +54,7 @@ describe("userRoutes", () => {
 
       expect(response.statusCode).toBe(200);
       expect(mockUserService.getCurrentUser).toHaveBeenCalledWith(
-        testJwtPayload.userId,
+        testJwtPayload.id,
       );
       const body = JSON.parse(response.payload);
       expect(body.email).toBe(testJwtPayload.email);
@@ -96,7 +96,7 @@ describe("userRoutes", () => {
         userId,
         expect.objectContaining({
           query: expect.any(Object),
-          initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+          initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
         }),
       );
     });
@@ -137,7 +137,7 @@ describe("userRoutes", () => {
         userId,
         expect.objectContaining({
           query: expect.any(Object),
-          initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+          initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
         }),
       );
     });

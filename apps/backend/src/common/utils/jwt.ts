@@ -1,20 +1,34 @@
-import type { UserRole } from "@recipes/shared";
+import crypto from "node:crypto";
+import type { Prettify, UserRole } from "@recipes/shared";
+import type { JwtPayload as _JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 import type { StringValue } from "ms";
 import { env } from "@/config/env.js";
 
-export interface JwtPayload {
-  userId: string;
+export type JwtPayload = Prettify<_JwtPayload> & {
+  id: string;
   email: string;
   role: UserRole;
-}
+};
 
 export function signToken(payload: JwtPayload): string {
-  return jwt.sign(payload, env.JWT_SECRET, {
+  return jwt.sign({ ...payload }, env.JWT_SECRET, {
+    algorithm: "HS256",
     expiresIn: env.JWT_EXPIRES_IN as StringValue,
+    subject: payload.id,
   });
 }
 
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+  return jwt.verify(token, env.JWT_SECRET, {
+    algorithms: ["HS256"],
+  }) as JwtPayload;
+}
+
+export function generateOpaqueToken() {
+  return crypto.randomBytes(48).toString("base64url");
+}
+
+export function hashToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
 }

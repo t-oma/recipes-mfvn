@@ -34,13 +34,13 @@ describe("categoryRoutes", () => {
   };
 
   const testJwtPayload = {
-    userId,
+    id: userId,
     email: "user@test.com",
     role: "user",
   } as const;
 
   const testAdminJwtPayload = {
-    userId: adminId,
+    id: adminId,
     email: "admin@test.com",
     role: "admin",
   } as const;
@@ -122,7 +122,7 @@ describe("categoryRoutes", () => {
           image: { url: "https://example.com/desserts.jpg" },
         },
         initiator: {
-          id: testAdminJwtPayload.userId,
+          id: testAdminJwtPayload.id,
           role: testAdminJwtPayload.role,
         },
       });
@@ -181,7 +181,7 @@ describe("categoryRoutes", () => {
       expect(response.statusCode).toBe(204);
       expect(mockCategoryService.deleteById).toHaveBeenCalledWith(categoryId, {
         initiator: {
-          id: testAdminJwtPayload.userId,
+          id: testAdminJwtPayload.id,
           role: testAdminJwtPayload.role,
         },
       });

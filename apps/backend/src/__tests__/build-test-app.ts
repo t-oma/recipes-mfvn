@@ -1,3 +1,4 @@
+import fastifyCookie from "@fastify/cookie";
 import Fastify from "fastify";
 import {
   serializerCompiler,
@@ -13,9 +14,10 @@ export async function createTestApp() {
   app.setSerializerCompiler(serializerCompiler);
   app.setErrorHandler(errorHandler);
   await app.register(cacheHeadersPlugin);
+  await app.register(fastifyCookie);
   return app;
 }
 
 export function authHeader(payload: JwtPayload): { authorization: string } {
-  return { authorization: `Bearer fake-token-${payload.userId}` };
+  return { authorization: `Bearer fake-token-${payload.id}` };
 }

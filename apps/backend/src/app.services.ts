@@ -6,6 +6,10 @@ import { createBcryptPasswordService } from "@/common/passwords/bcrypt.service.j
 import { env } from "@/config/env.js";
 import type { AuthService } from "@/modules/auth/auth.service.js";
 import { createAuthService } from "@/modules/auth/auth.service.js";
+import { RefreshSessionModel } from "@/modules/auth/refresh-session.model.js";
+import { RefreshSessionRepository } from "@/modules/auth/refresh-session.repository.js";
+import type { RefreshSessionService } from "@/modules/auth/refresh-session.service.js";
+import { createRefreshSessionService } from "@/modules/auth/refresh-session.service.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { CategoryRepository } from "@/modules/categories/category.repository.js";
 import type { CategoryService } from "@/modules/categories/category.service.js";
@@ -47,6 +51,7 @@ export interface AppServices {
   recipeRating: RecipeRatingService;
   category: CategoryService;
   review: ReviewService;
+  refreshSession: RefreshSessionService;
 
   recipeCache: CacheService;
   categoryCache: CacheService;
@@ -67,6 +72,9 @@ export function createServices(
   const userRepository = new UserRepository(UserModel);
   const recipeRepository = new RecipeRepository(RecipeModel);
   const reviewRepository = new ReviewRepository(ReviewModel);
+  const refreshSessionRepository = new RefreshSessionRepository(
+    RefreshSessionModel,
+  );
 
   const recipeCache = createNamespacedCache("recipes", cache);
   const categoryCache = createNamespacedCache("categories", cache);
@@ -117,6 +125,10 @@ export function createServices(
     userRepository,
     reviewCache,
   );
+  const refreshSessionService = createRefreshSessionService(
+    refreshSessionRepository,
+    userRepository,
+  );
   const authService = createAuthService(userRepository, passwordService, log);
 
   return {
@@ -129,6 +141,7 @@ export function createServices(
     recipeRating: recipeRatingService,
     category: categoryService,
     review: reviewService,
+    refreshSession: refreshSessionService,
 
     recipeCache,
     categoryCache,

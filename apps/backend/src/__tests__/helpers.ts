@@ -3,6 +3,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { Types } from "mongoose";
 import type { Mock } from "vitest";
 import { vi } from "vitest";
+import type { RefreshSessionDocument } from "@/modules/auth/refresh-session.model.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
 import type {
@@ -179,6 +180,29 @@ export function createReviewDoc(
     isFeatured: false,
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
+    ...overrides,
+  };
+}
+
+export function createRefreshSessionDoc(
+  overrides: Partial<RefreshSessionDocument> = {},
+): RefreshSessionDocument {
+  return {
+    _id: createObjectId(),
+    user: createObjectId(),
+    familyId: "test-family",
+    tokenHash: "test-token-hash",
+    expiresAt: new Date(
+      new Date("2024-01-01").getTime() + 7 * 24 * 60 * 60 * 1000,
+    ),
+    createdAt: new Date("2024-01-01"),
+    lastUsedAt: null,
+    rotatedAt: null,
+    replacedBy: null,
+    revokedAt: null,
+    revokeReason: null,
+    ip: null,
+    userAgent: null,
     ...overrides,
   };
 }

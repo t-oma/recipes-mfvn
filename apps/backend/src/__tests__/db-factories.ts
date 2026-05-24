@@ -1,5 +1,6 @@
 import type { Minutes, RecipeStats } from "@recipes/shared";
 import type { Types } from "mongoose";
+import { RefreshSessionModel } from "@/modules/auth/refresh-session.model.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
@@ -140,6 +141,32 @@ export async function createDbReview(
     text: "Amazing platform!",
     rating: 5,
     isFeatured: false,
+    ...overrides,
+  });
+}
+
+export async function createDbRefreshSession(
+  overrides: Partial<{
+    user: Types.ObjectId;
+    familyId: string;
+    tokenHash: string;
+    expiresAt: Date;
+    rotatedAt: Date | null;
+    replacedBy: string | null;
+    revokedAt: Date | null;
+    revokeReason: string | null;
+  }> = {},
+) {
+  return RefreshSessionModel.create({
+    user: overrides.user ?? createObjectId(),
+    familyId: overrides.familyId ?? `family-${unique("fam")}`,
+    tokenHash: overrides.tokenHash ?? `hash-${unique("hash")}`,
+    expiresAt:
+      overrides.expiresAt ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    rotatedAt: overrides.rotatedAt ?? null,
+    replacedBy: overrides.replacedBy ?? null,
+    revokedAt: overrides.revokedAt ?? null,
+    revokeReason: overrides.revokeReason ?? null,
     ...overrides,
   });
 }

@@ -19,7 +19,7 @@ describe("recipeRatingRoutes", () => {
   const recipeId = "507f1f77bcf86cd799439033";
 
   const testJwtPayload = {
-    userId,
+    id: userId,
     email: "user@test.com",
     role: "user",
   } as const;
@@ -52,7 +52,7 @@ describe("recipeRatingRoutes", () => {
       expect(body.value).toBe(5);
       expect(mockRecipeRatingService.rate).toHaveBeenCalledWith(recipeId, {
         data: { value: 5 },
-        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+        initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
       });
     });
 
@@ -108,7 +108,7 @@ describe("recipeRatingRoutes", () => {
 
       expect(response.statusCode).toBe(204);
       expect(mockRecipeRatingService.remove).toHaveBeenCalledWith(recipeId, {
-        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+        initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
       });
     });
 

@@ -21,7 +21,7 @@ describe("favoriteRoutes", () => {
   const recipeId = "507f1f77bcf86cd799439033";
 
   const testJwtPayload = {
-    userId,
+    id: userId,
     email: "user@test.com",
     role: "user",
   } as const;
@@ -52,7 +52,7 @@ describe("favoriteRoutes", () => {
       const body = JSON.parse(response.payload);
       expect(body.favorited).toBe(true);
       expect(mockFavoriteService.isFavorited).toHaveBeenCalledWith(recipeId, {
-        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+        initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
       });
     });
 
@@ -93,7 +93,7 @@ describe("favoriteRoutes", () => {
       const body = JSON.parse(response.payload);
       expect(body.favorited).toBe(true);
       expect(mockFavoriteService.add).toHaveBeenCalledWith(recipeId, {
-        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+        initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
       });
     });
 
@@ -122,7 +122,7 @@ describe("favoriteRoutes", () => {
       const body = JSON.parse(response.payload);
       expect(body.favorited).toBe(false);
       expect(mockFavoriteService.remove).toHaveBeenCalledWith(recipeId, {
-        initiator: { id: testJwtPayload.userId, role: testJwtPayload.role },
+        initiator: { id: testJwtPayload.id, role: testJwtPayload.role },
       });
     });
 

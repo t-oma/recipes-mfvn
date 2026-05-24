@@ -36,7 +36,7 @@ export const favoriteRoutes: FastifyPluginAsync<FavoriteModuleOptions> = async (
         assertAuthenticated(request);
 
         const favorited = await service.isFavorited(request.params.id, {
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.send({ favorited });
       },
@@ -59,7 +59,7 @@ export const favoriteRoutes: FastifyPluginAsync<FavoriteModuleOptions> = async (
         assertAuthenticated(request);
 
         const result = await service.add(request.params.id, {
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.send(result);
       },
@@ -82,7 +82,7 @@ export const favoriteRoutes: FastifyPluginAsync<FavoriteModuleOptions> = async (
         assertAuthenticated(request);
 
         const result = await service.remove(request.params.id, {
-          initiator: { id: request.user.userId, role: request.user.role },
+          initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.send(result);
       },

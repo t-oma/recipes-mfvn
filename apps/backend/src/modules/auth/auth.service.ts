@@ -36,15 +36,10 @@ export function createAuthService(
         password,
       });
       const token = signToken({
-        userId: user._id.toString(),
+        id: user._id.toString(),
         email: user.email,
         role: user.role,
       });
-
-      log.info(
-        { userId: user._id.toString(), email: user.email },
-        "User registered",
-      );
 
       return {
         user: toUserDetails(user),
@@ -65,15 +60,10 @@ export function createAuthService(
       }
 
       const token = signToken({
-        userId: user._id.toString(),
+        id: user._id.toString(),
         email: user.email,
         role: user.role,
       });
-
-      log.info(
-        { userId: user._id.toString(), email: user.email },
-        "User logged in",
-      );
 
       return {
         user: toUserDetails(user),
