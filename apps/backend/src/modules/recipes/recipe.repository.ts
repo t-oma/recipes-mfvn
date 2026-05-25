@@ -38,7 +38,7 @@ export type RecipeStatsDelta = {
 };
 
 export type RecipeCreateInput = RequireKeys<
-  CreateInput<RecipeDocument>,
+  CreateInput<Omit<RecipeDocument, "createdAt" | "updatedAt">>,
   | "title"
   | "description"
   | "ingredients"
@@ -46,6 +46,7 @@ export type RecipeCreateInput = RequireKeys<
   | "category"
   | "author"
   | "difficulty"
+  | "mealType"
   | "cookingTime"
   | "servings"
   | "isPublic"
@@ -75,8 +76,16 @@ export class RecipeRepository extends BaseRepository<
   }: QueryMethodParams<RecipeQuery>): Promise<
     [RecipeDocumentListItem[], number]
   > {
-    const { page, limit, sort, isFavorited, search, categoryId, difficulty } =
-      query;
+    const {
+      page,
+      limit,
+      sort,
+      isFavorited,
+      search,
+      categoryId,
+      difficulty,
+      mealType,
+    } = query;
 
     const sortWithPopularityReplaced = sort.replace(
       "popularity",
@@ -89,6 +98,7 @@ export class RecipeRepository extends BaseRepository<
         ...(search && { $text: { $search: search } }),
         ...(categoryId && { category: toObjectId(categoryId) }),
         ...(difficulty && { difficulty }),
+        ...(mealType && { mealType }),
       }),
       stages.unset<RecipeDocument>("__v"),
 

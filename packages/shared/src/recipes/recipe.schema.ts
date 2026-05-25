@@ -4,7 +4,10 @@ import {
   paginationQuerySchema,
   searchQuerySchema,
 } from "../query.js";
-import { difficultySchema } from "./recipe.primitives.schema.js";
+import {
+  difficultySchema,
+  mealTypeSchema,
+} from "./recipe.primitives.schema.js";
 
 export const recipeStatsSchema = z.object({
   favoritesCount: z.number().int().nonnegative(),
@@ -23,6 +26,7 @@ export const recipeQuerySchema = z
     categoryId: z.string().optional(),
     difficulty: difficultySchema.optional(),
     isFavorited: z.stringbool().optional(),
+    mealType: mealTypeSchema.optional(),
   })
   .extend(paginationQuerySchema.shape)
   .extend(searchQuerySchema.shape);

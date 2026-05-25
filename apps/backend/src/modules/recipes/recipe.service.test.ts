@@ -1,5 +1,4 @@
-import type { Minutes, RecipeQuery } from "@recipes/shared";
-import type { Types } from "mongoose";
+import type { MealType, Minutes, RecipeQuery } from "@recipes/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createObjectId,
@@ -15,20 +14,6 @@ import {
 } from "@/common/errors.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import { createRecipeService } from "@/modules/recipes/recipe.service.js";
-
-function createMockRecipe(authorId?: Types.ObjectId) {
-  const author = authorId ?? createObjectId();
-  const doc = createRecipeDoc({ author });
-  return {
-    ...doc,
-    author: {
-      _id: doc.author,
-      equals: (id: string) => id === doc.author.toString(),
-    },
-    save: vi.fn().mockResolvedValue(undefined),
-    deleteOne: vi.fn().mockResolvedValue(undefined),
-  };
-}
 
 describe("recipeService", () => {
   const mockRecipeRepository = {
@@ -335,6 +320,7 @@ describe("recipeService", () => {
 
       const authorId = createObjectId();
       const categoryId = createObjectId();
+      const mealType: MealType = "breakfast";
       const populated = populateRecipeDoc(
         createRecipeDoc({ title: "New Recipe" }),
         {
@@ -345,13 +331,14 @@ describe("recipeService", () => {
             slug: "italian",
             image: { url: "https://example.com/italian.jpg" },
           },
+          mealType,
         },
       );
 
       mockRecipeRepository.create.mockResolvedValue(populated);
 
       const result = await service.create({
-        data: { ...createData, category: categoryId.toString() },
+        data: { ...createData, category: categoryId.toString(), mealType },
         initiator: initiator(authorId.toString()),
       });
 
@@ -359,6 +346,7 @@ describe("recipeService", () => {
         ...createData,
         category: categoryId.toString(),
         author: authorId.toString(),
+        mealType,
       });
       expect(result.title).toBe("New Recipe");
       expect(result.userRating).toBeNull();
@@ -375,7 +363,11 @@ describe("recipeService", () => {
     it("should throw BadRequestError for invalid author ID", async () => {
       await expect(
         service.create({
-          data: { ...createData, category: createObjectId().toString() },
+          data: {
+            ...createData,
+            category: createObjectId().toString(),
+            mealType: "breakfast",
+          },
           initiator: { id: "invalid", role: "user" },
         }),
       ).rejects.toThrow(BadRequestError);
@@ -384,7 +376,7 @@ describe("recipeService", () => {
     it("should throw BadRequestError for invalid category ID", async () => {
       await expect(
         service.create({
-          data: { ...createData, category: "invalid" },
+          data: { ...createData, category: "invalid", mealType: "breakfast" },
           initiator: initiator(),
         }),
       ).rejects.toThrow(BadRequestError);
@@ -395,7 +387,11 @@ describe("recipeService", () => {
 
       await expect(
         service.create({
-          data: { ...createData, category: createObjectId().toString() },
+          data: {
+            ...createData,
+            category: createObjectId().toString(),
+            mealType: "breakfast",
+          },
           initiator: initiator(),
         }),
       ).rejects.toThrow(NotFoundError);
@@ -407,7 +403,11 @@ describe("recipeService", () => {
 
       await expect(
         service.create({
-          data: { ...createData, category: createObjectId().toString() },
+          data: {
+            ...createData,
+            category: createObjectId().toString(),
+            mealType: "breakfast",
+          },
           initiator: initiator(),
         }),
       ).rejects.toThrow(NotFoundError);
@@ -419,6 +419,7 @@ describe("recipeService", () => {
 
       const authorId = createObjectId();
       const categoryId = createObjectId();
+      const mealType: MealType = "breakfast";
       const populated = populateRecipeDoc(
         createRecipeDoc({ title: "New Recipe" }),
         {
@@ -429,13 +430,14 @@ describe("recipeService", () => {
             slug: "italian",
             image: { url: "https://example.com/italian.jpg" },
           },
+          mealType,
         },
       );
 
       mockRecipeRepository.create.mockResolvedValue(populated);
 
       const result = await service.create({
-        data: { ...createData, category: categoryId.toString() },
+        data: { ...createData, category: categoryId.toString(), mealType },
         initiator: initiator(authorId.toString()),
       });
 
@@ -453,18 +455,22 @@ describe("recipeService", () => {
   describe("update", () => {
     it("should update recipe when author matches", async () => {
       const authorId = createObjectId();
-      const recipe = createMockRecipe(authorId);
+      const recipe = createRecipeDoc({
+        author: authorId,
+        mealType: "breakfast",
+      });
       mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
       mockFavoriteRepository.exists.mockResolvedValue(false);
       mockRecipeRepository.save.mockResolvedValue(
-        populateRecipeDoc(createRecipeDoc({ author: authorId }), {
+        populateRecipeDoc(recipe, {
           title: "Updated",
+          mealType: "lunch",
         }),
       );
 
       const id = createObjectId().toString();
       const result = await service.update(id, {
-        data: { title: "Updated" },
+        data: { title: "Updated", mealType: "lunch" },
         initiator: initiator(authorId.toString()),
       });
 
@@ -473,8 +479,10 @@ describe("recipeService", () => {
       });
       expect(mockRecipeRepository.save).toHaveBeenCalledWith(recipe, {
         title: "Updated",
+        mealType: "lunch",
       });
       expect(result.title).toBe("Updated");
+      expect(result.mealType).toBe("lunch");
       expect(result.userRating).toBeNull();
       expect(result.stats.averageRating).toBeNull();
       expect(result.stats.ratingCount).toBe(0);
@@ -489,7 +497,7 @@ describe("recipeService", () => {
 
     it("should update recipe when user is admin", async () => {
       const authorId = createObjectId();
-      const recipe = createMockRecipe(authorId);
+      const recipe = createRecipeDoc({ author: authorId });
       mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
       mockFavoriteRepository.exists.mockResolvedValue(false);
       mockRecipeRepository.save.mockResolvedValue(
@@ -535,7 +543,7 @@ describe("recipeService", () => {
     });
 
     it("should throw ForbiddenError when not author and not admin", async () => {
-      const recipe = createMockRecipe();
+      const recipe = createRecipeDoc();
       mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
 
       await expect(
@@ -548,7 +556,7 @@ describe("recipeService", () => {
 
     it("should preserve existing stats when updating only title", async () => {
       const authorId = createObjectId();
-      const recipe = createMockRecipe(authorId);
+      const recipe = createRecipeDoc({ author: authorId });
       mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
       mockFavoriteRepository.exists.mockResolvedValue(false);
       mockRecipeRepository.save.mockResolvedValue(
@@ -586,7 +594,7 @@ describe("recipeService", () => {
   describe("delete", () => {
     it("should delete recipe when author matches", async () => {
       const authorId = createObjectId();
-      const recipe = createMockRecipe(authorId);
+      const recipe = createRecipeDoc({ author: authorId });
       mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
 
       const id = createObjectId().toString();
@@ -606,7 +614,7 @@ describe("recipeService", () => {
     });
 
     it("should delete recipe when user is admin", async () => {
-      const recipe = createMockRecipe();
+      const recipe = createRecipeDoc();
       mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
 
       const id = createObjectId().toString();
@@ -642,7 +650,7 @@ describe("recipeService", () => {
     });
 
     it("should throw ForbiddenError when not author and not admin", async () => {
-      const recipe = createMockRecipe();
+      const recipe = createRecipeDoc();
       mockRecipeRepository.findDocumentById.mockResolvedValue(recipe);
 
       await expect(

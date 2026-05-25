@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { imageSchema } from "../common/image.schema.js";
 import { recipeIngredientSchema } from "./ingredient.schema.js";
-import { difficultySchema, minutesSchema } from "./recipe.primitives.schema.js";
+import {
+  difficultySchema,
+  mealTypeSchema,
+  minutesSchema,
+} from "./recipe.primitives.schema.js";
 
 export const createRecipeInputSchema = z.object({
   title: z.string().trim().min(3).max(200),
@@ -13,6 +17,7 @@ export const createRecipeInputSchema = z.object({
   cookingTime: minutesSchema,
   servings: z.number().int().min(1),
   isPublic: z.boolean().default(true),
+  mealType: mealTypeSchema,
   image: imageSchema,
 });
 

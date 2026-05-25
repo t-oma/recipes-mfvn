@@ -24,6 +24,7 @@ export const recipeListItemSchema = createRecipeInputSchema
     cookingTime: true,
     servings: true,
     difficulty: true,
+    mealType: true,
   })
   .extend(persistenceFieldsSchema.pick({ id: true }).shape)
   .extend(recipeComputedSchema.shape)

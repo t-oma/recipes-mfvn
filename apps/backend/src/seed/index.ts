@@ -109,6 +109,7 @@ async function seed(): Promise<void> {
       category: toObjectId(categoryId),
       author: toObjectId(authorId),
       difficulty: recipe.difficulty,
+      mealType: recipe.mealType,
       cookingTime: recipe.cookingTime as Minutes,
       servings: recipe.servings,
       isPublic: recipe.isPublic,

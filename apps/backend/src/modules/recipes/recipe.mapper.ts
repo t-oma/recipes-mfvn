@@ -1,6 +1,7 @@
 import type {
   Difficulty,
   Image,
+  MealType,
   Minutes,
   RecipeDetails,
   RecipeListItem,
@@ -32,6 +33,7 @@ export type RecipeListItemView = RecipeSummaryView & {
   cookingTime: Minutes;
   servings: number;
   difficulty: Difficulty;
+  mealType: MealType;
 };
 
 export type RecipeView = RecipeListItemView & {
@@ -66,6 +68,7 @@ export function toRecipeListItem(
     servings: view.servings,
     isFavorited,
     category: toCategorySummary(view.category),
+    mealType: view.mealType,
     author: toUserSummary(view.author),
     stats: {
       favoritesCount: view.stats?.favoritesCount ?? 0,

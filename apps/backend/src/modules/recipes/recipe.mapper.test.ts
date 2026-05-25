@@ -33,6 +33,7 @@ describe("toRecipeListItem", () => {
       title: "Pasta",
       image: { url: "https://example.com/pasta.jpg" },
       difficulty: "easy" as const,
+      mealType: "breakfast" as const,
       cookingTime: 30 as Minutes,
       servings: 4,
       category: {
@@ -68,6 +69,7 @@ describe("toRecipeListItem", () => {
       alt: "Pasta",
     });
     expect(result.difficulty).toBe("easy");
+    expect(result.mealType).toBe("breakfast");
     expect(result.cookingTime).toBe(30);
     expect(result.servings).toBe(4);
     expect(result.category).toEqual({
@@ -94,6 +96,7 @@ describe("toRecipeListItem", () => {
       title: "Soup",
       image: { url: "https://example.com/soup.jpg" },
       difficulty: "easy" as const,
+      mealType: "breakfast" as const,
       cookingTime: 20 as Minutes,
       servings: 2,
       category: {
@@ -128,6 +131,7 @@ describe("toRecipeListItem", () => {
       title: "Salad",
       image: { url: "https://example.com/salad.jpg" },
       difficulty: "medium" as const,
+      mealType: "dinner" as const,
       cookingTime: 15 as Minutes,
       servings: 2,
       category: {
