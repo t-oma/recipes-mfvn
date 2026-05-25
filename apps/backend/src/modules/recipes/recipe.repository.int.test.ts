@@ -226,6 +226,13 @@ describe("RecipeRepository", () => {
           mealType: "snack",
           isPublic: true,
         });
+        await createDbRecipe({
+          title: "Beverage",
+          author: author._id,
+          category: category._id,
+          mealType: "beverage",
+          isPublic: true,
+        });
       });
 
       it.for([
@@ -233,6 +240,7 @@ describe("RecipeRepository", () => {
         { mealType: "lunch" as const },
         { mealType: "dinner" as const },
         { mealType: "snack" as const },
+        { mealType: "beverage" as const },
       ])("should filter by $mealType mealType", async ({ mealType }) => {
         const [recipes, total] = await repository.aggregateSearch({
           query: {
