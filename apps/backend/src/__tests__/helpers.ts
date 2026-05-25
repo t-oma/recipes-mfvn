@@ -108,6 +108,7 @@ export function createRecipeDoc(
     category: createObjectId(),
     author: createObjectId(),
     difficulty: "easy",
+    mealType: "breakfast",
     cookingTime: 30 as Minutes,
     servings: 4,
     isPublic: true,
