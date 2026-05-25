@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
   createDbCategory,
   createDbFavorite,
@@ -192,6 +192,61 @@ describe("RecipeRepository", () => {
 
       expect(total).toBe(1);
       expect(recipes[0]?.isFavorited).toBe(true);
+    });
+
+    describe(() => {
+      beforeAll(async () => {
+        const author = await createDbUser();
+        const category = await createDbCategory();
+        await createDbRecipe({
+          title: "Breakfast",
+          author: author._id,
+          category: category._id,
+          mealType: "breakfast",
+          isPublic: true,
+        });
+        await createDbRecipe({
+          title: "Lunch",
+          author: author._id,
+          category: category._id,
+          mealType: "lunch",
+          isPublic: true,
+        });
+        await createDbRecipe({
+          title: "Dinner",
+          author: author._id,
+          category: category._id,
+          mealType: "dinner",
+          isPublic: true,
+        });
+        await createDbRecipe({
+          title: "Snack",
+          author: author._id,
+          category: category._id,
+          mealType: "snack",
+          isPublic: true,
+        });
+      });
+
+      it.for([
+        { mealType: "breakfast" as const },
+        { mealType: "lunch" as const },
+        { mealType: "dinner" as const },
+        { mealType: "snack" as const },
+      ])("should filter by $mealType mealType", async ({ mealType }) => {
+        const [recipes, total] = await repository.aggregateSearch({
+          query: {
+            page: 1,
+            limit: 10,
+            sort: "-createdAt",
+            mealType,
+          },
+          initiator: noInitiator(),
+        });
+
+        expect(total).toBe(1);
+        expect(recipes[0]?.mealType).toBe(mealType);
+      });
     });
 
     it("should return ratings data", async () => {
@@ -718,6 +773,7 @@ describe("RecipeRepository", () => {
         category: category._id.toString(),
         author: author._id.toString(),
         difficulty: "easy",
+        mealType: "breakfast",
         cookingTime: 30 as never,
         servings: 2,
         isPublic: true,
@@ -742,6 +798,7 @@ describe("RecipeRepository", () => {
         category: category._id.toString(),
         author: author._id.toString(),
         difficulty: "easy",
+        mealType: "breakfast",
         cookingTime: 30 as never,
         servings: 2,
         isPublic: true,

@@ -1,4 +1,9 @@
-import type { Minutes, RecipeStats } from "@recipes/shared";
+import type {
+  Difficulty,
+  MealType,
+  Minutes,
+  RecipeStats,
+} from "@recipes/shared";
 import type { Types } from "mongoose";
 import { RefreshSessionModel } from "@/modules/auth/refresh-session.model.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
@@ -59,7 +64,8 @@ export async function createDbRecipe(
     instructions: string[];
     category: Types.ObjectId;
     author: Types.ObjectId;
-    difficulty: "easy" | "medium" | "hard";
+    difficulty: Difficulty;
+    mealType: MealType;
     cookingTime: Minutes;
     servings: number;
     isPublic: boolean;
@@ -75,6 +81,7 @@ export async function createDbRecipe(
     category: createObjectId(),
     author: createObjectId(),
     difficulty: "easy",
+    mealType: "breakfast",
     cookingTime: 30 as Minutes,
     servings: 4,
     isPublic: true,
