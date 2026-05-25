@@ -38,7 +38,7 @@ export type RecipeStatsDelta = {
 };
 
 export type RecipeCreateInput = RequireKeys<
-  CreateInput<RecipeDocument>,
+  CreateInput<Omit<RecipeDocument, "createdAt" | "updatedAt">>,
   | "title"
   | "description"
   | "ingredients"
@@ -46,6 +46,7 @@ export type RecipeCreateInput = RequireKeys<
   | "category"
   | "author"
   | "difficulty"
+  | "mealType"
   | "cookingTime"
   | "servings"
   | "isPublic"
