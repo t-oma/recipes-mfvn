@@ -10,6 +10,7 @@ import type {
   CachedResult,
   CacheService,
 } from "@/common/cache/cache.service.js";
+import { ConflictError, NotFoundError } from "@/common/errors.js";
 import type { TypedEmitter } from "@/common/events.js";
 import type {
   CreateMethodParams,
@@ -34,13 +35,10 @@ export interface CuisineService {
 
 type CuisineRepositoryPort = Pick<
   CuisineRepository,
-  "findMany" | "create" | "delete" | "findById"
+  "findMany" | "create" | "delete"
 >;
 type RecipeRepositoryPort = Pick<RecipeRepository, "count">;
-type CacheServicePort = Pick<
-  CacheService,
-  "getOrSet" | "delete" | "deletePattern"
->;
+type CacheServicePort = Pick<CacheService, "getOrSet" | "deletePattern">;
 type TypedEmitterPort = Pick<TypedEmitter, "emit">;
 
 export function createCuisineService(
@@ -82,17 +80,17 @@ export function createCuisineService(
     deleteById: async (id, _params) => {
       assertValidId(id, "Cuisine");
 
-      const cuisine = await repository.findById(id);
-      if (!cuisine) {
-        return;
-      }
-
       const recipeCount = await recipeRepository.count({ cuisine: id });
       if (recipeCount > 0) {
-        throw new Error("Cannot delete cuisine with associated recipes");
+        throw new ConflictError(
+          "Cannot delete cuisine with associated recipes",
+        );
       }
 
-      await repository.delete(id);
+      const deleted = await repository.delete(id);
+      if (!deleted) {
+        throw new NotFoundError("Cuisine not found");
+      }
 
       await cache.deletePattern(cuisineCache.keys.listPattern());
       bus.emit("cuisine:deleted", { cuisineId: id });
