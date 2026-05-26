@@ -6,7 +6,6 @@ import {
   initiator,
   noInitiator,
 } from "@/__tests__/helpers.js";
-import type { CachedGetResult } from "@/common/cache/cache.service.js";
 import { ConflictError, NotFoundError } from "@/common/errors.js";
 import { categoryCache } from "@/modules/categories/category.cache.js";
 import { createCategoryService } from "@/modules/categories/category.service.js";
@@ -21,17 +20,7 @@ describe("categoryService", () => {
     count: vi.fn(),
   };
   const mockCache = {
-    getOrSet: vi.fn(
-      // biome-ignore lint/suspicious/noExplicitAny: test
-      async (key, factory, ttl): Promise<CachedGetResult<any>> => ({
-        value: await factory(),
-        cache: {
-          status: "miss",
-          key,
-          ttl: ttl ?? 0,
-        },
-      }),
-    ),
+    getOrSet: vi.fn(),
     deletePattern: vi.fn(),
   };
   const mockBus = {
@@ -49,6 +38,17 @@ describe("categoryService", () => {
   });
 
   describe("findAll", () => {
+    beforeEach(() => {
+      mockCache.getOrSet.mockImplementation(async (key, factory, ttl) => ({
+        value: await factory(),
+        cache: {
+          status: "miss" as const,
+          key,
+          ttl: ttl ?? 0,
+        },
+      }));
+    });
+
     it("should return paginated categories sorted by name with recipe count", async () => {
       const docs = [
         {
