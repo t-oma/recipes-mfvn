@@ -7,6 +7,10 @@ export * from "./categories/category.input.schema.js";
 export * from "./categories/category.schema.js";
 export * from "./categories/category.response.schema.js";
 
+export * from "./cuisines/cuisine.input.schema.js";
+export * from "./cuisines/cuisine.schema.js";
+export * from "./cuisines/cuisine.response.schema.js";
+
 export * from "./users/user.response.schema.js";
 
 export * from "./comments/comment.input.schema.js";
