@@ -18,6 +18,10 @@ import { CommentModel } from "@/modules/comments/comment.model.js";
 import { CommentRepository } from "@/modules/comments/comment.repository.js";
 import type { CommentService } from "@/modules/comments/comment.service.js";
 import { createCommentService } from "@/modules/comments/comment.service.js";
+import { CuisineModel } from "@/modules/cuisines/cuisine.model.js";
+import { CuisineRepository } from "@/modules/cuisines/cuisine.repository.js";
+import type { CuisineService } from "@/modules/cuisines/cuisine.service.js";
+import { createCuisineService } from "@/modules/cuisines/cuisine.service.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
@@ -50,11 +54,13 @@ export interface AppServices {
   favorite: FavoriteService;
   recipeRating: RecipeRatingService;
   category: CategoryService;
+  cuisine: CuisineService;
   review: ReviewService;
   refreshSession: RefreshSessionService;
 
   recipeCache: CacheService;
   categoryCache: CacheService;
+  cuisineCache: CacheService;
   reviewCache: CacheService;
 
   log: Logger;
@@ -67,6 +73,7 @@ export function createServices(
 ): AppServices {
   const commentRepository = new CommentRepository(CommentModel);
   const categoryRepository = new CategoryRepository(CategoryModel);
+  const cuisineRepository = new CuisineRepository(CuisineModel);
   const favoriteRepository = new FavoriteRepository(FavoriteModel);
   const recipeRatingRepository = new RecipeRatingRepository(RecipeRatingModel);
   const userRepository = new UserRepository(UserModel);
@@ -78,6 +85,7 @@ export function createServices(
 
   const recipeCache = createNamespacedCache("recipes", cache);
   const categoryCache = createNamespacedCache("categories", cache);
+  const cuisineCache = createNamespacedCache("cuisines", cache);
   const reviewCache = createNamespacedCache("reviews", cache);
 
   const passwordService = createBcryptPasswordService(env.BCRYPT_SALT_ROUNDS);
@@ -111,6 +119,12 @@ export function createServices(
     categoryCache,
     bus,
   );
+  const cuisineService = createCuisineService(
+    cuisineRepository,
+    recipeRepository,
+    cuisineCache,
+    bus,
+  );
   const recipeService = createRecipeService(
     recipeRepository,
     userRepository,
@@ -140,11 +154,13 @@ export function createServices(
     favorite: favoriteService,
     recipeRating: recipeRatingService,
     category: categoryService,
+    cuisine: cuisineService,
     review: reviewService,
     refreshSession: refreshSessionService,
 
     recipeCache,
     categoryCache,
+    cuisineCache,
     reviewCache,
 
     log,
