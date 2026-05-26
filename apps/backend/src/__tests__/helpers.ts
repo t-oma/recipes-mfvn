@@ -6,6 +6,7 @@ import { vi } from "vitest";
 import type { RefreshSessionDocument } from "@/modules/auth/refresh-session.model.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
+import type { CuisineDocument } from "@/modules/cuisines/cuisine.model.js";
 import type {
   RecipeDocument,
   RecipeDocumentPopulated,
@@ -77,6 +78,22 @@ export function createCategoryDoc(
     updatedAt: new Date("2024-01-01"),
     ...overrides,
   } as CategoryDocument;
+}
+
+export function createCuisineDoc(
+  overrides: Partial<CuisineDocument> = {},
+): CuisineDocument {
+  const _id = createObjectId();
+  return {
+    _id,
+    name: "Test Cuisine",
+    slug: "test-cuisine",
+    description: "A test cuisine",
+    image: { url: "https://example.com/cuisine.jpg" },
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    ...overrides,
+  } as CuisineDocument;
 }
 
 export function createUserDoc(
