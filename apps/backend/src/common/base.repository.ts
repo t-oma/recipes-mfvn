@@ -33,9 +33,9 @@ export type RepositoryQueryOptions = Omit<QueryOptions, "populate" | "lean"> & {
 
 export type RefsForInput<T> = Prettify<
   Omit<T, RefKeys<T>> & {
-    [K in RefKeys<T>]: T[K] extends readonly Types.ObjectId[]
+    [K in RefKeys<T>]: NonNullable<T[K]> extends readonly Types.ObjectId[]
       ? readonly (Types.ObjectId | string)[]
-      : T[K] extends Types.ObjectId
+      : NonNullable<T[K]> extends Types.ObjectId
         ? Types.ObjectId | string
         : T[K];
   }

@@ -13,6 +13,7 @@ export const createRecipeInputSchema = z.object({
   ingredients: z.array(recipeIngredientSchema).min(1),
   instructions: z.array(z.string().trim().min(5)).min(1),
   category: z.string().length(24),
+  cuisine: z.string().length(24).optional(),
   difficulty: difficultySchema,
   cookingTime: minutesSchema,
   servings: z.number().int().min(1),

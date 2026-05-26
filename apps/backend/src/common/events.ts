@@ -8,6 +8,9 @@ export type DomainEvents = {
   "category:created": { categoryId: string };
   "category:deleted": { categoryId: string };
 
+  "cuisine:created": { cuisineId: string };
+  "cuisine:deleted": { cuisineId: string };
+
   "comment:created": {
     recipeId: string;
     commentId: string;

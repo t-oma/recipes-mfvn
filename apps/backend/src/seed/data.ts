@@ -13,10 +13,17 @@ export interface SeedCategory {
   image: { url: string };
 }
 
+export interface SeedCuisine {
+  name: string;
+  description: string;
+  image: { url: string };
+}
+
 export interface SeedRecipe {
   title: string;
   description: string;
   categoryName: string;
+  cuisineName?: string;
   authorEmail: string;
   difficulty: Difficulty;
   mealType: MealType;
@@ -159,6 +166,55 @@ export const seedCategories: SeedCategory[] = [
   },
 ];
 
+export const seedCuisines: SeedCuisine[] = [
+  {
+    name: "Ukrainian",
+    description:
+      "Hearty Eastern European cuisine known for borscht, pierogi, and rich comfort foods",
+    image: {
+      url: "https://images.unsplash.com/photo-1737113558898-283f21bfcaa7?q=80&w=987&auto=format&fit=crop",
+    },
+  },
+  {
+    name: "Italian",
+    description:
+      "Mediterranean classics from pasta and pizza to risotto and tiramisu",
+    image: {
+      url: "https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "Asian",
+    description:
+      "Diverse flavors from stir-fries and noodles to curries and dumplings",
+    image: {
+      url: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "American",
+    description: "Classic comfort food and iconic dishes from coast to coast",
+    image: {
+      url: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "French",
+    description: "Elegant cooking techniques and timeless classic recipes",
+    image: {
+      url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "Mexican",
+    description:
+      "Vibrant flavors with fresh ingredients, bold spices, and time-honored traditions",
+    image: {
+      url: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=520&fit=crop",
+    },
+  },
+];
+
 export const seedUsers: SeedUser[] = [
   {
     email: "admin@recipes.app",
@@ -198,6 +254,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Fluffy, golden pancakes served with maple syrup and butter. A timeless breakfast favorite that never goes out of style.",
     categoryName: "American",
+    cuisineName: "American",
     authorEmail: "mario@recipes.app",
     difficulty: "easy",
     mealType: "breakfast",
@@ -232,6 +289,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Creamy smashed avocado on toasted sourdough topped with a perfectly poached egg and chili flakes.",
     categoryName: "American",
+    cuisineName: "American",
     authorEmail: "julia@recipes.app",
     difficulty: "easy",
     mealType: "breakfast",
@@ -264,6 +322,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "An elegant breakfast of toasted English muffins, Canadian bacon, poached eggs, and rich hollandaise sauce.",
     categoryName: "American",
+    cuisineName: "American",
     authorEmail: "gordon@recipes.app",
     difficulty: "medium",
     mealType: "breakfast",
@@ -298,6 +357,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "A silky, custardy French omelette folded with finesse, filled with gruyere and fresh chives.",
     categoryName: "French",
+    cuisineName: "French",
     authorEmail: "alice@recipes.app",
     difficulty: "medium",
     mealType: "breakfast",
@@ -434,6 +494,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "A Roman classic made with eggs, pecorino romano, pancetta, and plenty of black pepper. No cream needed.",
     categoryName: "Italian",
+    cuisineName: "Italian",
     authorEmail: "mario@recipes.app",
     difficulty: "medium",
     mealType: "lunch",
@@ -498,6 +559,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Seasoned ground beef in crispy taco shells topped with homemade salsa, cheese, lettuce, and sour cream.",
     categoryName: "Mexican",
+    cuisineName: "Mexican",
     authorEmail: "gordon@recipes.app",
     difficulty: "easy",
     mealType: "lunch",
@@ -536,6 +598,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Quick and colorful stir fry with tender chicken, crisp vegetables, and a savory soy-sesame sauce over rice.",
     categoryName: "Asian",
+    cuisineName: "Asian",
     authorEmail: "alice@recipes.app",
     difficulty: "easy",
     mealType: "lunch",
@@ -646,6 +709,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Tender chicken in a rich, creamy tomato sauce infused with aromatic Indian spices. Serve over basmati rice.",
     categoryName: "Asian",
+    cuisineName: "Asian",
     authorEmail: "gordon@recipes.app",
     difficulty: "hard",
     mealType: "lunch",
@@ -761,6 +825,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "An Italian no-bake dessert of coffee-soaked ladyfingers layered with rich mascarpone cream and dusted with cocoa.",
     categoryName: "Desserts",
+    cuisineName: "Italian",
     authorEmail: "julia@recipes.app",
     difficulty: "hard",
     mealType: "snack",

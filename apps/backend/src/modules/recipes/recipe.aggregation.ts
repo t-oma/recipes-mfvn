@@ -2,6 +2,7 @@ import type { OptionalInitiator } from "@/common/types/methods.js";
 import { toObjectId } from "@/common/utils/mongo.js";
 import stages from "@/common/utils/stages.js";
 import { categoriesCollectionName } from "@/modules/categories/category.model.js";
+import { cuisinesCollectionName } from "@/modules/cuisines/cuisine.model.js";
 import { favoritesCollectionName } from "@/modules/favorites/favorite.model.js";
 import { recipeRatingsCollectionName } from "@/modules/recipe-ratings/recipe-rating.model.js";
 import { usersCollectionName } from "@/modules/users/user.model.js";
@@ -39,6 +40,28 @@ export function withCategories() {
       as: "category",
     },
     { required: true },
+  );
+}
+
+export function withCuisine() {
+  return stages.lookup(
+    {
+      from: cuisinesCollectionName,
+      localField: "cuisine",
+      foreignField: "_id",
+      pipeline: [
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            slug: 1,
+            image: 1,
+          },
+        },
+      ],
+      as: "cuisine",
+    },
+    { required: false },
   );
 }
 

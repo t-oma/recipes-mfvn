@@ -24,6 +24,7 @@ import type {
 } from "@/common/types/methods.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
 import type { CategoryRepository } from "@/modules/categories/category.repository.js";
+import type { CuisineRepository } from "@/modules/cuisines/cuisine.repository.js";
 import type { FavoriteRepository } from "@/modules/favorites/favorite.repository.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import type { UserRepository } from "@/modules/users/user.repository.js";
@@ -58,6 +59,10 @@ type RecipeRepositoryPort = Pick<
 type UserRepositoryPort = Pick<UserRepository, "exists" | "modelName">;
 type FavoriteRepositoryPort = Pick<FavoriteRepository, "exists">;
 type CategoryRepositoryPort = Pick<CategoryRepository, "exists" | "modelName">;
+type CuisineRepositoryPort = Pick<
+  CuisineRepository,
+  "exists" | "findOne" | "modelName"
+>;
 type CacheServicePort = Pick<
   CacheService,
   "getOrSet" | "delete" | "deletePattern"
@@ -69,6 +74,7 @@ export function createRecipeService(
   userRepository: UserRepositoryPort,
   favoriteRepository: FavoriteRepositoryPort,
   categoryRepository: CategoryRepositoryPort,
+  cuisineRepository: CuisineRepositoryPort,
   cache: CacheServicePort,
   bus: TypedEmitterPort,
 ): RecipeService {
@@ -88,8 +94,24 @@ export function createRecipeService(
       const cacheKey = recipeCache.keys.list(query);
 
       const load = async () => {
+        let cuisineId: string | undefined;
+        if (query.cuisine) {
+          const cuisine = await cuisineRepository.findOne({
+            slug: query.cuisine,
+          });
+          if (!cuisine) {
+            return withPagination([], 0, query.page, query.limit);
+          }
+          cuisineId = cuisine._id.toString();
+        }
+
+        const enrichedQuery = {
+          ...query,
+          cuisineId,
+        };
+
         const [recipes, total] = await repository.aggregateSearch({
-          query,
+          query: enrichedQuery,
           initiator,
         });
 
@@ -156,6 +178,10 @@ export function createRecipeService(
       assertValidId(initiator.id, "Author");
       assertValidId(data.category, "Category");
 
+      if (data.cuisine) {
+        await assertExists(cuisineRepository, data.cuisine);
+      }
+
       await assertExists(categoryRepository, data.category);
       await assertExists(userRepository, initiator.id);
 
@@ -172,6 +198,10 @@ export function createRecipeService(
 
     update: async (id, { data, initiator }) => {
       assertValidId(id, "Recipe");
+
+      if (data.cuisine) {
+        await assertExists(cuisineRepository, data.cuisine);
+      }
 
       const recipe = await repository.findDocumentById<EmptyObject>(id, {
         populate: false,

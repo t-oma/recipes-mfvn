@@ -45,6 +45,7 @@ describe("recipeRoutes", () => {
         url: "https://example.com/desserts.jpg",
       },
     },
+    cuisine: null,
     author: { id: userId, email: "chef@test.com", name: "Chef" },
     difficulty: "easy" as const,
     mealType: "breakfast" as const,

@@ -6,6 +6,7 @@ import { vi } from "vitest";
 import type { RefreshSessionDocument } from "@/modules/auth/refresh-session.model.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
 import type { CommentDocument } from "@/modules/comments/comment.model.js";
+import type { CuisineDocument } from "@/modules/cuisines/cuisine.model.js";
 import type {
   RecipeDocument,
   RecipeDocumentPopulated,
@@ -79,6 +80,22 @@ export function createCategoryDoc(
   } as CategoryDocument;
 }
 
+export function createCuisineDoc(
+  overrides: Partial<CuisineDocument> = {},
+): CuisineDocument {
+  const _id = createObjectId();
+  return {
+    _id,
+    name: "Test Cuisine",
+    slug: "test-cuisine",
+    description: "A test cuisine",
+    image: { url: "https://example.com/cuisine.jpg" },
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    ...overrides,
+  } as CuisineDocument;
+}
+
 export function createUserDoc(
   overrides: Partial<UserDocument> = {},
 ): UserDocument {
@@ -106,6 +123,7 @@ export function createRecipeDoc(
     ingredients: [{ name: "Flour", quantity: 200, unit: "g" }],
     instructions: ["Mix ingredients"],
     category: createObjectId(),
+    cuisine: undefined,
     author: createObjectId(),
     difficulty: "easy",
     mealType: "breakfast",
@@ -139,6 +157,7 @@ export function populateRecipeDoc(
       slug: "italian",
       image: { url: "https://example.com/italian.jpg" },
     },
+    cuisine: undefined,
     author: { _id: createObjectId(), name: "Chef", email: "chef@test.com" },
     isFavorited: false,
     userRating: null,

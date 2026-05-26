@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   createDbCategory,
+  createDbCuisine,
   createDbFavorite,
   createDbRecipe,
   createDbRecipeRating,
@@ -257,6 +258,70 @@ describe("RecipeRepository", () => {
       });
     });
 
+    it("should filter by cuisineId", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      const italian = await createDbCuisine({ name: "Italian" });
+      const mexican = await createDbCuisine({ name: "Mexican" });
+
+      await createDbRecipe({
+        title: "Pasta",
+        author: author._id,
+        category: category._id,
+        cuisine: italian._id,
+        isPublic: true,
+      });
+      await createDbRecipe({
+        title: "Tacos",
+        author: author._id,
+        category: category._id,
+        cuisine: mexican._id,
+        isPublic: true,
+      });
+      await createDbRecipe({
+        title: "No Cuisine",
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+      });
+
+      const [recipes, total] = await repository.aggregateSearch({
+        query: {
+          page: 1,
+          limit: 10,
+          sort: "-createdAt",
+          cuisineId: italian._id.toString(),
+        },
+        initiator: noInitiator(),
+      });
+
+      expect(total).toBe(1);
+      expect(recipes).toHaveLength(1);
+      expect(recipes[0]?.title).toBe("Pasta");
+      expect(recipes[0]?.cuisine?.name).toBe("Italian");
+    });
+
+    it("should include cuisine as undefined when not set", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+
+      await createDbRecipe({
+        title: "Simple Recipe",
+        author: author._id,
+        category: category._id,
+        isPublic: true,
+      });
+
+      const [recipes] = await repository.aggregateSearch({
+        query: { page: 1, limit: 10, sort: "-createdAt" },
+        initiator: noInitiator(),
+      });
+
+      const recipe = recipes.find((r) => r.title === "Simple Recipe");
+      expect(recipe).toBeDefined();
+      expect(recipe?.cuisine).toBeUndefined();
+    });
+
     it("should return ratings data", async () => {
       const user = await createDbUser();
       const otherUser = await createDbUser();
@@ -443,9 +508,11 @@ describe("RecipeRepository", () => {
     it("should return recipe by id with populated data", async () => {
       const author = await createDbUser({ name: "Chef" });
       const category = await createDbCategory({ name: "Desserts" });
+      const cuisine = await createDbCuisine({ name: "Italian" });
       const recipe = await createDbRecipe({
         author: author._id,
         category: category._id,
+        cuisine: cuisine._id,
         title: "Cake",
         isPublic: true,
       });
@@ -458,6 +525,27 @@ describe("RecipeRepository", () => {
       expect(result?.title).toBe("Cake");
       expect(result?.author.name).toBe("Chef");
       expect(result?.category.name).toBe("Desserts");
+      expect(result?.cuisine?.name).toBe("Italian");
+      expect(result?.cuisine?.slug).toBe("italian");
+    });
+
+    it("should return recipe with undefined cuisine when not set", async () => {
+      const author = await createDbUser({ name: "Chef" });
+      const category = await createDbCategory({ name: "Soups" });
+      const recipe = await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Simple Soup",
+        isPublic: true,
+      });
+
+      const result = await repository.aggregateById(recipe._id.toString(), {
+        initiator: { id: undefined, role: undefined },
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.title).toBe("Simple Soup");
+      expect(result?.cuisine).toBeUndefined();
     });
 
     it("should return undefined for private recipe when unauthenticated", async () => {

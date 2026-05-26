@@ -21,6 +21,7 @@ import { swaggerOptions, swaggerUiOptions } from "@/config/swagger.js";
 import { authRoutes } from "@/modules/auth/auth.routes.js";
 import { categoryRoutes } from "@/modules/categories/category.routes.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
+import { cuisineRoutes } from "@/modules/cuisines/cuisine.routes.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import { favoriteRoutes } from "@/modules/favorites/favorite.routes.js";
 import { RecipeRatingModel } from "@/modules/recipe-ratings/recipe-rating.model.js";
@@ -136,6 +137,10 @@ export async function buildApp(log: Logger) {
   app.register(categoryRoutes, {
     service: services.category,
     prefix: "/api/categories",
+  });
+  app.register(cuisineRoutes, {
+    service: services.cuisine,
+    prefix: "/api/cuisines",
   });
   app.register(reviewRoutes, {
     service: services.review,

@@ -171,6 +171,7 @@ describe("toRecipeDetails", () => {
         servings: 4,
         isPublic: true,
       }),
+      cuisine: undefined,
       category: {
         _id: categoryId,
         name: "Italian",
@@ -222,6 +223,7 @@ describe("toRecipeDetails", () => {
   it("should default rating fields when missing", () => {
     const doc = {
       ...createRecipeDoc(),
+      cuisine: undefined,
       category: {
         _id: createObjectId(),
         name: "Cat",
@@ -241,6 +243,7 @@ describe("toRecipeDetails", () => {
   it("should map isFavorited=false", () => {
     const doc = {
       ...createRecipeDoc(),
+      cuisine: undefined,
       category: {
         _id: createObjectId(),
         name: "Cat",
@@ -258,6 +261,7 @@ describe("toRecipeDetails", () => {
   it("should default partial stats fields when some are missing", () => {
     const doc = {
       ...createRecipeDoc(),
+      cuisine: undefined,
       category: {
         _id: createObjectId(),
         name: "Cat",
