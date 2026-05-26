@@ -39,6 +39,11 @@ describe("recipeService", () => {
     exists: vi.fn(),
     modelName: "Category",
   };
+  const mockCuisineRepository = {
+    exists: vi.fn(),
+    findOne: vi.fn(),
+    modelName: "Cuisine",
+  };
   const mockCache = {
     getOrSet: vi.fn(),
     delete: vi.fn(),
@@ -53,6 +58,7 @@ describe("recipeService", () => {
     mockUserRepository,
     mockFavoriteRepository,
     mockCategoryRepository,
+    mockCuisineRepository,
     mockCache,
     mockBus,
   );

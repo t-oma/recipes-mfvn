@@ -10,11 +10,13 @@ import { toObjectId } from "@/common/utils/mongo.js";
 import type { PaginatedStageResult } from "@/common/utils/stages.js";
 import stages, { extractPaginatedResult } from "@/common/utils/stages.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
+import type { CuisineDocument } from "@/modules/cuisines/cuisine.model.js";
 import type { UserDocument } from "@/modules/users/user.model.js";
 import {
   byVisibility,
   withAuthor,
   withCategories,
+  withCuisine,
   withFavorited,
   withUserRating,
 } from "./recipe.aggregation.js";
@@ -56,6 +58,7 @@ export type RecipeUpdateInput = UpdateInput<Omit<RecipeDocument, "author">>;
 export type RecipeDefaultPopulate = {
   author: Pick<UserDocument, "_id" | "name" | "email">;
   category: Pick<CategoryDocument, "_id" | "name" | "slug" | "image">;
+  cuisine?: Pick<CuisineDocument, "_id" | "name" | "slug" | "image">;
 };
 
 type RecipeDocumentListItem = Omit<
@@ -63,6 +66,10 @@ type RecipeDocumentListItem = Omit<
   "description" | "ingredients" | "instructions" | "createdAt" | "updatedAt"
 > &
   RecipeComputed;
+
+export type SearchRecipeQuery = Omit<RecipeQuery, "cuisineId"> & {
+  cuisineId?: string;
+};
 
 export class RecipeRepository extends BaseRepository<
   RecipeDocument,
@@ -73,7 +80,7 @@ export class RecipeRepository extends BaseRepository<
   async aggregateSearch({
     query,
     initiator,
-  }: QueryMethodParams<RecipeQuery>): Promise<
+  }: QueryMethodParams<SearchRecipeQuery>): Promise<
     [RecipeDocumentListItem[], number]
   > {
     const {
@@ -83,6 +90,7 @@ export class RecipeRepository extends BaseRepository<
       isFavorited,
       search,
       categoryId,
+      cuisineId,
       difficulty,
       mealType,
     } = query;
@@ -97,6 +105,7 @@ export class RecipeRepository extends BaseRepository<
         ...byVisibility(initiator),
         ...(search && { $text: { $search: search } }),
         ...(categoryId && { category: toObjectId(categoryId) }),
+        ...(cuisineId && { cuisine: toObjectId(cuisineId) }),
         ...(difficulty && { difficulty }),
         ...(mealType && { mealType }),
       }),
@@ -122,6 +131,7 @@ export class RecipeRepository extends BaseRepository<
           updatedAt: 0,
         }),
         ...withCategories(),
+        ...withCuisine(),
         ...withAuthor(),
       ),
     ].flat();
@@ -145,6 +155,7 @@ export class RecipeRepository extends BaseRepository<
       }),
       { $unset: "__v" },
       withCategories(),
+      withCuisine(),
       withAuthor(),
       withFavorited(initiator.id),
       withUserRating(initiator.id),
@@ -209,6 +220,7 @@ export class RecipeRepository extends BaseRepository<
     return [
       { path: "author", select: "name email" },
       { path: "category", select: "name slug image" },
+      { path: "cuisine", select: "name slug image" },
     ];
   }
 

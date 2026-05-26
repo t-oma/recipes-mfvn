@@ -8,6 +8,7 @@ import type { Types } from "mongoose";
 import { RefreshSessionModel } from "@/modules/auth/refresh-session.model.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
+import { CuisineModel } from "@/modules/cuisines/cuisine.model.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import { RecipeRatingModel } from "@/modules/recipe-ratings/recipe-rating.model.js";
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
@@ -56,6 +57,24 @@ export async function createDbCategory(
   });
 }
 
+export async function createDbCuisine(
+  overrides: Partial<{
+    name: string;
+    slug: string;
+    description: string;
+    image: { url: string };
+  }> = {},
+) {
+  const name = overrides.name ?? unique("cuisine");
+  return CuisineModel.create({
+    name,
+    slug: overrides.slug ?? name.toLowerCase().replace(/\s+/g, "-"),
+    description: "A test cuisine",
+    image: { url: "https://example.com/cuisine.jpg" },
+    ...overrides,
+  });
+}
+
 export async function createDbRecipe(
   overrides: Partial<{
     title: string;
@@ -63,6 +82,7 @@ export async function createDbRecipe(
     ingredients: { name: string; quantity: number; unit: string }[];
     instructions: string[];
     category: Types.ObjectId;
+    cuisine?: Types.ObjectId;
     author: Types.ObjectId;
     difficulty: Difficulty;
     mealType: MealType;

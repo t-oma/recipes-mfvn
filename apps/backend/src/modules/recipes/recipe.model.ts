@@ -12,6 +12,7 @@ import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
 import type { CategoryDocument } from "@/modules/categories/category.model.js";
+import type { CuisineDocument } from "@/modules/cuisines/cuisine.model.js";
 import type { UserDocument } from "@/modules/users/user.model.js";
 
 export interface IngredientDocument {
@@ -28,6 +29,7 @@ export interface RecipeDocument extends BaseDocument {
   ingredients: IngredientDocument[];
   instructions: string[];
   category: Types.ObjectId;
+  cuisine?: Types.ObjectId;
   author: Types.ObjectId;
   difficulty: Difficulty;
   mealType: MealType;
@@ -43,6 +45,7 @@ export interface RecipeDocumentPopulated
     RecipeDocument,
     {
       category: Pick<CategoryDocument, "_id" | "name" | "slug" | "image">;
+      cuisine?: Pick<CuisineDocument, "_id" | "name" | "slug" | "image">;
       author: Pick<UserDocument, "_id" | "name" | "email">;
     }
   > {}
@@ -102,6 +105,11 @@ const recipeSchema = new Schema<RecipeDocument>(
       type: Schema.Types.ObjectId,
       ref: "Category",
       required: true,
+    },
+    cuisine: {
+      type: Schema.Types.ObjectId,
+      ref: "Cuisine",
+      required: false,
     },
     author: {
       type: Schema.Types.ObjectId,

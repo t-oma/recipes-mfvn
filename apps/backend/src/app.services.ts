@@ -130,6 +130,7 @@ export function createServices(
     userRepository,
     favoriteRepository,
     categoryRepository,
+    cuisineRepository,
     recipeCache,
     bus,
   );

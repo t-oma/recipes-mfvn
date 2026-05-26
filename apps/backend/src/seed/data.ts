@@ -23,6 +23,7 @@ export interface SeedRecipe {
   title: string;
   description: string;
   categoryName: string;
+  cuisineName?: string;
   authorEmail: string;
   difficulty: Difficulty;
   mealType: MealType;
@@ -253,6 +254,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Fluffy, golden pancakes served with maple syrup and butter. A timeless breakfast favorite that never goes out of style.",
     categoryName: "American",
+    cuisineName: "American",
     authorEmail: "mario@recipes.app",
     difficulty: "easy",
     mealType: "breakfast",
@@ -287,6 +289,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Creamy smashed avocado on toasted sourdough topped with a perfectly poached egg and chili flakes.",
     categoryName: "American",
+    cuisineName: "American",
     authorEmail: "julia@recipes.app",
     difficulty: "easy",
     mealType: "breakfast",
@@ -319,6 +322,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "An elegant breakfast of toasted English muffins, Canadian bacon, poached eggs, and rich hollandaise sauce.",
     categoryName: "American",
+    cuisineName: "American",
     authorEmail: "gordon@recipes.app",
     difficulty: "medium",
     mealType: "breakfast",
@@ -353,6 +357,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "A silky, custardy French omelette folded with finesse, filled with gruyere and fresh chives.",
     categoryName: "French",
+    cuisineName: "French",
     authorEmail: "alice@recipes.app",
     difficulty: "medium",
     mealType: "breakfast",
@@ -489,6 +494,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "A Roman classic made with eggs, pecorino romano, pancetta, and plenty of black pepper. No cream needed.",
     categoryName: "Italian",
+    cuisineName: "Italian",
     authorEmail: "mario@recipes.app",
     difficulty: "medium",
     mealType: "lunch",
@@ -553,6 +559,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Seasoned ground beef in crispy taco shells topped with homemade salsa, cheese, lettuce, and sour cream.",
     categoryName: "Mexican",
+    cuisineName: "Mexican",
     authorEmail: "gordon@recipes.app",
     difficulty: "easy",
     mealType: "lunch",
@@ -591,6 +598,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Quick and colorful stir fry with tender chicken, crisp vegetables, and a savory soy-sesame sauce over rice.",
     categoryName: "Asian",
+    cuisineName: "Asian",
     authorEmail: "alice@recipes.app",
     difficulty: "easy",
     mealType: "lunch",
@@ -701,6 +709,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "Tender chicken in a rich, creamy tomato sauce infused with aromatic Indian spices. Serve over basmati rice.",
     categoryName: "Asian",
+    cuisineName: "Asian",
     authorEmail: "gordon@recipes.app",
     difficulty: "hard",
     mealType: "lunch",
@@ -816,6 +825,7 @@ export const seedRecipes: SeedRecipe[] = [
     description:
       "An Italian no-bake dessert of coffee-soaked ladyfingers layered with rich mascarpone cream and dusted with cocoa.",
     categoryName: "Desserts",
+    cuisineName: "Italian",
     authorEmail: "julia@recipes.app",
     difficulty: "hard",
     mealType: "snack",

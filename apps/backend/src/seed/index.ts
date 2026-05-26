@@ -118,12 +118,26 @@ async function seed(): Promise<void> {
       );
       continue;
     }
+    const cuisineId = recipe.cuisineName
+      ? cuisineMap.get(recipe.cuisineName)
+      : undefined;
+    if (recipe.cuisineName && !cuisineId) {
+      logger.error(
+        {
+          title: recipe.title,
+          cuisine: recipe.cuisineName,
+        },
+        "Missing cuisine for recipe, skipping",
+      );
+      continue;
+    }
     const created = await RecipeModel.create({
       title: recipe.title,
       description: recipe.description,
       ingredients: recipe.ingredients,
       instructions: recipe.instructions,
       category: toObjectId(categoryId),
+      ...(cuisineId && { cuisine: toObjectId(cuisineId) }),
       author: toObjectId(authorId),
       difficulty: recipe.difficulty,
       mealType: recipe.mealType,

@@ -24,6 +24,7 @@ export const recipeQuerySchema = z
       "-createdAt",
     ),
     categoryId: z.string().optional(),
+    cuisine: z.string().trim().optional(),
     difficulty: difficultySchema.optional(),
     isFavorited: z.stringbool().optional(),
     mealType: mealTypeSchema.optional(),

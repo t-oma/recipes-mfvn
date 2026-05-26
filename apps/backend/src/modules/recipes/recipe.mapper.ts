@@ -10,6 +10,8 @@ import type {
 } from "@recipes/shared";
 import type { CategorySummaryView } from "@/modules/categories/category.mapper.js";
 import { toCategorySummary } from "@/modules/categories/category.mapper.js";
+import type { CuisineSummaryView } from "@/modules/cuisines/cuisine.mapper.js";
+import { toCuisineSummary } from "@/modules/cuisines/cuisine.mapper.js";
 import type { UserSummaryView } from "@/modules/users/user.mapper.js";
 import { toUserSummary } from "@/modules/users/user.mapper.js";
 
@@ -29,6 +31,7 @@ export type RecipeListItemView = RecipeSummaryView & {
   userRating?: number | null;
   image: Image;
   category: CategorySummaryView;
+  cuisine?: CuisineSummaryView | null;
   author: UserSummaryView;
   cookingTime: Minutes;
   servings: number;
@@ -68,6 +71,7 @@ export function toRecipeListItem(
     servings: view.servings,
     isFavorited,
     category: toCategorySummary(view.category),
+    cuisine: view.cuisine ? toCuisineSummary(view.cuisine) : null,
     mealType: view.mealType,
     author: toUserSummary(view.author),
     stats: {
