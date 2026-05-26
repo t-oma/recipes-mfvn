@@ -27,6 +27,7 @@ describe("cuisineRoutes", () => {
     description: "Mediterranean classics",
     image: {
       url: "https://example.com/italian.jpg",
+      alt: "Italian cuisine",
     },
     recipeCount: 3,
     createdAt: "2024-01-01T00:00:00.000Z",
@@ -60,7 +61,7 @@ describe("cuisineRoutes", () => {
     it("should return paginated cuisines", async () => {
       mockCuisineService.findAll.mockResolvedValue({
         value: {
-          items: [{ ...validCuisine, recipeCount: 5 }],
+          items: [validCuisine],
           pagination: {
             page: 1,
             limit: 10,
