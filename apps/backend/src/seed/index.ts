@@ -7,6 +7,7 @@ import { connectDatabase, disconnectDatabase } from "@/config/database.js";
 import { env } from "@/config/env.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
+import { CuisineModel } from "@/modules/cuisines/cuisine.model.js";
 import { FavoriteModel } from "@/modules/favorites/favorite.model.js";
 import { RecipeRatingModel } from "@/modules/recipe-ratings/recipe-rating.model.js";
 import { RecipeModel } from "@/modules/recipes/recipe.model.js";
@@ -16,6 +17,7 @@ import { UserModel } from "@/modules/users/user.model.js";
 import {
   seedCategories,
   seedComments,
+  seedCuisines,
   seedFavorites,
   seedRatings,
   seedRecipes,
@@ -34,6 +36,7 @@ async function clearDatabase(): Promise<void> {
   await RecipeRatingModel.deleteMany({});
   await RecipeModel.deleteMany({});
   await CategoryModel.deleteMany({});
+  await CuisineModel.deleteMany({});
   await UserModel.deleteMany({});
   logger.info("All collections cleared");
 }
@@ -59,6 +62,20 @@ async function seed(): Promise<void> {
     const created = await CategoryModel.create(category);
     categoryMap.set(category.name, created._id.toString());
     logger.info({ name: category.name }, "Category created");
+  }
+
+  // Create cuisines
+  const cuisineMap = new Map<string, string>();
+  for (const cuisine of seedCuisines) {
+    const existing = await CuisineModel.findOne({ name: cuisine.name });
+    if (existing) {
+      logger.warn({ name: cuisine.name }, "Cuisine already exists, skipping");
+      cuisineMap.set(cuisine.name, existing._id.toString());
+      continue;
+    }
+    const created = await CuisineModel.create(cuisine);
+    cuisineMap.set(cuisine.name, created._id.toString());
+    logger.info({ name: cuisine.name }, "Cuisine created");
   }
 
   // Create users

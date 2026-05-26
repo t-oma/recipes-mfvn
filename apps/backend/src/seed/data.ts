@@ -13,6 +13,12 @@ export interface SeedCategory {
   image: { url: string };
 }
 
+export interface SeedCuisine {
+  name: string;
+  description: string;
+  image: { url: string };
+}
+
 export interface SeedRecipe {
   title: string;
   description: string;
@@ -155,6 +161,55 @@ export const seedCategories: SeedCategory[] = [
       "From tender steaks to slow-cooked roasts, the best of meat and poultry",
     image: {
       url: "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=400&h=520&fit=crop",
+    },
+  },
+];
+
+export const seedCuisines: SeedCuisine[] = [
+  {
+    name: "Ukrainian",
+    description:
+      "Hearty Eastern European cuisine known for borscht, pierogi, and rich comfort foods",
+    image: {
+      url: "https://images.unsplash.com/photo-1737113558898-283f21bfcaa7?q=80&w=987&auto=format&fit=crop",
+    },
+  },
+  {
+    name: "Italian",
+    description:
+      "Mediterranean classics from pasta and pizza to risotto and tiramisu",
+    image: {
+      url: "https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "Asian",
+    description:
+      "Diverse flavors from stir-fries and noodles to curries and dumplings",
+    image: {
+      url: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "American",
+    description: "Classic comfort food and iconic dishes from coast to coast",
+    image: {
+      url: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "French",
+    description: "Elegant cooking techniques and timeless classic recipes",
+    image: {
+      url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=520&fit=crop",
+    },
+  },
+  {
+    name: "Mexican",
+    description:
+      "Vibrant flavors with fresh ingredients, bold spices, and time-honored traditions",
+    image: {
+      url: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=520&fit=crop",
     },
   },
 ];
