@@ -3,11 +3,10 @@ import type {
   CategoryQuery,
   Paginated,
 } from "@recipes/shared";
-import { apiClient } from "@/shared/api/client";
+import { http } from "@/shared/api/http";
 
 export function getCategories(filters: Partial<CategoryQuery> = {}) {
-  return apiClient<Paginated<CategoryListItem>>("/api/categories", {
-    method: "GET",
+  return http.get<Paginated<CategoryListItem>>("/api/categories", {
     query: filters,
   });
 }

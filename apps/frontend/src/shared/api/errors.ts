@@ -5,7 +5,6 @@ export class ApiError extends Error {
   body: {
     error: string;
     code: string;
-    status: number;
     details?: unknown;
   };
 
@@ -15,7 +14,6 @@ export class ApiError extends Error {
     body: {
       error: string;
       code: string;
-      status: number;
       details?: unknown;
     },
   ) {

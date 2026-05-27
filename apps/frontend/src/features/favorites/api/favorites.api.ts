@@ -1,4 +1,4 @@
-import { apiClient } from "@/shared/api/client";
+import { http } from "@/shared/api/http";
 
 /**
  * Check if recipe with the given id is favorited by the current user.
@@ -6,10 +6,8 @@ import { apiClient } from "@/shared/api/client";
  * @param id - recipe id.
  * @returns \{favorited: boolean\} if the recipe is favorited.
  */
-export function isFavorited(id: string): Promise<boolean> {
-  return apiClient<boolean>(`/api/recipes/${id}/favorite`, {
-    method: "GET",
-  });
+export function isFavorited(id: string) {
+  return http.get<boolean>(`/api/recipes/${id}/favorite`);
 }
 
 /**
@@ -18,10 +16,8 @@ export function isFavorited(id: string): Promise<boolean> {
  * @param id - recipe id.
  * @returns \{favorited: true\} if the recipe was added to the user's favorites.
  */
-export function addFavorite(id: string): Promise<{ favorited: true }> {
-  return apiClient<{ favorited: true }>(`/api/recipes/${id}/favorite`, {
-    method: "POST",
-  });
+export function addFavorite(id: string) {
+  return http.post<{ favorited: true }>(`/api/recipes/${id}/favorite`);
 }
 
 /**
@@ -30,8 +26,6 @@ export function addFavorite(id: string): Promise<{ favorited: true }> {
  * @param id - recipe id.
  * @returns \{favorited: false\} if the recipe was removed from the user's favorites.
  */
-export function removeFavorite(id: string): Promise<{ favorited: false }> {
-  return apiClient<{ favorited: false }>(`/api/recipes/${id}/favorite`, {
-    method: "DELETE",
-  });
+export function removeFavorite(id: string) {
+  return http.delete<{ favorited: false }>(`/api/recipes/${id}/favorite`);
 }

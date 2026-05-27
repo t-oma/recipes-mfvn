@@ -6,7 +6,7 @@ import type {
   RecipeQuery,
   UpdateRecipeInput,
 } from "@recipes/shared";
-import { apiClient } from "@/shared/api/client";
+import { http } from "@/shared/api/http";
 
 /**
  * Retrieve recipes with the given filters.
@@ -15,7 +15,7 @@ import { apiClient } from "@/shared/api/client";
  * @returns Paginated list of recipes.
  */
 export function getRecipes(filters: Partial<RecipeQuery> = {}) {
-  return apiClient<Paginated<RecipeListItem>>("/api/recipes", {
+  return http.get<Paginated<RecipeListItem>>("/api/recipes", {
     query: filters,
   });
 }
@@ -27,7 +27,7 @@ export function getRecipes(filters: Partial<RecipeQuery> = {}) {
  * @returns Recipe.
  */
 export function getRecipeDetails(id: string) {
-  return apiClient<RecipeDetails>(`/api/recipes/${id}`);
+  return http.get<RecipeDetails>(`/api/recipes/${id}`);
 }
 
 /**
@@ -37,8 +37,7 @@ export function getRecipeDetails(id: string) {
  * @returns Created recipe.
  */
 export function createRecipe(body: CreateRecipeInput) {
-  return apiClient<RecipeDetails>("/api/recipes", {
-    method: "POST",
+  return http.post<RecipeDetails>("/api/recipes", {
     body,
   });
 }
@@ -51,8 +50,7 @@ export function createRecipe(body: CreateRecipeInput) {
  * @returns Updated recipe.
  */
 export function updateRecipe(id: string, body: UpdateRecipeInput) {
-  return apiClient<RecipeDetails>(`/api/recipes/${id}`, {
-    method: "PATCH",
+  return http.patch<RecipeDetails>(`/api/recipes/${id}`, {
     body,
   });
 }
@@ -63,7 +61,5 @@ export function updateRecipe(id: string, body: UpdateRecipeInput) {
  * @param id - recipe id.
  */
 export function deleteRecipe(id: string) {
-  return apiClient<void>(`/api/recipes/${id}`, {
-    method: "DELETE",
-  });
+  return http.delete(`/api/recipes/${id}`);
 }
