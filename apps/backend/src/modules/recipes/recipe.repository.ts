@@ -67,8 +67,9 @@ type RecipeDocumentListItem = Omit<
 > &
   RecipeComputed;
 
-export type SearchRecipeQuery = Omit<RecipeQuery, "cuisineId"> & {
+export type SearchRecipeQuery = Omit<RecipeQuery, "cuisine" | "category"> & {
   cuisineId?: string;
+  categoryId?: string;
 };
 
 export class RecipeRepository extends BaseRepository<

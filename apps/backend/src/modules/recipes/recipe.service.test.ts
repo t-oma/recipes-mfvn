@@ -37,6 +37,7 @@ describe("recipeService", () => {
   };
   const mockCategoryRepository = {
     exists: vi.fn(),
+    findOne: vi.fn(),
     modelName: "Category",
   };
   const mockCuisineRepository = {
