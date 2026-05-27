@@ -16,15 +16,7 @@ import { apiClient } from "@/shared/api/client";
  */
 export function getRecipes(filters: Partial<RecipeQuery> = {}) {
   return apiClient<Paginated<RecipeListItem>>("/api/recipes", {
-    query: {
-      page: filters.page,
-      limit: filters.limit,
-      search: filters.search,
-      categoryId: filters.categoryId,
-      difficulty: filters.difficulty,
-      isFavorited: filters.isFavorited,
-      sort: filters.sort,
-    },
+    query: filters,
   });
 }
 
