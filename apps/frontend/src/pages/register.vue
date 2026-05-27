@@ -3,19 +3,23 @@ import type { FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import type { RegisterInput } from "@recipes/shared";
 import { registerInputSchema } from "@recipes/shared";
+import { useMutation } from "@tanstack/vue-query";
 import { useToast } from "primevue";
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
+import { useRouter } from "vue-router";
+import { registerOptions } from "@/features/auth/api/auth.queries";
 import AuthPageShell from "@/features/auth/ui/AuthPageShell.vue";
 
 definePage({
   meta: {
     layout: "no-layout",
+    guestOnly: true,
   },
 });
 
 const toast = useToast();
+const router = useRouter();
 
-const isLoading = ref(false);
 const initialValues = reactive<RegisterInput>({
   email: "",
   password: "",
@@ -23,22 +27,30 @@ const initialValues = reactive<RegisterInput>({
 });
 const resolver = zodResolver(registerInputSchema);
 
+const { mutate, isPending } = useMutation(registerOptions());
+
 function onSubmit({ valid, values }: FormSubmitEvent) {
   if (!valid) return;
 
-  console.log(values);
-
-  // TODO: integrate register mutation
-  isLoading.value = true;
-  setTimeout(() => {
-    isLoading.value = false;
-    toast.add({
-      severity: "success",
-      summary: "Success",
-      detail: "You have successfully registered.",
-      life: 3000,
-    });
-  }, 1200);
+  mutate(values as RegisterInput, {
+    onSuccess: () => {
+      toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "You have successfully registered.",
+        life: 3000,
+      });
+      router.push("/");
+    },
+    onError: (error) => {
+      toast.add({
+        severity: "error",
+        summary: "Error",
+        detail: error.message || "Registration failed.",
+        life: 3000,
+      });
+    },
+  });
 }
 </script>
 
@@ -160,9 +172,9 @@ function onSubmit({ valid, values }: FormSubmitEvent) {
 
       <Button
         type="submit"
-        :label="isLoading ? 'Creating account...' : 'Create Account'"
-        :loading="isLoading"
-        :disabled="isLoading"
+        :label="isPending ? 'Creating account...' : 'Create Account'"
+        :loading="isPending"
+        :disabled="isPending"
         class="font-semibold"
         fluid
       />
