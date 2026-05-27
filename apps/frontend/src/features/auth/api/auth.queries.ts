@@ -4,6 +4,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/vue-query";
+import { useAuthStore } from "@/features/auth/model/auth.store";
 import {
   getCurrentUser,
   login as loginApi,
@@ -12,7 +13,7 @@ import {
   register as registerApi,
 } from "./auth.api";
 
-const authKeys = {
+export const authKeys = {
   all: ["auth"] as const,
   me: () => [...authKeys.all, "me"] as const,
 };
@@ -31,10 +32,12 @@ export function useCurrentUser() {
 
 export function loginOptions() {
   const queryClient = useQueryClient();
+  const authStore = useAuthStore();
 
   return mutationOptions({
     mutationFn: loginApi,
     onSuccess: ({ token, user }) => {
+      authStore.setSession({ token, user });
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
@@ -42,10 +45,12 @@ export function loginOptions() {
 
 export function registerOptions() {
   const queryClient = useQueryClient();
+  const authStore = useAuthStore();
 
   return mutationOptions({
     mutationFn: registerApi,
     onSuccess: ({ token, user }) => {
+      authStore.setSession({ token, user });
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
@@ -53,10 +58,12 @@ export function registerOptions() {
 
 export function refreshSessionOptions() {
   const queryClient = useQueryClient();
+  const authStore = useAuthStore();
 
   return mutationOptions({
     mutationFn: refreshApi,
     onSuccess: ({ token, user }) => {
+      authStore.setSession({ token, user });
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
@@ -64,10 +71,12 @@ export function refreshSessionOptions() {
 
 export function logoutOptions() {
   const queryClient = useQueryClient();
+  const authStore = useAuthStore();
 
   return mutationOptions({
     mutationFn: logoutApi,
     onSuccess: () => {
+      authStore.clearSession();
       queryClient.clear();
     },
   });
