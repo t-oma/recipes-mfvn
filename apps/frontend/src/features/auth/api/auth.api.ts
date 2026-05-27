@@ -20,6 +20,21 @@ export function login(body: LoginInput): Promise<AuthResponse> {
   });
 }
 
+export function refresh(): Promise<AuthResponse> {
+  return apiClient<AuthResponse>("/api/auth/refresh", {
+    method: "POST",
+    credentials: "include",
+    body: {},
+  });
+}
+
+export function logout(): Promise<void> {
+  return apiClient<void>("/api/auth/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+}
+
 export function getCurrentUser(): Promise<UserDetails> {
   return apiClient<UserDetails>("/api/users/me");
 }

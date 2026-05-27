@@ -1,19 +1,5 @@
 import { ApiError } from "./errors";
 
-const TOKEN_KEY = "auth_token";
-
-export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function removeToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
-}
-
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let raw: unknown;
@@ -49,11 +35,6 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-function authHeaders(): Record<string, string> {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 export interface ApiRequestOptions
   extends Omit<RequestInit, "body" | "method"> {
   query?: Record<string, string | number | boolean | undefined>;
@@ -86,7 +67,6 @@ export async function apiClient<T>(
     ...rest,
     headers: {
       "Content-Type": "application/json",
-      ...authHeaders(),
       ...headers,
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,

@@ -4,11 +4,11 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/vue-query";
-import { computed } from "vue";
-import { getToken, removeToken, setToken } from "@/shared/api/client";
 import {
   getCurrentUser,
   login as loginApi,
+  logout as logoutApi,
+  refresh as refreshApi,
   register as registerApi,
 } from "./auth.api";
 
@@ -21,7 +21,6 @@ export function currentUserOptions() {
   return queryOptions({
     queryKey: authKeys.me(),
     queryFn: getCurrentUser,
-    enabled: () => !!getToken(),
     retry: false,
   });
 }
@@ -36,43 +35,40 @@ export function loginOptions() {
   return mutationOptions({
     mutationFn: loginApi,
     onSuccess: ({ token, user }) => {
-      setToken(token);
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
 }
+
 export function registerOptions() {
   const queryClient = useQueryClient();
 
   return mutationOptions({
     mutationFn: registerApi,
     onSuccess: ({ token, user }) => {
-      setToken(token);
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
 }
 
-/**
- * Logout user.
- *
- * Removes the token from the local storage and clears the query client cache.
- */
-export function useLogout() {
+export function refreshSessionOptions() {
   const queryClient = useQueryClient();
 
-  return () => {
-    removeToken();
-    queryClient.setQueryData(authKeys.me(), null);
-    queryClient.clear();
-  };
+  return mutationOptions({
+    mutationFn: refreshApi,
+    onSuccess: ({ token, user }) => {
+      queryClient.setQueryData(authKeys.me(), user);
+    },
+  });
 }
 
-/**
- * Check if the user is authenticated.
- *
- * @returns true if the user is authenticated, false otherwise.
- */
-export function useIsAuthenticated() {
-  return computed(() => !!getToken());
+export function logoutOptions() {
+  const queryClient = useQueryClient();
+
+  return mutationOptions({
+    mutationFn: logoutApi,
+    onSuccess: () => {
+      queryClient.clear();
+    },
+  });
 }
