@@ -23,7 +23,7 @@ export const recipeQuerySchema = z
     sort: createSortSchema(["createdAt", "cookingTime", "popularity"]).default(
       "-createdAt",
     ),
-    categoryId: z.string().optional(),
+    category: z.string().trim().optional(),
     cuisine: z.string().trim().optional(),
     difficulty: difficultySchema.optional(),
     isFavorited: z.stringbool().optional(),

@@ -58,7 +58,10 @@ type RecipeRepositoryPort = Pick<
 >;
 type UserRepositoryPort = Pick<UserRepository, "exists" | "modelName">;
 type FavoriteRepositoryPort = Pick<FavoriteRepository, "exists">;
-type CategoryRepositoryPort = Pick<CategoryRepository, "exists" | "modelName">;
+type CategoryRepositoryPort = Pick<
+  CategoryRepository,
+  "exists" | "findOne" | "modelName"
+>;
 type CuisineRepositoryPort = Pick<
   CuisineRepository,
   "exists" | "findOne" | "modelName"
@@ -105,9 +108,21 @@ export function createRecipeService(
           cuisineId = cuisine._id.toString();
         }
 
+        let categoryId: string | undefined;
+        if (query.category) {
+          const category = await categoryRepository.findOne({
+            slug: query.category,
+          });
+          if (!category) {
+            return withPagination([], 0, query.page, query.limit);
+          }
+          categoryId = category._id.toString();
+        }
+
         const enrichedQuery = {
           ...query,
           cuisineId,
+          categoryId,
         };
 
         const [recipes, total] = await repository.aggregateSearch({

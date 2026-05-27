@@ -6,7 +6,7 @@ export const recipeCache = {
     byId: (id: string) => `id:${id}`,
     list: (filters: RecipeQuery) =>
       `list:${filters.page}:${filters.limit}:${hashFilters({
-        categoryId: filters.categoryId,
+        category: filters.category,
         difficulty: filters.difficulty,
         sort: filters.sort,
       })}`,
