@@ -2,6 +2,8 @@
 import { useMutation } from "@tanstack/vue-query";
 import { logoutOptions } from "@/features/auth/api/auth.queries";
 import { useAuthStore } from "@/features/auth/model/auth.store";
+import SignedIn from "@/features/auth/ui/SignedIn.vue";
+import SignedOut from "@/features/auth/ui/SignedOut.vue";
 import AppLogo from "@/shared/ui/AppLogo.vue";
 
 const authStore = useAuthStore();
@@ -46,7 +48,7 @@ const { mutate: logout } = useMutation(logoutOptions());
         </nav>
 
         <div class="flex items-center gap-3">
-          <template v-if="authStore.isAuthenticated">
+          <SignedIn>
             <span class="text-sm font-medium text-stone-700">
               {{ authStore.user?.name }}
             </span>
@@ -57,16 +59,16 @@ const { mutate: logout } = useMutation(logoutOptions());
             >
               Log out
             </button>
-          </template>
+          </SignedIn>
 
-          <template v-else>
+          <SignedOut>
             <RouterLink
               to="/login"
               class="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-stone-300 hover:shadow-md"
             >
               Sign In
             </RouterLink>
-          </template>
+          </SignedOut>
 
           <button
             type="button"
