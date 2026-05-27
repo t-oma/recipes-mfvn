@@ -7,6 +7,8 @@ import { createPinia } from "pinia";
 import { ToastService } from "primevue";
 import PrimeVue from "primevue/config";
 import { createApp } from "vue";
+import { useAuthStore } from "@/features/auth/model/auth.store";
+import { http } from "@/shared/api/http";
 import App from "./App.vue";
 import router from "./router";
 
@@ -90,7 +92,18 @@ app.use(PrimeVue, {
 });
 app.use(ToastService);
 app.use(VueQueryPlugin);
-app.use(createPinia());
-app.use(router);
 
+app.use(createPinia());
+
+const authStore = useAuthStore();
+
+http.setAuthBridge({
+  getAccessToken: () => authStore.accessToken,
+  refresh: () => authStore.refresh(),
+  clearSession: () => authStore.clearSession(),
+});
+
+await authStore.initialize();
+
+app.use(router);
 app.mount("#app");
