@@ -4,7 +4,7 @@ import type {
   CreateCommentInput,
   Paginated,
 } from "@recipes/shared";
-import { apiClient } from "@/shared/api/client";
+import { http } from "@/shared/api/http";
 
 /**
  * Get comments for the recipe with the given id.
@@ -14,12 +14,9 @@ import { apiClient } from "@/shared/api/client";
  * @param query.limit - number of items per page.
  * @returns Paginated list of comments.
  */
-export function getRecipeComments(
-  id: string,
-  { page = 1, limit = 20 }: Partial<CommentQuery>,
-): Promise<Paginated<CommentDetails>> {
-  return apiClient<Paginated<CommentDetails>>(`/api/recipes/${id}/comments`, {
-    query: { page, limit },
+export function getRecipeComments(id: string, query: Partial<CommentQuery>) {
+  return http.get<Paginated<CommentDetails>>(`/api/recipes/${id}/comments`, {
+    query,
   });
 }
 
@@ -30,12 +27,8 @@ export function getRecipeComments(
  * @param body - comment data.
  * @returns Created comment.
  */
-export function createRecipeComment(
-  id: string,
-  body: CreateCommentInput,
-): Promise<CommentDetails> {
-  return apiClient<CommentDetails>(`/api/recipes/${id}/comments`, {
-    method: "POST",
+export function createRecipeComment(id: string, body: CreateCommentInput) {
+  return http.post<CommentDetails>(`/api/recipes/${id}/comments`, {
     body,
   });
 }
@@ -45,8 +38,6 @@ export function createRecipeComment(
  *
  * @param id - comment id.
  */
-export function deleteRecipeComment(commentId: string): Promise<void> {
-  return apiClient<void>(`/api/recipes/comments/${commentId}`, {
-    method: "DELETE",
-  });
+export function deleteRecipeComment(commentId: string) {
+  return http.delete(`/api/recipes/comments/${commentId}`);
 }

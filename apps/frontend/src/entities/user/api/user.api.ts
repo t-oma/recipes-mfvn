@@ -5,7 +5,7 @@ import type {
   Paginated,
   RecipeListItem,
 } from "@recipes/shared";
-import { apiClient } from "@/shared/api/client";
+import { http } from "@/shared/api/http";
 
 /**
  * @todo Implement retriving favorite recipes for the user other than the current one.
@@ -17,12 +17,9 @@ import { apiClient } from "@/shared/api/client";
  * @param query.limit - number of items per page.
  * @returns Paginated list of favorite recipes.
  */
-export function getUserFavorites(
-  _user: string,
-  { page = 1, limit = 20 }: Partial<FavoriteQuery>,
-) {
-  return apiClient<Paginated<RecipeListItem>>("/api/users/me/favorites", {
-    query: { page, limit },
+export function getUserFavorites(_user: string, query: Partial<FavoriteQuery>) {
+  return http.get<Paginated<RecipeListItem>>("/api/users/me/favorites", {
+    query,
   });
 }
 
@@ -36,11 +33,8 @@ export function getUserFavorites(
  * @param query.limit - number of items per page.
  * @returns Paginated list of comments.
  */
-export function getUserComments(
-  _user: string,
-  { page = 1, limit = 20 }: Partial<CommentQuery>,
-): Promise<Paginated<CommentDetails>> {
-  return apiClient<Paginated<CommentDetails>>("/api/users/me/comments", {
-    query: { page, limit },
+export function getUserComments(_user: string, query: Partial<CommentQuery>) {
+  return http.get<Paginated<CommentDetails>>("/api/users/me/comments", {
+    query,
   });
 }

@@ -4,22 +4,34 @@ import type {
   RegisterInput,
   UserDetails,
 } from "@recipes/shared";
-import { apiClient } from "@/shared/api/client";
+import { http } from "@/shared/api/http";
 
-export function register(body: RegisterInput): Promise<AuthResponse> {
-  return apiClient<AuthResponse>("/api/auth/register", {
-    method: "POST",
-    body,
+export function register(body: RegisterInput) {
+  return http.post<AuthResponse>("/api/auth/register", { body });
+}
+
+export function login(body: LoginInput) {
+  return http.post<AuthResponse>("/api/auth/login", { body });
+}
+
+export function refresh() {
+  return http.post<AuthResponse>("/api/auth/refresh", {
+    body: {},
+    credentials: "include",
+    skipAuthRefresh: true,
+    withAuth: false,
   });
 }
 
-export function login(body: LoginInput): Promise<AuthResponse> {
-  return apiClient<AuthResponse>("/api/auth/login", {
-    method: "POST",
-    body,
+export function logout() {
+  return http.post<void>("/api/auth/logout", {
+    body: {},
+    credentials: "include",
+    skipAuthRefresh: true,
+    withAuth: false,
   });
 }
 
-export function getCurrentUser(): Promise<UserDetails> {
-  return apiClient<UserDetails>("/api/users/me");
+export function getCurrentUser() {
+  return http.get<UserDetails>("/api/users/me");
 }

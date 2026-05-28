@@ -1,78 +1,78 @@
 import {
-  mutationOptions,
   queryOptions,
+  useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/vue-query";
-import { computed } from "vue";
-import { getToken, removeToken, setToken } from "@/shared/api/client";
+import { useAuthStore } from "@/features/auth/model/auth.store";
 import {
   getCurrentUser,
   login as loginApi,
+  logout as logoutApi,
+  refresh as refreshApi,
   register as registerApi,
 } from "./auth.api";
 
-const authKeys = {
+export const authKeys = {
   all: ["auth"] as const,
   me: () => [...authKeys.all, "me"] as const,
 };
 
-export function currentUserOptions() {
+export function currentUserOptions(enabled: () => boolean = () => true) {
   return queryOptions({
     queryKey: authKeys.me(),
     queryFn: getCurrentUser,
-    enabled: () => !!getToken(),
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    enabled,
   });
 }
 
 export function useCurrentUser() {
-  return useQuery(currentUserOptions());
+  const authStore = useAuthStore();
+
+  return useQuery(
+    currentUserOptions(
+      () => authStore.isInitialized && authStore.isAuthenticated,
+    ),
+  );
 }
 
-export function loginOptions() {
+export function useLoginMutation() {
   const queryClient = useQueryClient();
+  const authStore = useAuthStore();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: loginApi,
     onSuccess: ({ token, user }) => {
-      setToken(token);
+      authStore.setSession(token);
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
 }
-export function registerOptions() {
-  const queryClient = useQueryClient();
 
-  return mutationOptions({
+export function useRegisterMutation() {
+  const queryClient = useQueryClient();
+  const authStore = useAuthStore();
+
+  return useMutation({
     mutationFn: registerApi,
     onSuccess: ({ token, user }) => {
-      setToken(token);
+      authStore.setSession(token);
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
 }
 
-/**
- * Logout user.
- *
- * Removes the token from the local storage and clears the query client cache.
- */
-export function useLogout() {
+export function useLogoutMutation() {
   const queryClient = useQueryClient();
+  const authStore = useAuthStore();
 
-  return () => {
-    removeToken();
-    queryClient.setQueryData(authKeys.me(), null);
-    queryClient.clear();
-  };
-}
-
-/**
- * Check if the user is authenticated.
- *
- * @returns true if the user is authenticated, false otherwise.
- */
-export function useIsAuthenticated() {
-  return computed(() => !!getToken());
+  return useMutation({
+    mutationFn: logoutApi,
+    onSettled: () => {
+      authStore.clearSession();
+      queryClient.clear();
+    },
+  });
 }

@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import {
+  useCurrentUser,
+  useLogoutMutation,
+} from "@/features/auth/api/auth.queries";
+import SignedIn from "@/features/auth/ui/SignedIn.vue";
+import SignedOut from "@/features/auth/ui/SignedOut.vue";
 import AppLogo from "@/shared/ui/AppLogo.vue";
+
+const { data: user } = useCurrentUser();
+const { mutate: logout } = useLogoutMutation();
 </script>
 
 <template>
@@ -40,12 +49,28 @@ import AppLogo from "@/shared/ui/AppLogo.vue";
         </nav>
 
         <div class="flex items-center gap-3">
-          <RouterLink
-            to="/login"
-            class="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-stone-300 hover:shadow-md"
-          >
-            Sign In
-          </RouterLink>
+          <SignedIn>
+            <span class="text-sm font-medium text-stone-700">
+              {{ user?.name }}
+            </span>
+            <button
+              type="button"
+              class="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-stone-300 hover:shadow-md"
+              @click="() => logout()"
+            >
+              Log out
+            </button>
+          </SignedIn>
+
+          <SignedOut>
+            <RouterLink
+              to="/login"
+              class="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-stone-300 hover:shadow-md"
+            >
+              Sign In
+            </RouterLink>
+          </SignedOut>
+
           <button
             type="button"
             class="bg-terracotta shadow-terracotta/25 hover:bg-terracotta-dark hover:shadow-terracotta/30 rounded-xl px-4 py-2 text-sm font-medium text-white shadow-lg transition-all hover:shadow-xl"

@@ -4,40 +4,53 @@ import { zodResolver } from "@primevue/forms/resolvers/zod";
 import type { LoginInput } from "@recipes/shared";
 import { loginInputSchema } from "@recipes/shared";
 import { useToast } from "primevue";
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useLoginMutation } from "@/features/auth/api/auth.queries";
 import AuthPageShell from "@/features/auth/ui/AuthPageShell.vue";
 
 definePage({
   meta: {
     layout: "no-layout",
+    guestOnly: true,
   },
 });
 
 const toast = useToast();
+const router = useRouter();
+const route = useRoute();
 
-const isLoading = ref(false);
 const initialValues = reactive<LoginInput>({
   email: "",
   password: "",
 });
 const resolver = zodResolver(loginInputSchema);
 
+const { mutate, isPending } = useLoginMutation();
+
 function onSubmit({ valid, values }: FormSubmitEvent) {
   if (!valid) return;
 
-  console.log(values);
-
-  // TODO: integrate login mutation
-  isLoading.value = true;
-  setTimeout(() => {
-    isLoading.value = false;
-    toast.add({
-      severity: "success",
-      summary: "Success",
-      detail: "You have successfully logged in.",
-      life: 3000,
-    });
-  }, 1200);
+  mutate(values as LoginInput, {
+    onSuccess: () => {
+      toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "You have successfully logged in.",
+        life: 3000,
+      });
+      const redirect = route.query.redirect;
+      router.push(typeof redirect === "string" ? redirect : "/");
+    },
+    onError: (error) => {
+      toast.add({
+        severity: "error",
+        summary: "Error",
+        detail: error.message || "Invalid credentials.",
+        life: 3000,
+      });
+    },
+  });
 }
 </script>
 
@@ -138,9 +151,9 @@ function onSubmit({ valid, values }: FormSubmitEvent) {
 
       <Button
         type="submit"
-        :label="isLoading ? 'Signing in...' : 'Sign In'"
-        :loading="isLoading"
-        :disabled="isLoading"
+        :label="isPending ? 'Signing in...' : 'Sign In'"
+        :loading="isPending"
+        :disabled="isPending"
         class="font-semibold"
         fluid
       />
