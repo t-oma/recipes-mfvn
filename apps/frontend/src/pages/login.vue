@@ -3,11 +3,10 @@ import type { FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import type { LoginInput } from "@recipes/shared";
 import { loginInputSchema } from "@recipes/shared";
-import { useMutation } from "@tanstack/vue-query";
 import { useToast } from "primevue";
 import { reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { loginOptions } from "@/features/auth/api/auth.queries";
+import { useLoginMutation } from "@/features/auth/api/auth.queries";
 import AuthPageShell from "@/features/auth/ui/AuthPageShell.vue";
 
 definePage({
@@ -27,7 +26,7 @@ const initialValues = reactive<LoginInput>({
 });
 const resolver = zodResolver(loginInputSchema);
 
-const { mutate, isPending } = useMutation(loginOptions());
+const { mutate, isPending } = useLoginMutation();
 
 function onSubmit({ valid, values }: FormSubmitEvent) {
   if (!valid) return;

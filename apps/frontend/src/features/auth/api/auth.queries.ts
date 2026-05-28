@@ -1,6 +1,6 @@
 import {
-  mutationOptions,
   queryOptions,
+  useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/vue-query";
@@ -18,23 +18,30 @@ export const authKeys = {
   me: () => [...authKeys.all, "me"] as const,
 };
 
-export function currentUserOptions() {
+export function currentUserOptions(enabled: () => boolean = () => true) {
   return queryOptions({
     queryKey: authKeys.me(),
     queryFn: getCurrentUser,
     retry: false,
+    enabled,
   });
 }
 
 export function useCurrentUser() {
-  return useQuery(currentUserOptions());
+  const authStore = useAuthStore();
+
+  return useQuery(
+    currentUserOptions(
+      () => authStore.isInitialized && authStore.isAuthenticated,
+    ),
+  );
 }
 
-export function loginOptions() {
+export function useLoginMutation() {
   const queryClient = useQueryClient();
   const authStore = useAuthStore();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: loginApi,
     onSuccess: ({ token, user }) => {
       authStore.setSession({ token, user });
@@ -43,11 +50,11 @@ export function loginOptions() {
   });
 }
 
-export function registerOptions() {
+export function useRegisterMutation() {
   const queryClient = useQueryClient();
   const authStore = useAuthStore();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: registerApi,
     onSuccess: ({ token, user }) => {
       authStore.setSession({ token, user });
@@ -56,11 +63,11 @@ export function registerOptions() {
   });
 }
 
-export function refreshSessionOptions() {
+export function useRefreshSessionMutation() {
   const queryClient = useQueryClient();
   const authStore = useAuthStore();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: refreshApi,
     onSuccess: ({ token, user }) => {
       authStore.setSession({ token, user });
@@ -69,11 +76,11 @@ export function refreshSessionOptions() {
   });
 }
 
-export function logoutOptions() {
+export function useLogoutMutation() {
   const queryClient = useQueryClient();
   const authStore = useAuthStore();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: logoutApi,
     onSuccess: () => {
       authStore.clearSession();

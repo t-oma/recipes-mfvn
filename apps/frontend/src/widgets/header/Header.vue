@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { useMutation } from "@tanstack/vue-query";
-import { logoutOptions } from "@/features/auth/api/auth.queries";
+import { useLogoutMutation } from "@/features/auth/api/auth.queries";
 import { useAuthStore } from "@/features/auth/model/auth.store";
 import SignedIn from "@/features/auth/ui/SignedIn.vue";
 import SignedOut from "@/features/auth/ui/SignedOut.vue";
 import AppLogo from "@/shared/ui/AppLogo.vue";
 
 const authStore = useAuthStore();
-const { mutate: logout } = useMutation(logoutOptions());
+const { mutate: logout } = useLogoutMutation();
 </script>
 
 <template>
