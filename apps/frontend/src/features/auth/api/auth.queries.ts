@@ -83,7 +83,7 @@ export function useLogoutMutation() {
 
   return useMutation({
     mutationFn: logoutApi,
-    onSuccess: () => {
+    onSettled: () => {
       authStore.clearSession();
       queryClient.clear();
     },
