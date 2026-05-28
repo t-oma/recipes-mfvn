@@ -23,6 +23,7 @@ export function currentUserOptions(enabled: () => boolean = () => true) {
     queryKey: authKeys.me(),
     queryFn: getCurrentUser,
     retry: false,
+    staleTime: 5 * 60 * 1000,
     enabled,
   });
 }
@@ -44,7 +45,7 @@ export function useLoginMutation() {
   return useMutation({
     mutationFn: loginApi,
     onSuccess: ({ token, user }) => {
-      authStore.setSession({ token, user });
+      authStore.setSession(token);
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
@@ -57,7 +58,7 @@ export function useRegisterMutation() {
   return useMutation({
     mutationFn: registerApi,
     onSuccess: ({ token, user }) => {
-      authStore.setSession({ token, user });
+      authStore.setSession(token);
       queryClient.setQueryData(authKeys.me(), user);
     },
   });
@@ -70,7 +71,7 @@ export function useRefreshSessionMutation() {
   return useMutation({
     mutationFn: refreshApi,
     onSuccess: ({ token, user }) => {
-      authStore.setSession({ token, user });
+      authStore.setSession(token);
       queryClient.setQueryData(authKeys.me(), user);
     },
   });

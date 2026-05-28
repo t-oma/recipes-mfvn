@@ -1,29 +1,24 @@
-import type { AuthResponse, UserDetails } from "@recipes/shared";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { refresh as refreshApi } from "../api/auth.api";
 
 export const useAuthStore = defineStore("auth", () => {
   const accessToken = ref<string | null>(null);
-  const user = ref<UserDetails | null>(null);
   const isInitialized = ref(false);
 
-  const isAuthenticated = computed(() => !!accessToken.value && !!user.value);
+  const isAuthenticated = computed(() => !!accessToken.value);
 
-  function setSession(response: AuthResponse) {
-    accessToken.value = response.token;
-    user.value = response.user;
+  function setSession(token: string) {
+    accessToken.value = token;
   }
-
   function clearSession() {
     accessToken.value = null;
-    user.value = null;
   }
 
   async function initialize() {
     try {
       const data = await refreshApi();
-      setSession(data);
+      setSession(data.token);
     } catch {
       clearSession();
     } finally {
@@ -34,7 +29,7 @@ export const useAuthStore = defineStore("auth", () => {
   async function refresh(): Promise<{ token: string } | null> {
     try {
       const data = await refreshApi();
-      setSession(data);
+      setSession(data.token);
       return { token: data.token };
     } catch {
       clearSession();
@@ -44,7 +39,6 @@ export const useAuthStore = defineStore("auth", () => {
 
   return {
     accessToken,
-    user,
     isInitialized,
     isAuthenticated,
     setSession,

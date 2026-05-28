@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { useLogoutMutation } from "@/features/auth/api/auth.queries";
-import { useAuthStore } from "@/features/auth/model/auth.store";
+import {
+  useCurrentUser,
+  useLogoutMutation,
+} from "@/features/auth/api/auth.queries";
 import SignedIn from "@/features/auth/ui/SignedIn.vue";
 import SignedOut from "@/features/auth/ui/SignedOut.vue";
 import AppLogo from "@/shared/ui/AppLogo.vue";
 
-const authStore = useAuthStore();
+const { data: user } = useCurrentUser();
 const { mutate: logout } = useLogoutMutation();
 </script>
 
@@ -49,7 +51,7 @@ const { mutate: logout } = useLogoutMutation();
         <div class="flex items-center gap-3">
           <SignedIn>
             <span class="text-sm font-medium text-stone-700">
-              {{ authStore.user?.name }}
+              {{ user?.name }}
             </span>
             <button
               type="button"
