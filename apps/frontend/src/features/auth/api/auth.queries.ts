@@ -64,19 +64,6 @@ export function useRegisterMutation() {
   });
 }
 
-export function useRefreshSessionMutation() {
-  const queryClient = useQueryClient();
-  const authStore = useAuthStore();
-
-  return useMutation({
-    mutationFn: refreshApi,
-    onSuccess: ({ token, user }) => {
-      authStore.setSession(token);
-      queryClient.setQueryData(authKeys.me(), user);
-    },
-  });
-}
-
 export function useLogoutMutation() {
   const queryClient = useQueryClient();
   const authStore = useAuthStore();
