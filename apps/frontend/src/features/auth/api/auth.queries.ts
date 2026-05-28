@@ -9,7 +9,6 @@ import {
   getCurrentUser,
   login as loginApi,
   logout as logoutApi,
-  refresh as refreshApi,
   register as registerApi,
 } from "./auth.api";
 
