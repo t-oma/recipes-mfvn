@@ -2,17 +2,19 @@ import "@/assets/main.css";
 
 import { definePreset } from "@primeuix/themes";
 import Aura from "@primeuix/themes/aura";
-import { VueQueryPlugin } from "@tanstack/vue-query";
+import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query";
 import { createPinia } from "pinia";
 import { ToastService } from "primevue";
 import PrimeVue from "primevue/config";
 import { createApp } from "vue";
+import { createAuthSession } from "@/features/auth/model/auth.session";
 import { useAuthStore } from "@/features/auth/model/auth.store";
 import { http } from "@/shared/api/http";
 import App from "./App.vue";
 import router from "./router";
 
 const app = createApp(App);
+const queryClient = new QueryClient();
 
 const preset = definePreset(Aura, {
   primitive: {
@@ -91,19 +93,20 @@ app.use(PrimeVue, {
   },
 });
 app.use(ToastService);
-app.use(VueQueryPlugin);
+app.use(VueQueryPlugin, { queryClient });
 
 app.use(createPinia());
 
 const authStore = useAuthStore();
+const authSession = createAuthSession({ queryClient, authStore });
 
 http.setAuthBridge({
   getAccessToken: () => authStore.accessToken,
-  refresh: () => authStore.refresh(),
+  refresh: () => authSession.restoreSession(),
   clearSession: () => authStore.clearSession(),
 });
 
-await authStore.initialize();
+await authSession.restoreSession({ markInitialized: true });
 
 app.use(router);
 app.mount("#app");
