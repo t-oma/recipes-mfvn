@@ -39,30 +39,34 @@ const { mutate: logout } = useLogoutMutation();
             <span class="text-sm font-medium text-stone-700">
               {{ user?.name }}
             </span>
-            <button
-              type="button"
-              class="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-stone-300 hover:shadow-md"
-              @click="() => logout()"
-            >
-              Log out
-            </button>
+            <Button
+              label="Log out"
+              size="small"
+              severity="secondary"
+              @click="logout()"
+              outlined
+            />
           </SignedIn>
 
           <SignedOut>
-            <RouterLink
-              to="/login"
-              class="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-stone-300 hover:shadow-md"
+            <Button
+              asChild
+              v-slot="slotProps"
+              size="small"
+              severity="secondary"
+              outlined
             >
-              Sign In
-            </RouterLink>
+              <RouterLink
+                to="/login"
+                class="font-medium"
+                :class="slotProps.class"
+              >
+                Sign In
+              </RouterLink>
+            </Button>
           </SignedOut>
 
-          <button
-            type="button"
-            class="bg-terracotta shadow-terracotta/25 hover:bg-terracotta-dark hover:shadow-terracotta/30 rounded-xl px-4 py-2 text-sm font-medium text-white shadow-lg transition-all hover:shadow-xl"
-          >
-            Add Recipe
-          </button>
+          <Button label="Add Recipe" size="small" />
         </div>
       </div>
     </div>
