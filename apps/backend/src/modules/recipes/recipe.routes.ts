@@ -11,6 +11,9 @@ import {
 } from "@recipes/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import { isObjectIdOrHexString } from "mongoose";
+import { z } from "zod";
+import { BadRequestError } from "@/common/errors.js";
 import {
   assertAuthenticated,
   authGuard,
@@ -18,13 +21,16 @@ import {
 } from "@/common/middleware/auth.guard.js";
 import { commentParamsSchema } from "@/modules/comments/comment.schema.js";
 import type { CommentService } from "@/modules/comments/comment.service.js";
-import { recipeParamsSchema } from "@/modules/recipes/recipe.schema.js";
 import type { RecipeService } from "@/modules/recipes/recipe.service.js";
 
 export interface RecipeModuleOptions {
   service: RecipeService;
   commentService: CommentService;
 }
+
+export const recipeParamsSchema = z.object({
+  ref: z.string().trim().min(24),
+});
 
 export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
   fastify,
@@ -56,7 +62,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       },
     )
     .get(
-      "/:id",
+      "/:ref",
       {
         schema: {
           params: recipeParamsSchema,
@@ -69,7 +75,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         onRequest: optionalAuth,
       },
       async (request, reply) => {
-        const { value, cache } = await service.findById(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        const { value, cache } = await service.findById(id, {
           initiator: { id: request.user?.id, role: request.user?.role },
         });
 
@@ -102,7 +110,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       },
     )
     .patch(
-      "/:id",
+      "/:ref",
       {
         schema: {
           params: recipeParamsSchema,
@@ -119,15 +127,18 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       async (request, reply) => {
         assertAuthenticated(request);
 
-        const recipe = await service.update(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        const recipe = await service.update(id, {
           data: request.body,
           initiator: { id: request.user.id, role: request.user.role },
         });
+
         return reply.send(recipe);
       },
     )
     .delete(
-      "/:id",
+      "/:ref",
       {
         schema: {
           params: recipeParamsSchema,
@@ -140,14 +151,17 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       async (request, reply) => {
         assertAuthenticated(request);
 
-        await service.delete(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        await service.delete(id, {
           initiator: { id: request.user.id, role: request.user.role },
         });
+
         return reply.status(204).send();
       },
     )
     .get(
-      "/:id/comments",
+      "/:ref/comments",
       {
         schema: {
           params: recipeParamsSchema,
@@ -161,7 +175,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
         onRequest: optionalAuth,
       },
       async (request, reply) => {
-        const result = await commentService.findByRecipe(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        const result = await commentService.findByRecipe(id, {
           query: request.query,
           initiator: { id: request.user?.id, role: request.user?.role },
         });
@@ -169,7 +185,7 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       },
     )
     .post(
-      "/:id/comments",
+      "/:ref/comments",
       {
         schema: {
           params: recipeParamsSchema,
@@ -186,7 +202,9 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       async (request, reply) => {
         assertAuthenticated(request);
 
-        const comment = await commentService.create(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        const comment = await commentService.create(id, {
           data: request.body,
           initiator: { id: request.user.id, role: request.user.role },
         });
@@ -214,3 +232,19 @@ export const recipeRoutes: FastifyPluginAsync<RecipeModuleOptions> = async (
       },
     );
 };
+
+export function parseRecipeRef(input: string) {
+  const id = input.slice(0, 24);
+
+  if (!isObjectIdOrHexString(id)) {
+    throw new BadRequestError("Invalid recipe id");
+  }
+
+  const rest = input.slice(24);
+  const slug = rest.startsWith("-") ? rest.slice(1) : null;
+
+  return {
+    id,
+    slug: slug || null,
+  };
+}

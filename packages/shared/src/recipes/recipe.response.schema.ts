@@ -12,11 +12,9 @@ export const recipeComputedSchema = z.object({
 });
 
 export const recipeSummarySchema = createRecipeInputSchema
-  .extend(persistenceFieldsSchema.shape)
-  .pick({
-    id: true,
-    title: true,
-  });
+  .pick({ title: true })
+  .extend(persistenceFieldsSchema.pick({ id: true }).shape)
+  .extend({ slug: z.string() });
 
 export const recipeListItemSchema = createRecipeInputSchema
   .pick({
@@ -32,7 +30,8 @@ export const recipeListItemSchema = createRecipeInputSchema
   .extend({ stats: recipeStatsSchema })
   .extend({ category: categorySummarySchema })
   .extend({ cuisine: cuisineSummarySchema.nullable() })
-  .extend({ author: userSummarySchema });
+  .extend({ author: userSummarySchema })
+  .extend({ slug: z.string() });
 
 export const recipeDetailsSchema = createRecipeInputSchema
   .extend(persistenceFieldsSchema.shape)
@@ -40,7 +39,8 @@ export const recipeDetailsSchema = createRecipeInputSchema
   .extend({ stats: recipeStatsSchema })
   .extend({ category: categorySummarySchema })
   .extend({ cuisine: cuisineSummarySchema.nullable() })
-  .extend({ author: userSummarySchema });
+  .extend({ author: userSummarySchema })
+  .extend({ slug: z.string() });
 
 export type RecipeComputed = z.infer<typeof recipeComputedSchema>;
 export type RecipeSummary = z.infer<typeof recipeSummarySchema>;

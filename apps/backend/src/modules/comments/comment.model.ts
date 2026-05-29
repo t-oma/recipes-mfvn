@@ -1,24 +1,12 @@
-import type { Replace } from "@recipes/shared";
 import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
-import type { RecipeDocument } from "@/modules/recipes/recipe.model.js";
-import type { UserDocument } from "@/modules/users/user.model.js";
 
 export interface CommentDocument extends BaseDocument {
   text: string;
   recipe: Types.ObjectId;
   author: Types.ObjectId;
 }
-
-export interface CommentDocumentPopulated
-  extends Replace<
-    CommentDocument,
-    {
-      author: Pick<UserDocument, "_id" | "name" | "email">;
-      recipe: Pick<RecipeDocument, "_id" | "title">;
-    }
-  > {}
 
 export type CommentModelType = Model<CommentDocument>;
 

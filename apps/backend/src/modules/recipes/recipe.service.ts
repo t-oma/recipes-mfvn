@@ -22,6 +22,7 @@ import type {
   QueryMethodParams,
   UpdateMethodParams,
 } from "@/common/types/methods.js";
+import { slugify } from "@/common/utils/slug.js";
 import { assertExists, assertValidId } from "@/common/utils/validation.js";
 import type { CategoryRepository } from "@/modules/categories/category.repository.js";
 import type { CuisineRepository } from "@/modules/cuisines/cuisine.repository.js";
@@ -203,6 +204,7 @@ export function createRecipeService(
       const recipe = await repository.create({
         ...data,
         author: initiator.id,
+        slug: slugify(data.title),
       });
 
       await cache.deletePattern(recipeCache.keys.listPattern());
