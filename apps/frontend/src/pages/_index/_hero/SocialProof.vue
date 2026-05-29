@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
 import { reviewStatsOptions } from "@/entities/review/api/review.queries";
-import Rating from "@/shared/ui/Rating.vue";
 
 const { data: stats, isLoading } = useQuery(reviewStatsOptions());
 </script>
@@ -23,7 +22,11 @@ const { data: stats, isLoading } = useQuery(reviewStatsOptions());
         v-if="isLoading"
         class="h-3.5 w-24 animate-pulse rounded bg-stone-200"
       />
-      <Rating v-else :rating="stats?.averageRating" />
+      <Rating
+        v-else
+        :defaultValue="Math.ceil(stats?.averageRating ?? 0)"
+        readonly
+      />
 
       <p class="mt-0.5 text-sm text-stone-500">
         <span

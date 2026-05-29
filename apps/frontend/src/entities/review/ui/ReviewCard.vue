@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import Rating from "@/shared/ui/Rating.vue";
-
 const props = defineProps<{
   text: string;
   author: string;
@@ -12,7 +10,7 @@ const props = defineProps<{
   <div
     class="flex flex-col rounded-2xl border border-stone-100 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:shadow-stone-900/5"
   >
-    <Rating :rating="rating" class="mb-4" />
+    <Rating :defaultValue="rating" class="mb-4" readonly />
 
     <p class="line-clamp-3 flex-1 leading-relaxed text-stone-700 italic">
       "{{ text }}"
