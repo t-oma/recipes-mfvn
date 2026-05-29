@@ -5,6 +5,7 @@ import {
 } from "@/features/auth/api/auth.queries";
 import SignedIn from "@/features/auth/ui/SignedIn.vue";
 import SignedOut from "@/features/auth/ui/SignedOut.vue";
+import AppLink from "@/shared/ui/AppLink.vue";
 import AppLogo from "@/shared/ui/AppLogo.vue";
 
 const { data: user } = useCurrentUser();
@@ -22,28 +23,13 @@ const { mutate: logout } = useLogoutMutation();
         <nav class="hidden md:block">
           <ul class="flex items-center gap-8">
             <li>
-              <a
-                href="#recipes"
-                class="hover:text-terracotta text-sm font-medium text-stone-600 transition-colors"
-              >
-                Recipes
-              </a>
+              <AppLink to="#recipes">Recipes</AppLink>
             </li>
             <li>
-              <a
-                href="#categories"
-                class="hover:text-terracotta text-sm font-medium text-stone-600 transition-colors"
-              >
-                Categories
-              </a>
+              <AppLink to="#categories">Categories</AppLink>
             </li>
             <li>
-              <a
-                href="#about"
-                class="hover:text-terracotta text-sm font-medium text-stone-600 transition-colors"
-              >
-                About
-              </a>
+              <AppLink to="#about">About</AppLink>
             </li>
           </ul>
         </nav>
