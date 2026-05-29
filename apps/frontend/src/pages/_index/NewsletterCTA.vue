@@ -27,12 +27,7 @@
           placeholder="your@email.com"
           class="flex-1 rounded-xl border-0 bg-white/90 px-5 py-4 text-base text-stone-800 placeholder-stone-400 ring-0 backdrop-blur-sm transition-all outline-none focus:bg-white focus:ring-2 focus:ring-white/50"
         />
-        <button
-          type="button"
-          class="shrink-0 rounded-xl bg-stone-900 px-8 py-4 text-base font-semibold text-white transition-all hover:bg-stone-800"
-        >
-          Subscribe
-        </button>
+        <Button label="Subscribe" iconPos="right" severity="contrast" />
       </div>
 
       <p class="mt-4 text-sm text-white/60">No spam. Unsubscribe anytime.</p>

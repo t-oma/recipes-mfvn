@@ -77,12 +77,20 @@ const preset = definePreset(Aura, {
         sm: {
           paddingX: "0.75rem",
         },
+        lg: {
+          paddingX: "1.25rem",
+        },
       },
       colorScheme: {
         light: {
           root: {
             secondary: {
               background: "#ffffff",
+            },
+            contrast: {
+              background: "var(--color-stone-900)",
+              hoverBackground: "var(--color-stone-800)",
+              activeBackground: "var(--color-stone-700)",
             },
           },
           outlined: {
@@ -94,6 +102,12 @@ const preset = definePreset(Aura, {
             },
           },
         },
+      },
+    },
+    rating: {
+      icon: {
+        activeColor: "var(--color-amber-400)",
+        hoverColor: "var(--color-amber-500)",
       },
     },
   },

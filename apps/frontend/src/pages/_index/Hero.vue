@@ -55,22 +55,21 @@ const recipe = {
           </p>
 
           <div class="mt-10 flex flex-wrap items-center gap-4">
-            <button
-              type="button"
-              class="group flex items-center gap-3 rounded-2xl bg-stone-900 px-7 py-4 text-base font-semibold text-white shadow-xl shadow-stone-900/20 transition-all hover:bg-stone-800 hover:shadow-2xl hover:shadow-stone-900/30"
-            >
-              Start Cooking
-              <i
-                class="pi pi-arrow-right text-sm transition-transform group-hover:translate-x-1"
-              />
-            </button>
-            <button
-              type="button"
-              class="flex items-center gap-2 rounded-2xl border-2 border-stone-200 bg-white px-7 py-4 text-base font-semibold text-stone-700 transition-all hover:border-stone-300 hover:bg-stone-50"
-            >
-              <i class="pi pi-play-circle text-terracotta text-lg" />
-              Watch Tour
-            </button>
+            <Button
+              label="Start Cooking"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              severity="contrast"
+              size="large"
+              class="*:data-[pc-section='icon']:transition-transform hover:*:data-[pc-section='icon']:translate-x-1"
+            />
+            <Button
+              label="Watch Tour"
+              icon="pi pi-play-circle"
+              severity="secondary"
+              size="large"
+              outlined
+            />
           </div>
 
           <SocialProof />

@@ -46,7 +46,7 @@ const recipe = {
           homemade croutons.
         </p>
 
-        <div class="mt-10 flex flex-wrap gap-4">
+        <div class="my-10 flex flex-wrap gap-4">
           <div
             class="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-sm"
           >
@@ -71,12 +71,7 @@ const recipe = {
           </div>
         </div>
 
-        <button
-          type="button"
-          class="bg-terracotta shadow-terracotta/30 hover:bg-terracotta-dark mt-10 rounded-2xl px-8 py-4 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl"
-        >
-          View Recipe
-        </button>
+        <Button label="View Recipe" size="large" />
       </div>
 
       <div class="relative">

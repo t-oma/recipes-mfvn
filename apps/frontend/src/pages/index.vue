@@ -143,22 +143,24 @@ const {
         v-else-if="!testimonials?.length"
         class="rounded-2xl border border-stone-100 bg-white p-12 text-center shadow-sm"
       >
-        <div
-          class="from-terracotta/20 text-terracotta mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br to-amber-100 text-2xl"
-        >
-          <i class="pi pi-comment" />
-        </div>
+        <Avatar
+          icon="pi pi-comment"
+          size="xlarge"
+          shape="circle"
+          class="from-terracotta/20! text-terracotta! mb-4 bg-linear-to-br! to-amber-100! text-2xl"
+        />
+
         <h3 class="text-xl font-semibold text-stone-800">No reviews yet</h3>
         <p class="mt-2 text-stone-500">
           Be the first to share your cooking experience!
         </p>
-        <button
-          type="button"
-          class="mt-6 inline-flex items-center gap-2 rounded-xl bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-stone-800"
-        >
-          <i class="pi pi-pen-to-square" />
-          Write a Review
-        </button>
+
+        <Button
+          label="Write a Review"
+          icon="pi pi-pen-to-square"
+          severity="contrast"
+          class="mt-6"
+        />
       </div>
 
       <div v-else class="grid gap-6 md:grid-cols-3">
