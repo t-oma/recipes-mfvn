@@ -864,6 +864,7 @@ describe("RecipeRepository", () => {
       const created = await repository.create({
         title: "New Recipe",
         description: "Desc",
+        slug: "new-recipe",
         ingredients: [{ name: "Flour", quantity: 100, unit: "g" }],
         instructions: ["Mix"],
         category: category._id.toString(),
@@ -889,6 +890,7 @@ describe("RecipeRepository", () => {
       const created = await repository.create({
         title: "To Delete",
         description: "Desc",
+        slug: "to-delete",
         ingredients: [{ name: "Flour", quantity: 100, unit: "g" }],
         instructions: ["Mix"],
         category: category._id.toString(),

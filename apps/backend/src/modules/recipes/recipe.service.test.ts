@@ -12,6 +12,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "@/common/errors.js";
+import { slugify } from "@/common/utils/slug.js";
 import { recipeCache } from "@/modules/recipes/recipe.cache.js";
 import { createRecipeService } from "@/modules/recipes/recipe.service.js";
 
@@ -351,6 +352,7 @@ describe("recipeService", () => {
 
       expect(mockRecipeRepository.create).toHaveBeenCalledWith({
         ...createData,
+        slug: slugify(createData.title),
         category: categoryId.toString(),
         author: authorId.toString(),
         mealType,
