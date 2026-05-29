@@ -1,4 +1,4 @@
-import type { RequireKeys } from "@recipes/shared";
+import type { Merge, RequireKeys } from "@recipes/shared";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
 import type {
@@ -15,10 +15,7 @@ import {
 import type { RecipeDocument } from "@/modules/recipes/recipe.model.js";
 import { recipesCollectionName } from "@/modules/recipes/recipe.model.js";
 import type { UserDocument } from "@/modules/users/user.model.js";
-import type {
-  CommentDocument,
-  CommentDocumentPopulated,
-} from "./comment.model.js";
+import type { CommentDocument } from "./comment.model.js";
 
 export type CommentCreateInput = RequireKeys<
   CreateInput<CommentDocument>,
@@ -27,8 +24,17 @@ export type CommentCreateInput = RequireKeys<
 export type CommentUpdateInput = UpdateInput<CommentDocument>;
 export type CommentDefaultPopulate = {
   author: Pick<UserDocument, "_id" | "name" | "email">;
-  recipe: Pick<RecipeDocument, "_id" | "title">;
+  recipe: Pick<RecipeDocument, "_id" | "title" | "slug">;
 };
+
+export interface CommentDocumentPopulated
+  extends Merge<
+    CommentDocument,
+    {
+      author: Pick<UserDocument, "_id" | "name" | "email">;
+      recipe: Pick<RecipeDocument, "_id" | "title" | "slug">;
+    }
+  > {}
 
 export class CommentRepository extends BaseRepository<
   CommentDocument,
@@ -91,7 +97,7 @@ export class CommentRepository extends BaseRepository<
   protected override getDefaultPopulate() {
     return [
       { path: "author", select: "_id name email" },
-      { path: "recipe", select: "_id title" },
+      { path: "recipe", select: "_id title slug" },
     ];
   }
 }
@@ -109,6 +115,7 @@ function withRecipe(initiator: OptionalInitiator) {
         stages.project({
           _id: 1,
           title: 1,
+          slug: 1,
         }),
       ],
       as: "recipe",

@@ -3,6 +3,7 @@ import type { Minutes } from "@recipes/shared";
 import { hashSync } from "bcryptjs";
 import { logger } from "@/common/logger.js";
 import { toObjectId } from "@/common/utils/mongo.js";
+import { slugify } from "@/common/utils/slug.js";
 import { connectDatabase, disconnectDatabase } from "@/config/database.js";
 import { env } from "@/config/env.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
@@ -134,6 +135,7 @@ async function seed(): Promise<void> {
     const created = await RecipeModel.create({
       title: recipe.title,
       description: recipe.description,
+      slug: slugify(recipe.title),
       ingredients: recipe.ingredients,
       instructions: recipe.instructions,
       category: toObjectId(categoryId),

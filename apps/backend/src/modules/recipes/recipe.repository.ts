@@ -53,6 +53,7 @@ export type RecipeCreateInput = RequireKeys<
   | "servings"
   | "isPublic"
   | "image"
+  | "slug"
 >;
 export type RecipeUpdateInput = UpdateInput<Omit<RecipeDocument, "author">>;
 export type RecipeDefaultPopulate = {

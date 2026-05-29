@@ -13,6 +13,7 @@ describe("toRecipeSummary", () => {
     const doc = {
       _id: createObjectId(),
       title: "Pasta Carbonara",
+      slug: "pasta-carbonara",
     };
 
     const result = toRecipeSummary(doc);
@@ -20,6 +21,7 @@ describe("toRecipeSummary", () => {
     expect(result).toEqual({
       id: doc._id.toString(),
       title: "Pasta Carbonara",
+      slug: "pasta-carbonara",
     });
   });
 });
@@ -31,6 +33,7 @@ describe("toRecipeListItem", () => {
     const doc = {
       _id: createObjectId(),
       title: "Pasta",
+      slug: "pasta",
       image: { url: "https://example.com/pasta.jpg" },
       difficulty: "easy" as const,
       mealType: "breakfast" as const,
@@ -62,6 +65,7 @@ describe("toRecipeListItem", () => {
 
     expect(result.id).toBe(doc._id.toString());
     expect(result.title).toBe("Pasta");
+    expect(result.slug).toBe("pasta");
     expect(result.isFavorited).toBe(true);
     expect(result.userRating).toBe(4);
     expect(result.image).toEqual({
@@ -94,6 +98,7 @@ describe("toRecipeListItem", () => {
     const doc = {
       _id: createObjectId(),
       title: "Soup",
+      slug: "soup",
       image: { url: "https://example.com/soup.jpg" },
       difficulty: "easy" as const,
       mealType: "breakfast" as const,
@@ -129,6 +134,7 @@ describe("toRecipeListItem", () => {
     const doc = {
       _id: createObjectId(),
       title: "Salad",
+      slug: "salad",
       image: { url: "https://example.com/salad.jpg" },
       difficulty: "medium" as const,
       mealType: "dinner" as const,
@@ -165,6 +171,7 @@ describe("toRecipeDetails", () => {
     const doc = {
       ...createRecipeDoc({
         title: "Pasta",
+        slug: "pasta",
         description: "Delicious pasta",
         difficulty: "easy",
         cookingTime: 30 as Minutes,
@@ -199,6 +206,7 @@ describe("toRecipeDetails", () => {
 
     expect(result.id).toBe(doc._id.toString());
     expect(result.title).toBe("Pasta");
+    expect(result.slug).toBe("pasta");
     expect(result.isFavorited).toBe(doc.isFavorited);
     expect(result.category).toEqual({
       id: categoryId.toString(),

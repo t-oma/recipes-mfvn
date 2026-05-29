@@ -7,7 +7,10 @@ import {
   authGuard,
 } from "@/common/middleware/auth.guard.js";
 import type { RecipeRatingService } from "@/modules/recipe-ratings/recipe-rating.service.js";
-import { recipeParamsSchema } from "@/modules/recipes/recipe.schema.js";
+import {
+  parseRecipeRef,
+  recipeParamsSchema,
+} from "@/modules/recipes/recipe.routes.js";
 
 export interface RecipeRatingModuleOptions {
   service: RecipeRatingService;
@@ -19,7 +22,7 @@ export const recipeRatingRoutes: FastifyPluginAsync<
   fastify
     .withTypeProvider<ZodTypeProvider>()
     .put(
-      "/:id/rating",
+      "/:ref/rating",
       {
         schema: {
           params: recipeParamsSchema,
@@ -36,7 +39,9 @@ export const recipeRatingRoutes: FastifyPluginAsync<
       async (request, reply) => {
         assertAuthenticated(request);
 
-        const result = await service.rate(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        const result = await service.rate(id, {
           data: request.body,
           initiator: { id: request.user.id, role: request.user.role },
         });
@@ -44,7 +49,7 @@ export const recipeRatingRoutes: FastifyPluginAsync<
       },
     )
     .delete(
-      "/:id/rating",
+      "/:ref/rating",
       {
         schema: {
           params: recipeParamsSchema,
@@ -60,7 +65,9 @@ export const recipeRatingRoutes: FastifyPluginAsync<
       async (request, reply) => {
         assertAuthenticated(request);
 
-        await service.remove(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        await service.remove(id, {
           initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.status(204).send();

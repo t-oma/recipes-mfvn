@@ -1,3 +1,5 @@
+import type { Minutes, RecipeDetails } from "@recipes/shared";
+import { buildRecipeRef } from "@recipes/shared";
 import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";
@@ -35,6 +37,7 @@ describe("recipeRoutes", () => {
     id: recipeId,
     title: "Test Recipe",
     description: "A delicious test recipe",
+    slug: "test-recipe",
     ingredients: [{ name: "Flour", quantity: 200, unit: "g" }],
     instructions: ["Mix ingredients", "Bake it well"],
     category: {
@@ -49,7 +52,7 @@ describe("recipeRoutes", () => {
     author: { id: userId, email: "chef@test.com", name: "Chef" },
     difficulty: "easy" as const,
     mealType: "breakfast" as const,
-    cookingTime: 30,
+    cookingTime: 30 as Minutes,
     servings: 4,
     isPublic: true,
     createdAt: "2024-01-01T00:00:00.000Z",
@@ -68,7 +71,7 @@ describe("recipeRoutes", () => {
     },
     isFavorited: false,
     userRating: null,
-  };
+  } satisfies RecipeDetails;
 
   const paginatedResult = {
     items: [validRecipe],
@@ -183,7 +186,7 @@ describe("recipeRoutes", () => {
 
       const response = await app.inject({
         method: "GET",
-        url: `/api/recipes/${recipeId}`,
+        url: `/api/recipes/${buildRecipeRef({ id: recipeId, slug: validRecipe.slug })}`,
       });
 
       expect(response.statusCode).toBe(200);
@@ -406,7 +409,11 @@ describe("recipeRoutes", () => {
       mockCommentService.create.mockResolvedValue({
         id: commentId,
         text: "Great!",
-        recipe: { id: recipeId, title: "Test" },
+        recipe: {
+          id: recipeId,
+          title: "Test",
+          slug: buildRecipeRef({ id: recipeId, slug: "test" }),
+        },
         author: {
           id: testJwtPayload.id,
           email: testJwtPayload.email,

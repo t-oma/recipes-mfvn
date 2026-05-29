@@ -6,7 +6,10 @@ import {
   authGuard,
 } from "@/common/middleware/auth.guard.js";
 import type { FavoriteService } from "@/modules/favorites/favorite.service.js";
-import { recipeParamsSchema } from "@/modules/recipes/recipe.schema.js";
+import {
+  parseRecipeRef,
+  recipeParamsSchema,
+} from "@/modules/recipes/recipe.routes.js";
 
 export interface FavoriteModuleOptions {
   service: FavoriteService;
@@ -19,7 +22,7 @@ export const favoriteRoutes: FastifyPluginAsync<FavoriteModuleOptions> = async (
   fastify
     .withTypeProvider<ZodTypeProvider>()
     .get(
-      "/:id/favorite",
+      "/:ref/favorite",
       {
         schema: {
           params: recipeParamsSchema,
@@ -35,14 +38,17 @@ export const favoriteRoutes: FastifyPluginAsync<FavoriteModuleOptions> = async (
       async (request, reply) => {
         assertAuthenticated(request);
 
-        const favorited = await service.isFavorited(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        const favorited = await service.isFavorited(id, {
           initiator: { id: request.user.id, role: request.user.role },
         });
+
         return reply.send({ favorited });
       },
     )
     .post(
-      "/:id/favorite",
+      "/:ref/favorite",
       {
         schema: {
           params: recipeParamsSchema,
@@ -58,14 +64,16 @@ export const favoriteRoutes: FastifyPluginAsync<FavoriteModuleOptions> = async (
       async (request, reply) => {
         assertAuthenticated(request);
 
-        const result = await service.add(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        const result = await service.add(id, {
           initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.send(result);
       },
     )
     .delete(
-      "/:id/favorite",
+      "/:ref/favorite",
       {
         schema: {
           params: recipeParamsSchema,
@@ -81,7 +89,9 @@ export const favoriteRoutes: FastifyPluginAsync<FavoriteModuleOptions> = async (
       async (request, reply) => {
         assertAuthenticated(request);
 
-        const result = await service.remove(request.params.id, {
+        const { id } = parseRecipeRef(request.params.ref);
+
+        const result = await service.remove(id, {
           initiator: { id: request.user.id, role: request.user.role },
         });
         return reply.send(result);

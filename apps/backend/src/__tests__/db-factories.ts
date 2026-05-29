@@ -5,6 +5,7 @@ import type {
   RecipeStats,
 } from "@recipes/shared";
 import type { Types } from "mongoose";
+import { slugify } from "@/common/utils/slug.js";
 import { RefreshSessionModel } from "@/modules/auth/refresh-session.model.js";
 import { CategoryModel } from "@/modules/categories/category.model.js";
 import { CommentModel } from "@/modules/comments/comment.model.js";
@@ -79,6 +80,7 @@ export async function createDbRecipe(
   overrides: Partial<{
     title: string;
     description: string;
+    slug: string;
     ingredients: { name: string; quantity: number; unit: string }[];
     instructions: string[];
     category: Types.ObjectId;
@@ -93,9 +95,12 @@ export async function createDbRecipe(
     stats: RecipeStats;
   }> = {},
 ) {
+  const title = overrides.title ?? unique("recipe");
+
   return RecipeModel.create({
-    title: unique("recipe"),
+    title,
     description: "A test recipe",
+    slug: slugify(title),
     ingredients: [{ name: "Flour", quantity: 200, unit: "g" }],
     instructions: ["Mix ingredients"],
     category: createObjectId(),

@@ -120,6 +120,7 @@ export function createRecipeDoc(
     _id,
     title: "Test Recipe",
     description: "A test recipe",
+    slug: "test-recipe",
     ingredients: [{ name: "Flour", quantity: 200, unit: "g" }],
     instructions: ["Mix ingredients"],
     category: createObjectId(),
