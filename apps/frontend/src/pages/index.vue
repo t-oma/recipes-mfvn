@@ -51,7 +51,7 @@ const {
         subtitle="Recipe Categories"
         :link="{
           to: '#',
-          text: 'All categories',
+          label: 'All categories',
         }"
       />
 
@@ -91,7 +91,7 @@ const {
         subtitle="Featured Recipes"
         :link="{
           to: '#',
-          text: 'All recipes',
+          label: 'All recipes',
         }"
       />
       <div

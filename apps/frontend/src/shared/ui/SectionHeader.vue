@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
+import PrimaryLink from "./PrimaryLink.vue";
 
 const { align = "left" } = defineProps<{
   title: string;
   subtitle: string;
   link?: {
-    text: string;
+    label: string;
     to: string;
   };
   align?: "left" | "center";
@@ -33,13 +33,8 @@ const { align = "left" } = defineProps<{
       </h2>
     </div>
 
-    <RouterLink
-      v-if="link"
-      :to="link.to"
-      class="text-terracotta hover:text-terracotta-dark hidden items-center gap-2 text-sm font-semibold transition-colors sm:flex"
-    >
-      {{ link.text }}
-      <i class="pi pi-arrow-right text-xs" />
-    </RouterLink>
+    <PrimaryLink v-if="link" :to="link.to" class="font-medium">
+      {{ link.label }}
+    </PrimaryLink>
   </div>
 </template>

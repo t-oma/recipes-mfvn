@@ -2,7 +2,8 @@
 import { computed } from "vue";
 import type { RouterLinkProps } from "vue-router";
 
-const props = defineProps<RouterLinkProps>();
+export type AppLinkProps = RouterLinkProps;
+const props = defineProps<AppLinkProps>();
 
 const isExternal = computed(() => {
   return typeof props.to === "string" && props.to.startsWith("http");
@@ -10,22 +11,12 @@ const isExternal = computed(() => {
 </script>
 
 <template>
-  <RouterLink
-    v-if="!isExternal"
-    :to="to"
-    class="hover:text-terracotta-500 inline-flex items-center justify-center gap-2 text-sm font-medium text-stone-600 transition-colors"
-  >
+  <RouterLink v-if="!isExternal" v-bind="$props">
     <slot />
   </RouterLink>
 
   <!-- biome-ignore lint/a11y/useAnchorContent: accesibile content provided by slot or attributes -->
-  <a
-    v-else
-    :href="to.toString()"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="hover:text-terracotta-500 inline-flex items-center justify-center gap-2 text-sm font-medium text-stone-600 transition-colors"
-  >
+  <a v-else :href="to.toString()" target="_blank" rel="noopener noreferrer">
     <slot />
   </a>
 </template>

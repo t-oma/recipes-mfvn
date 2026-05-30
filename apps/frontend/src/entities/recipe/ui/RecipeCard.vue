@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { RecipeListItem } from "@recipes/shared";
 import { buildRecipeRef } from "@recipes/shared";
+import PrimaryLink from "@/shared/ui/PrimaryLink.vue";
 
 type Props = {
   recipe: Pick<
@@ -23,7 +24,8 @@ const props = defineProps<Props>();
         class: 'flex-1',
       },
       footer: {
-        class: 'mt-auto',
+        class:
+          'mt-auto flex items-center justify-between border-t border-stone-100 pt-4',
       },
     }"
   >
@@ -65,23 +67,20 @@ const props = defineProps<Props>();
     </template>
 
     <template #footer>
-      <div
-        class="flex items-center justify-between border-t border-stone-100 pt-4"
-      >
-        <div class="flex items-center gap-1">
-          <i class="pi pi-star-fill text-xs text-amber-400" />
-          <span class="text-sm font-semibold text-stone-700">
-            {{ recipe.stats.averageRating }}
-          </span>
-        </div>
-        <RouterLink
-          :to="`#/recipes/${buildRecipeRef(recipe)}`"
-          class="text-terracotta flex items-center gap-1 text-xs font-semibold opacity-0 transition-opacity group-hover:opacity-100"
-        >
-          View
-          <i class="pi pi-arrow-right text-[0.75rem]!" />
-        </RouterLink>
+      <div class="flex items-center gap-1">
+        <i class="pi pi-star-fill text-xs text-amber-400" />
+        <span class="text-sm font-semibold text-stone-700">
+          {{ recipe.stats.averageRating }}
+        </span>
       </div>
+
+      <PrimaryLink
+        :to="`#/recipes/${buildRecipeRef(recipe)}`"
+        class="text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100"
+        icon="pi pi-arrow-right text-[0.75rem]!"
+      >
+        View
+      </PrimaryLink>
     </template>
   </Card>
 </template>

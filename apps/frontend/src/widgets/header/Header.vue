@@ -8,6 +8,21 @@ import SignedOut from "@/features/auth/ui/SignedOut.vue";
 import AppLink from "@/shared/ui/AppLink.vue";
 import AppLogo from "@/shared/ui/AppLogo.vue";
 
+const links = [
+  {
+    to: "#recipes",
+    label: "Recipes",
+  },
+  {
+    to: "#categories",
+    label: "Categories",
+  },
+  {
+    to: "#about",
+    label: "About",
+  },
+];
+
 const { data: user } = useCurrentUser();
 const { mutate: logout } = useLogoutMutation();
 </script>
@@ -22,14 +37,13 @@ const { mutate: logout } = useLogoutMutation();
 
         <nav class="hidden md:block">
           <ul class="flex items-center gap-8">
-            <li>
-              <AppLink to="#recipes">Recipes</AppLink>
-            </li>
-            <li>
-              <AppLink to="#categories">Categories</AppLink>
-            </li>
-            <li>
-              <AppLink to="#about">About</AppLink>
+            <li v-for="link in links" :key="link.to">
+              <AppLink
+                :to="link.to"
+                class="hover:text-terracotta-500 inline-flex items-center justify-center gap-2 text-sm font-medium text-stone-600 transition-colors"
+              >
+                {{ link.label }}
+              </AppLink>
             </li>
           </ul>
         </nav>
