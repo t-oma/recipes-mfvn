@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useQuery } from "@tanstack/vue-query";
+import { reviewStatsOptions } from "@/entities/review/api/review.queries";
 import WavyDivider from "@/shared/ui/WavyDivider.vue";
 import HeroRecipe from "./_hero/HeroRecipe.vue";
 import SocialProof from "./_hero/SocialProof.vue";
@@ -11,6 +13,9 @@ const recipe = {
   saveCount: 2_847,
   cookingTime: "45",
 };
+
+const { data: reviewsStats, isLoading: isReviewStatsLoading } =
+  useQuery(reviewStatsOptions());
 </script>
 
 <template>
@@ -72,7 +77,29 @@ const recipe = {
             />
           </div>
 
-          <SocialProof />
+          <div class="mt-12 flex items-center gap-6">
+            <AvatarGroup>
+              <Avatar
+                v-for="(user, index) in ['EK', 'AM', 'MS', 'JP']"
+                :key="index"
+                :label="user"
+                shape="circle"
+                class="h-9! w-9!"
+                :pt="{
+                  label: {
+                    class: 'text-xs font-semibold',
+                  },
+                }"
+              />
+            </AvatarGroup>
+
+            <div v-if="isReviewStatsLoading" class="space-y-2">
+              <Skeleton class="h-3 w-24!" />
+              <Skeleton class="h-3 w-26!" />
+            </div>
+
+            <SocialProof v-else-if="reviewsStats" :stats="reviewsStats" />
+          </div>
         </div>
 
         <HeroRecipe :recipe />
