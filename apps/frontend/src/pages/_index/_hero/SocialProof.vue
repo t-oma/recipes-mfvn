@@ -7,15 +7,20 @@ const { data: stats, isLoading } = useQuery(reviewStatsOptions());
 
 <template>
   <div class="mt-12 flex items-center gap-6">
-    <div class="flex -space-x-3">
-      <div
+    <AvatarGroup>
+      <Avatar
         v-for="(user, index) in ['EK', 'AM', 'MS', 'JP']"
         :key="index"
-        class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-linear-to-br from-stone-200 to-stone-300 text-xs font-bold text-stone-600"
-      >
-        {{ user }}
-      </div>
-    </div>
+        :label="user"
+        shape="circle"
+        class="h-9! w-9!"
+        :pt="{
+          label: {
+            class: 'text-xs font-semibold',
+          },
+        }"
+      />
+    </AvatarGroup>
 
     <div>
       <div
