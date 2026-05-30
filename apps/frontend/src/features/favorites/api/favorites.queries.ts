@@ -1,12 +1,12 @@
 import type { RecipeDetails } from "@recipes/shared";
-import { mutationOptions, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
 import { addFavorite, removeFavorite } from "./favorites.api";
 
-export function addFavoriteOptions() {
+export function useAddFavorite() {
   const queryClient = useQueryClient();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: addFavorite,
 
     onSuccess: (_, id) => {
@@ -18,10 +18,10 @@ export function addFavoriteOptions() {
   });
 }
 
-export function removeFavoriteOptions() {
+export function useRemoveFavorite() {
   const queryClient = useQueryClient();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: removeFavorite,
 
     onSuccess: (_, id) => {

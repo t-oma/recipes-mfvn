@@ -6,9 +6,9 @@ const { bg = "bg-white" } = defineProps<{
 </script>
 
 <template>
-  <section :id class="py-20 lg:py-28" :class="bg">
+  <section :id class="py-16 lg:py-24" :class="bg">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <slot></slot>
+      <slot />
     </div>
   </section>
 </template>

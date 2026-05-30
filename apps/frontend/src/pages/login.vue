@@ -133,13 +133,10 @@ function onSubmit({ valid, values }: FormSubmitEvent) {
       </FormField>
 
       <div class="flex items-center justify-between">
-        <label class="flex cursor-pointer items-center gap-2">
-          <input
-            type="checkbox"
-            class="text-terracotta accent-terracotta focus:ring-terracotta h-4 w-4 rounded border-stone-300"
-          />
-          <span class="text-sm text-stone-600">Remember me</span>
-        </label>
+        <FormField name="rememberMe" class="flex items-center gap-2">
+          <Checkbox input-id="remember-me" binary />
+          <label for="remember-me" class="text-sm">Remember me</label>
+        </FormField>
 
         <RouterLink
           to="#"

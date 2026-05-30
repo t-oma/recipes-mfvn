@@ -1,9 +1,5 @@
 import type { CommentQuery, CreateCommentInput } from "@recipes/shared";
-import {
-  mutationOptions,
-  queryOptions,
-  useQueryClient,
-} from "@tanstack/vue-query";
+import { queryOptions, useMutation, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
 import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
@@ -33,10 +29,10 @@ export function recipeCommentListOptions(
   });
 }
 
-export function recipeCommentCreateOptions() {
+export function useCreateRecipeComment() {
   const queryClient = useQueryClient();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: ({
       recipeId,
       body,
@@ -53,10 +49,10 @@ export function recipeCommentCreateOptions() {
   });
 }
 
-export function recipeCommentDeleteOptions() {
+export function useDeleteRecipeComment() {
   const queryClient = useQueryClient();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: ({ commentId }: { recipeId: string; commentId: string }) =>
       deleteRecipeComment(commentId),
 

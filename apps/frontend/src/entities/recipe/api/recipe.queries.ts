@@ -1,9 +1,5 @@
 import type { RecipeQuery, UpdateRecipeInput } from "@recipes/shared";
-import {
-  mutationOptions,
-  queryOptions,
-  useQueryClient,
-} from "@tanstack/vue-query";
+import { queryOptions, useMutation, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
 import {
@@ -39,32 +35,23 @@ export function recipeDetailsOptions(id: MaybeRef<string>) {
   });
 }
 
-export function recipeCreateOptions() {
+export function useCreateRecipe() {
   const queryClient = useQueryClient();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: createRecipe,
-
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recipeKeys.lists() });
     },
   });
 }
 
-/**
- * Update a recipe with the given id.
- *
- * @param id - recipe id.
- * @param body - recipe data.
- * @returns Updated recipe.
- */
-export function recipeUpdateOptions() {
+export function useUpdateRecipe() {
   const queryClient = useQueryClient();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: ({ id, body }: { id: string; body: UpdateRecipeInput }) =>
       updateRecipe(id, body),
-
     onSuccess: (recipe) => {
       queryClient.setQueryData(recipeKeys.details(recipe.id), recipe);
       queryClient.invalidateQueries({ queryKey: recipeKeys.all });
@@ -72,17 +59,11 @@ export function recipeUpdateOptions() {
   });
 }
 
-/**
- * Delete a recipe with the given id.
- *
- * @param id - recipe id.
- */
-export function recipeDeleteOptions() {
+export function useDeleteRecipe() {
   const queryClient = useQueryClient();
 
-  return mutationOptions({
+  return useMutation({
     mutationFn: deleteRecipe,
-
     onSuccess: (_, id) => {
       queryClient.removeQueries({ queryKey: recipeKeys.details(id) });
       queryClient.invalidateQueries({ queryKey: recipeKeys.all });

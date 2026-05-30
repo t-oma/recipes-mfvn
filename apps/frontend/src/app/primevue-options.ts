@@ -41,6 +41,20 @@ const preset = definePreset(Aura, {
     },
     colorScheme: {
       light: {
+        surface: {
+          0: "var(--color-white)",
+          50: "var(--color-stone-50)",
+          100: "var(--color-stone-100)",
+          200: "var(--color-stone-200)",
+          300: "var(--color-stone-300)",
+          400: "var(--color-stone-400)",
+          500: "var(--color-stone-500)",
+          600: "var(--color-stone-600)",
+          700: "var(--color-stone-700)",
+          800: "var(--color-stone-800)",
+          900: "var(--color-stone-900)",
+          950: "var(--color-stone-950)",
+        },
         primary: {
           color: "var(--color-terracotta-500)",
           hoverColor: "var(--color-terracotta-600)",
@@ -58,13 +72,42 @@ const preset = definePreset(Aura, {
   components: {
     button: {
       root: {
-        borderRadius: "{borderRadius.2xl}",
+        borderRadius: "{borderRadius.xl}",
         paddingX: "1rem",
-        paddingY: "0.75rem",
         sm: {
           paddingX: "0.75rem",
-          paddingY: "0.5rem",
         },
+        lg: {
+          paddingX: "1.25rem",
+        },
+      },
+      colorScheme: {
+        light: {
+          root: {
+            secondary: {
+              background: "#ffffff",
+            },
+            contrast: {
+              background: "var(--color-stone-900)",
+              hoverBackground: "var(--color-stone-800)",
+              activeBackground: "var(--color-stone-700)",
+            },
+          },
+          outlined: {
+            secondary: {
+              borderColor: "{stone.200}",
+              color: "{stone.700}",
+              hoverBackground: "{stone.100}",
+              activeBackground: "{stone.200}",
+            },
+          },
+        },
+      },
+    },
+    rating: {
+      icon: {
+        activeColor: "var(--color-amber-400)",
+        hoverColor: "var(--color-amber-500)",
       },
     },
   },
