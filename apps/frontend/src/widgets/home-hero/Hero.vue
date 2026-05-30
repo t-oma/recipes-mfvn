@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
 import { reviewStatsOptions } from "@/entities/review/api/review.queries";
+import SocialProof from "@/shared/ui/SocialProof.vue";
 import WavyDivider from "@/shared/ui/WavyDivider.vue";
-import HeroRecipe from "./_hero/HeroRecipe.vue";
-import SocialProof from "./_hero/SocialProof.vue";
+import HeroRecipe from "./HeroRecipe.vue";
 
 const recipe = {
   title: "Braised Potatoes with Mushrooms",
@@ -14,7 +14,7 @@ const recipe = {
   cookingTime: "45",
 };
 
-const { data: reviewsStats, isLoading: isReviewStatsLoading } =
+const { data: reviewsStats, isPending: isReviewsStatsPending } =
   useQuery(reviewStatsOptions());
 </script>
 
@@ -77,29 +77,11 @@ const { data: reviewsStats, isLoading: isReviewStatsLoading } =
             />
           </div>
 
-          <div class="mt-12 flex items-center gap-6">
-            <AvatarGroup>
-              <Avatar
-                v-for="(user, index) in ['EK', 'AM', 'MS', 'JP']"
-                :key="index"
-                :label="user"
-                shape="circle"
-                class="h-9! w-9!"
-                :pt="{
-                  label: {
-                    class: 'text-xs font-semibold',
-                  },
-                }"
-              />
-            </AvatarGroup>
-
-            <div v-if="isReviewStatsLoading" class="space-y-2">
-              <Skeleton class="h-3 w-24!" />
-              <Skeleton class="h-3 w-26!" />
-            </div>
-
-            <SocialProof v-else-if="reviewsStats" :stats="reviewsStats" />
-          </div>
+          <SocialProof
+            :stats="reviewsStats"
+            :loading="isReviewsStatsPending"
+            class="mt-12"
+          />
         </div>
 
         <HeroRecipe :recipe />

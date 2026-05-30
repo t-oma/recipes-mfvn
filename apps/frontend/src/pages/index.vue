@@ -8,7 +8,7 @@ import { testimonialsOptions } from "@/entities/review/api/review.queries";
 import ReviewCard from "@/entities/review/ui/ReviewCard.vue";
 import Section from "@/shared/ui/Section.vue";
 import SectionHeader from "@/shared/ui/SectionHeader.vue";
-import Hero from "./_index/Hero.vue";
+import { HomeHero } from "@/widgets/home-hero";
 import NewsletterCTA from "./_index/NewsletterCTA.vue";
 import TodaysPick from "./_index/TodaysPick.vue";
 
@@ -43,7 +43,7 @@ const {
 
 <template>
   <main>
-    <Hero />
+    <HomeHero />
 
     <Section id="categories" bg="bg-white">
       <SectionHeader
