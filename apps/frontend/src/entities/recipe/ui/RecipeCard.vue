@@ -16,6 +16,9 @@ const props = defineProps<Props>();
   <Card
     class="group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl! hover:shadow-stone-900/8!"
     :pt="{
+      header: {
+        class: 'relative',
+      },
       body: {
         class: 'flex-1',
       },
@@ -25,19 +28,19 @@ const props = defineProps<Props>();
     }"
   >
     <template #header>
-      <div class="relative shrink-0 overflow-hidden">
-        <img
-          :src="recipe.image.url"
-          :alt="recipe.image.alt"
-          class="aspect-4/3 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <button
-          type="button"
-          class="absolute top-3 right-3 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/90 text-stone-400 backdrop-blur-md transition-colors hover:text-rose-500"
-        >
-          <i class="pi pi-heart-fill text-sm" />
-        </button>
-      </div>
+      <Image
+        :src="recipe.image.url"
+        :alt="recipe.image.alt"
+        class="h-full transition-transform duration-500 group-hover:scale-105"
+        preview
+      />
+      <Button
+        icon="pi pi-heart-fill text-stone-400 group-active/favorite:text-rose-500 group-hover/favorite:text-rose-500"
+        size="small"
+        class="group/favorite absolute! top-3 right-3"
+        severity="secondary"
+        rounded
+      />
     </template>
 
     <template #content>
