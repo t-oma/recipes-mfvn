@@ -13,14 +13,17 @@ const { loading = false } = defineProps<{
 </script>
 
 <template>
-  <header class="grid grid-cols-5 gap-8 bg-stone-50 py-6 lg:py-10">
+  <header class="grid gap-4 bg-stone-50 py-6 md:grid-cols-5 md:gap-8 lg:py-10">
     <template v-if="loading">
-      <Skeleton v-if="loading" height="100%" class="col-span-3 aspect-4/3" />
+      <Skeleton
+        height="100%"
+        class="hidden aspect-4/3 md:col-span-3 md:block"
+      />
 
-      <div class="col-span-2 flex flex-col justify-center space-y-2">
-        <Skeleton height="6.5rem" width="80%" />
+      <div class="flex flex-col justify-center space-y-2 md:col-span-2">
+        <Skeleton width="80%" class="h-14! md:h-26!" />
         <Skeleton height="1.25rem" width="50%" />
-        <Skeleton height="1.25rem" width="40%" class="mt-6" />
+        <Skeleton height="1.25rem" width="40%" class="mt-4" />
       </div>
     </template>
 
@@ -28,15 +31,15 @@ const { loading = false } = defineProps<{
       <Image
         :src="recipe.image.url"
         :alt="recipe.image.alt"
-        class="col-span-3 overflow-hidden rounded-md object-cover"
+        class="hidden! overflow-hidden rounded-md object-cover md:col-span-3 md:block!"
         preview
       />
 
       <div
-        class="col-span-2 flex flex-col justify-center space-y-2 border-b-2 border-stone-200"
+        class="flex flex-col justify-center space-y-2 md:col-span-2 md:border-b-2 md:border-stone-200"
       >
         <h1
-          class="font-display text-4xl leading-tight font-bold tracking-tight text-pretty text-stone-900 lg:text-5xl"
+          class="font-display text-4xl leading-tight font-bold tracking-tight text-pretty text-stone-900"
         >
           {{ recipe.title }}
         </h1>
@@ -45,7 +48,7 @@ const { loading = false } = defineProps<{
           {{ formatRecipeDate(recipe.createdAt, recipe.updatedAt) }}
         </p>
 
-        <div class="mt-6 flex items-center gap-3">
+        <div class="mt-4 flex items-center gap-3">
           <AppLink
             :to="`#/authors/${recipe.author.id}`"
             class="inline-flex items-center justify-center gap-1 font-medium text-stone-600"
@@ -57,6 +60,13 @@ const { loading = false } = defineProps<{
           </AppLink>
         </div>
       </div>
+
+      <Image
+        :src="recipe.image.url"
+        :alt="recipe.image.alt"
+        class="overflow-hidden rounded-md object-cover md:col-span-3 md:hidden!"
+        preview
+      />
     </template>
   </header>
 </template>
