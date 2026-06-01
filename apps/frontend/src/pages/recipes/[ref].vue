@@ -54,8 +54,8 @@ const authStore = useAuthStore();
     <template v-else>
       <RecipeHeader :recipe="recipe" :loading="isLoading" />
 
-      <div class="grid grid-cols-5 gap-8 pb-6 lg:pb-10">
-        <div class="col-span-2 space-y-6">
+      <div class="grid gap-8 pb-6 lg:grid-cols-[320px_1fr] lg:pb-10">
+        <div class="space-y-6">
           <RecipeDescriptionList
             :cook-time="recipe?.cookingTime"
             :difficulty="recipe?.difficulty"
@@ -66,6 +66,11 @@ const authStore = useAuthStore();
             :allow-rating="authStore.isAuthenticated"
             :loading="isPending"
           />
+
+          <Skeleton v-if="isPending" class="h-20! lg:hidden" />
+          <p v-else class="text-lg text-pretty lg:hidden">
+            {{ recipe?.description }}
+          </p>
 
           <div class="flex items-center gap-4">
             <Button
@@ -100,8 +105,8 @@ const authStore = useAuthStore();
           </div>
         </div>
 
-        <Skeleton v-if="isPending" class="col-span-3 h-20!" />
-        <p v-else class="col-span-3 text-pretty">
+        <Skeleton v-if="isPending" class="hidden h-20! lg:block" />
+        <p v-else class="hidden text-lg text-pretty lg:block">
           {{ recipe?.description }}
         </p>
       </div>
