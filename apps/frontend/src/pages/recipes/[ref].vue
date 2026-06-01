@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/vue-query";
 import { useRoute } from "vue-router";
 import { recipeDetailsOptions } from "@/entities/recipe/api/recipe.queries";
+import IngredientList from "@/entities/recipe/ui/IngredientList.vue";
 import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vue";
 import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
 import { useAuthStore } from "@/features/auth/model/auth.store";
@@ -109,6 +110,14 @@ const authStore = useAuthStore();
         <p v-else class="hidden text-lg text-pretty lg:block">
           {{ recipe?.description }}
         </p>
+      </div>
+
+      <div class="grid gap-8 pb-6 lg:grid-cols-[320px_1fr] lg:pb-10">
+        <IngredientList
+          :ingredients="recipe?.ingredients"
+          :servings="recipe?.servings"
+          :loading="isPending"
+        />
       </div>
     </template>
   </WidthContainer>
