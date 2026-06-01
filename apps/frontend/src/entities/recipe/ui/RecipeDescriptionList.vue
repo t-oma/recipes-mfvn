@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppLink from "@/shared/ui/AppLink.vue";
+
 const { allowRating = false, loading = false } = defineProps<{
   cookTime?: number | null;
   difficulty?: string | null;
@@ -92,6 +94,15 @@ const { allowRating = false, loading = false } = defineProps<{
       <dd class="col-span-2 flex items-center gap-2">
         <span class="font-medium">{{ averageRating ?? 0 }}</span>
         <Rating
+          v-tooltip.top="{
+            value:
+              '<span class=\'underline\'>Log in</span> or <span class=\'underline\'>sign up</span> to rate recipes',
+            class: 'text-xs text-pretty text-center',
+            showDelay: 300,
+            hideDelay: 300,
+            disabled: allowRating,
+            escape: false,
+          }"
           :defaultValue="averageRating ?? 0"
           :readonly="!allowRating"
           class="text-amber-400"

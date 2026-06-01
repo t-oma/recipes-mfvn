@@ -69,13 +69,33 @@ const authStore = useAuthStore();
 
           <div class="flex items-center gap-4">
             <Button
+              v-tooltip.top="{
+                value:
+                  '<span class=\'underline\'>Log in</span> or <span class=\'underline\'>sign up</span> to save recipes',
+                class: 'text-xs text-pretty text-center',
+                showDelay: 300,
+                hideDelay: 300,
+                disabled: authStore.isAuthenticated,
+                escape: false,
+              }"
               :label="`${recipe?.isFavorited ? 'Saved' : 'Save'} (${recipe?.stats.favoritesCount ?? 0})`"
               :icon="`pi ${recipe?.isFavorited ? 'pi-bookmark-fill' : 'pi-bookmark'}`"
+              :disabled="!authStore.isAuthenticated"
             />
             <Button
+              v-tooltip.top="{
+                value:
+                  '<span class=\'underline\'>Log in</span> or <span class=\'underline\'>sign up</span> to comment on recipes',
+                class: 'text-xs text-pretty text-center',
+                showDelay: 300,
+                hideDelay: 300,
+                disabled: authStore.isAuthenticated,
+                escape: false,
+              }"
               :label="`Comment (${recipe?.stats.commentsCount ?? 0})`"
               icon="pi pi-comment"
               severity="secondary"
+              :disabled="!authStore.isAuthenticated"
             />
           </div>
         </div>
