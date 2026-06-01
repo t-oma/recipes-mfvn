@@ -100,7 +100,8 @@ const authStore = useAuthStore();
           </div>
         </div>
 
-        <p class="col-span-3 text-pretty">
+        <Skeleton v-if="isPending" class="col-span-3 h-20!" />
+        <p v-else class="col-span-3 text-pretty">
           {{ recipe?.description }}
         </p>
       </div>
