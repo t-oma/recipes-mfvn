@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLink from "@/shared/ui/AppLink.vue";
 
-const { allowRating = false, loading = false } = defineProps<{
+const { canRate = false, loading = false } = defineProps<{
   cookTime?: number | null;
   difficulty?: string | null;
   mealType?: string | null;
@@ -11,7 +11,7 @@ const { allowRating = false, loading = false } = defineProps<{
     slug: string;
   } | null;
   averageRating?: number | null;
-  allowRating?: boolean;
+  canRate?: boolean;
   loading?: boolean;
 }>();
 </script>
@@ -100,11 +100,11 @@ const { allowRating = false, loading = false } = defineProps<{
             class: 'text-xs text-pretty text-center',
             showDelay: 300,
             hideDelay: 300,
-            disabled: allowRating,
+            disabled: canRate,
             escape: false,
           }"
           :defaultValue="averageRating ?? 0"
-          :readonly="!allowRating"
+          :readonly="!canRate"
           class="text-amber-400"
         />
       </dd>

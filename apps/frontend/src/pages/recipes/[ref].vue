@@ -65,11 +65,11 @@ const authStore = useAuthStore();
             :servings="recipe?.servings"
             :cuisine="recipe?.cuisine"
             :average-rating="recipe?.stats.averageRating"
-            :allow-rating="authStore.isAuthenticated"
+            :can-rate="authStore.isAuthenticated"
             :loading="isPending"
           />
 
-          <Skeleton v-if="isPending" class="h-20! lg:hidden" />
+          <Skeleton v-if="isPending" class="h-20! lg:hidden!" />
           <p v-else class="text-lg text-pretty lg:hidden">
             {{ recipe?.description }}
           </p>
@@ -107,7 +107,7 @@ const authStore = useAuthStore();
           </div>
         </div>
 
-        <Skeleton v-if="isPending" class="hidden h-20! lg:block" />
+        <Skeleton v-if="isPending" class="hidden! h-20! lg:block!" />
         <p v-else class="hidden text-lg text-pretty lg:block">
           {{ recipe?.description }}
         </p>
