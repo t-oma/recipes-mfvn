@@ -75,7 +75,7 @@ const props = defineProps<Props>();
       </div>
 
       <PrimaryLink
-        :to="`#/recipes/${buildRecipeRef(recipe)}`"
+        :to="`/recipes/${buildRecipeRef(recipe)}`"
         class="text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100"
         icon="pi pi-arrow-right text-[0.75rem]!"
       >

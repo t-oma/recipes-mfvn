@@ -1,0 +1,89 @@
+<script setup lang="ts">
+import { useQuery } from "@tanstack/vue-query";
+import { useRoute } from "vue-router";
+import { recipeDetailsOptions } from "@/entities/recipe/api/recipe.queries";
+import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vue";
+import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
+import { useAuthStore } from "@/features/auth/model/auth.store";
+import WidthContainer from "@/shared/ui/WidthContainer.vue";
+
+definePage({
+  meta: {
+    layout: "default",
+  },
+});
+
+function extractIdFromRef(ref: string): string {
+  const idx = ref.indexOf("-");
+  return idx === -1 ? ref : ref.slice(0, idx);
+}
+
+const route = useRoute();
+const recipeRef = route.params.ref;
+const recipeId = extractIdFromRef(recipeRef);
+
+const {
+  data: recipe,
+  isLoading,
+  isPending,
+  error,
+} = useQuery(recipeDetailsOptions(recipeId));
+const authStore = useAuthStore();
+</script>
+
+<template>
+  <WidthContainer as="main">
+    <div
+      v-if="error"
+      class="flex min-h-[calc(100vh-72px)] items-center justify-center"
+    >
+      <div class="py-10 text-center">
+        <div
+          class="from-terracotta/20 text-terracotta mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br to-amber-100 text-2xl"
+        >
+          <i class="pi pi-exclamation-circle" />
+        </div>
+        <h2 class="text-xl font-semibold text-stone-800">
+          Failed to load recipe
+        </h2>
+        <p class="mt-2 text-stone-500">{{ error.message }}</p>
+        <Button label="Go back home" class="mt-6" as="RouterLink" to="/" />
+      </div>
+    </div>
+
+    <template v-else>
+      <RecipeHeader :recipe="recipe" :loading="isLoading" />
+
+      <div class="grid grid-cols-5 gap-8 pb-6 lg:pb-10">
+        <div class="col-span-2 space-y-6">
+          <RecipeDescriptionList
+            :cook-time="recipe?.cookingTime"
+            :difficulty="recipe?.difficulty"
+            :meal-type="recipe?.mealType"
+            :servings="recipe?.servings"
+            :cuisine="recipe?.cuisine"
+            :average-rating="recipe?.stats.averageRating"
+            :allow-rating="authStore.isAuthenticated"
+            :loading="isPending"
+          />
+
+          <div class="flex items-center gap-4">
+            <Button
+              :label="`${recipe?.isFavorited ? 'Saved' : 'Save'} (${recipe?.stats.favoritesCount ?? 0})`"
+              :icon="`pi ${recipe?.isFavorited ? 'pi-bookmark-fill' : 'pi-bookmark'}`"
+            />
+            <Button
+              :label="`Comment (${recipe?.stats.commentsCount ?? 0})`"
+              icon="pi pi-comment"
+              severity="secondary"
+            />
+          </div>
+        </div>
+
+        <p class="col-span-3 text-pretty">
+          {{ recipe?.description }}
+        </p>
+      </div>
+    </template>
+  </WidthContainer>
+</template>
