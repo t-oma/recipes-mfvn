@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/vue-query";
 import { useRoute } from "vue-router";
 import { recipeDetailsOptions } from "@/entities/recipe/api/recipe.queries";
 import IngredientList from "@/entities/recipe/ui/IngredientList.vue";
+import InstructionSteps from "@/entities/recipe/ui/InstructionSteps.vue";
 import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vue";
 import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
 import { useAuthStore } from "@/features/auth/model/auth.store";
@@ -116,6 +117,11 @@ const authStore = useAuthStore();
         <IngredientList
           :ingredients="recipe?.ingredients"
           :servings="recipe?.servings"
+          :loading="isPending"
+        />
+
+        <InstructionSteps
+          :instructions="recipe?.instructions"
           :loading="isPending"
         />
       </div>
