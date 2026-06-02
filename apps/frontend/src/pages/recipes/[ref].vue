@@ -8,6 +8,7 @@ import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vu
 import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
 import { useAuthStore } from "@/features/auth/model/auth.store";
 import WidthContainer from "@/shared/ui/WidthContainer.vue";
+import { RecipeComments } from "@/widgets/recipe-comments";
 
 definePage({
   meta: {
@@ -125,6 +126,8 @@ const authStore = useAuthStore();
           :loading="isPending"
         />
       </div>
+
+      <RecipeComments :recipe-id="recipeId" class="py-6 lg:py-10" />
     </template>
   </WidthContainer>
 </template>
