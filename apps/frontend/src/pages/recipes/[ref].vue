@@ -7,6 +7,7 @@ import InstructionSteps from "@/entities/recipe/ui/InstructionSteps.vue";
 import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vue";
 import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
 import { useAuthStore } from "@/features/auth/model/auth.store";
+import ToggleFavoriteButton from "@/features/toggle-recipe-favorite/ui/ToggleFavoriteButton.vue";
 import WidthContainer from "@/shared/ui/WidthContainer.vue";
 import { RecipeComments } from "@/widgets/recipe-comments";
 
@@ -76,19 +77,11 @@ const authStore = useAuthStore();
           </p>
 
           <div class="flex items-center gap-4">
-            <Button
-              v-tooltip.top="{
-                value:
-                  '<span class=\'underline\'>Log in</span> or <span class=\'underline\'>sign up</span> to save recipes',
-                class: 'text-xs text-pretty text-center',
-                showDelay: 300,
-                hideDelay: 300,
-                disabled: authStore.isAuthenticated,
-                escape: false,
-              }"
-              :label="`${recipe?.isFavorited ? 'Saved' : 'Save'} (${recipe?.stats.favoritesCount ?? 0})`"
-              :icon="`pi ${recipe?.isFavorited ? 'pi-bookmark-fill' : 'pi-bookmark'}`"
-              :disabled="!authStore.isAuthenticated"
+            <ToggleFavoriteButton
+              :recipe-id="recipeId"
+              :is-favorited="recipe?.isFavorited"
+              :total="recipe?.stats.favoritesCount"
+              :can-favorite="authStore.isAuthenticated"
             />
             <Button
               v-tooltip.top="{
@@ -104,6 +97,8 @@ const authStore = useAuthStore();
               icon="pi pi-comment"
               severity="secondary"
               :disabled="!authStore.isAuthenticated"
+              as="RouterLink"
+              to="#comments"
             />
           </div>
         </div>
@@ -128,6 +123,7 @@ const authStore = useAuthStore();
       </div>
 
       <RecipeComments
+        id="comments"
         :recipe-id="recipeId"
         :can-comment="authStore.isAuthenticated"
         class="py-6 lg:py-10"
