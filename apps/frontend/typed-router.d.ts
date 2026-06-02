@@ -41,6 +41,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/recipes/[ref]': RouteRecordInfo<
+      '/recipes/[ref]',
+      '/recipes/:ref',
+      { ref: ParamValue<true> },
+      { ref: ParamValue<false> },
+      | never
+    >,
     '/register': RouteRecordInfo<
       '/register',
       '/register',
@@ -70,6 +77,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/login.vue': {
       routes:
         | '/login'
+      views:
+        | never
+    }
+    'src/pages/recipes/[ref].vue': {
+      routes:
+        | '/recipes/[ref]'
       views:
         | never
     }
