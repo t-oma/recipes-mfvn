@@ -1,33 +1,48 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
+import type { CreateCommentInput } from "@recipes/shared";
 import { createCommentInputSchema, MAX_COMMENT_LENGTH } from "@recipes/shared";
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
+import { useCreateRecipeComment } from "../api/useCreateRecipeComment";
 
-const { loading = false, canComment = false } = defineProps<{
-  loading?: boolean;
+const { recipeId, canComment = false } = defineProps<{
+  recipeId: string;
   canComment?: boolean;
 }>();
 
 const resolver = zodResolver(createCommentInputSchema);
 const initialValues = reactive({ text: "" });
 
-const comment = ref("");
+const {
+  mutate: createComment,
+  isPending,
+  isError,
+} = useCreateRecipeComment(recipeId);
 
-function onSubmit({ valid, values }: FormSubmitEvent) {}
+function onSubmit({ valid, values, reset }: FormSubmitEvent) {
+  if (!valid || !canComment) return;
 
-function onReset() {
-  comment.value = "";
+  createComment(
+    {
+      text: (values as CreateCommentInput).text.trim(),
+    },
+    {
+      onSuccess: () => {
+        reset();
+      },
+    },
+  );
 }
 </script>
 
 <template>
   <Form
+    v-slot="$form"
     :resolver
     :initial-values
     class="rounded-xl bg-white p-4 shadow"
     @submit="onSubmit"
-    @reset="onReset"
   >
     <div class="space-y-3">
       <FormField v-slot="$field" name="text" class="flex flex-col">
@@ -39,11 +54,10 @@ function onReset() {
         </label>
 
         <Textarea
-          v-model="comment"
           id="comment-text"
           rows="2"
           auto-resize
-          :disabled="loading || !canComment"
+          :disabled="isPending || !canComment"
           placeholder="Share what you liked, what you changed, or a helpful tip"
         />
 
@@ -64,7 +78,7 @@ function onReset() {
         </p>
 
         <span class="shrink-0 text-xs text-stone-400">
-          {{ comment.trim().length }}/{{ MAX_COMMENT_LENGTH }}
+          {{ $form.text?.value?.trim?.().length ?? 0 }}/{{ MAX_COMMENT_LENGTH }}
         </span>
       </div>
 
@@ -73,16 +87,20 @@ function onReset() {
           type="reset"
           label="Clear"
           severity="secondary"
-          :disabled="!comment.length || loading"
+          :disabled="!($form.text?.value?.trim?.().length ?? 0) || isPending"
         />
 
         <Button
           type="submit"
           label="Post comment"
-          :loading="loading"
-          :disabled="loading || !canComment"
+          :loading="isPending"
+          :disabled="isPending || !canComment"
         />
       </div>
+
+      <Message v-if="isError" severity="error" size="small">
+        Failed to post comment. Please try again.
+      </Message>
 
       <p v-if="!canComment" class="text-sm text-stone-500">
         Log in to post a comment.
