@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/vue-query";
 import { recipeCommentListOptions } from "@/entities/recipe-comment/api/comment.queries";
 import CommentCard from "@/entities/recipe-comment/ui/CommentCard.vue";
+import CreateCommentForm from "@/features/create-recipe-comment/ui/CreateCommentForm.vue";
 
 const props = defineProps<{
   recipeId: string;
@@ -25,6 +26,8 @@ const {
         ({{ comments?.items.length ?? 0 }})
       </span>
     </div>
+
+    <CreateCommentForm :recipe-id="recipeId" :can-comment="canComment" />
 
     <div v-if="isPending" class="space-y-4">
       <div

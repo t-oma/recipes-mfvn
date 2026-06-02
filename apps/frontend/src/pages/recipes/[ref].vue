@@ -127,7 +127,11 @@ const authStore = useAuthStore();
         />
       </div>
 
-      <RecipeComments :recipe-id="recipeId" class="py-6 lg:py-10" />
+      <RecipeComments
+        :recipe-id="recipeId"
+        :can-comment="authStore.isAuthenticated"
+        class="py-6 lg:py-10"
+      />
     </template>
   </WidthContainer>
 </template>
