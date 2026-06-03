@@ -6,6 +6,6 @@ export {
   useRegisterMutation,
 } from "./api";
 
-export { useAuthStore } from "./model";
+export { createAuthSession, useAuthStore } from "./model";
 
 export { AuthPageShell, SignedIn, SignedOut } from "./ui";
