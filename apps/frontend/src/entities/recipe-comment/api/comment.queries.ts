@@ -2,14 +2,14 @@ import type { CommentQuery } from "@recipes/shared";
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
-import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
+import { recipeQueryKeys } from "@/entities/recipe";
 import { deleteRecipeComment, getRecipeComments } from "./comment.api";
 
 export const recipeCommentKeys = {
   all: ["comments"] as const,
 
   lists: (id: string) =>
-    [...recipeKeys.details(id), ...recipeCommentKeys.all] as const,
+    [...recipeQueryKeys.detail(id), ...recipeCommentKeys.all] as const,
   list: (id: string, filters: Partial<CommentQuery>) =>
     [...recipeCommentKeys.lists(id), filters] as const,
 };

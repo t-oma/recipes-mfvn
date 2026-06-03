@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
 import { useRoute } from "vue-router";
-import { recipeDetailsOptions } from "@/entities/recipe/api/recipe.queries";
-import IngredientList from "@/entities/recipe/ui/IngredientList.vue";
-import InstructionSteps from "@/entities/recipe/ui/InstructionSteps.vue";
-import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vue";
-import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
+import {
+  IngredientList,
+  InstructionSteps,
+  RecipeDescriptionList,
+  RecipeHeader,
+  recipeDetailsOptions,
+} from "@/entities/recipe";
 import { useAuthStore } from "@/features/auth";
 import { RateRecipeControl } from "@/features/rate-recipe";
 import { ToggleFavoriteButton } from "@/features/toggle-recipe-favorite";

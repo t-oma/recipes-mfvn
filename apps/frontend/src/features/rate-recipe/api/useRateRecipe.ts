@@ -1,6 +1,6 @@
 import type { RecipeDetails, RecipeRatingInput } from "@recipes/shared";
 import { useMutation } from "@tanstack/vue-query";
-import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
+import { recipeQueryKeys } from "@/entities/recipe";
 import { recalculateRating } from "../lib/recalculateRating";
 import { rateRecipe } from "./rate-recipe.api";
 
@@ -10,7 +10,7 @@ export function useRateRecipe(recipeId: string) {
       rateRecipe(recipeId, { value }),
 
     onMutate: async (newRating, context) => {
-      const queryKey = recipeKeys.details(recipeId);
+      const queryKey = recipeQueryKeys.detail(recipeId);
 
       await context.client.cancelQueries({ queryKey });
 
@@ -41,14 +41,14 @@ export function useRateRecipe(recipeId: string) {
 
     onError: (_error, _rating, onMutateResult, context) => {
       context.client.setQueryData(
-        recipeKeys.details(recipeId),
+        recipeQueryKeys.detail(recipeId),
         onMutateResult?.previousRecipe,
       );
     },
 
     onSettled: (_data, _error, _rating, _onMutateResult, context) => {
       context.client.invalidateQueries({
-        queryKey: recipeKeys.details(recipeId),
+        queryKey: recipeQueryKeys.detail(recipeId),
       });
     },
   });
