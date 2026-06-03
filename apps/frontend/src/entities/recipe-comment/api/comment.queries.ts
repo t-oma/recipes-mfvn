@@ -1,13 +1,9 @@
-import type { CommentQuery, CreateCommentInput } from "@recipes/shared";
+import type { CommentQuery } from "@recipes/shared";
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
 import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
-import {
-  createRecipeComment,
-  deleteRecipeComment,
-  getRecipeComments,
-} from "./comment.api";
+import { deleteRecipeComment, getRecipeComments } from "./comment.api";
 
 export const recipeCommentKeys = {
   all: ["comments"] as const,
@@ -26,26 +22,6 @@ export function recipeCommentListOptions(
     queryKey: recipeCommentKeys.list(toValue(id), toValue(filters)),
     queryFn: () => getRecipeComments(toValue(id), toValue(filters)),
     enabled: () => !!toValue(id),
-  });
-}
-
-export function useCreateRecipeComment() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      recipeId,
-      body,
-    }: {
-      recipeId: string;
-      body: CreateCommentInput;
-    }) => createRecipeComment(recipeId, body),
-
-    onSuccess: (_, { recipeId }) => {
-      queryClient.invalidateQueries({
-        queryKey: recipeCommentKeys.lists(recipeId),
-      });
-    },
   });
 }
 

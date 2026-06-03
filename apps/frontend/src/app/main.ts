@@ -4,6 +4,7 @@ import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query";
 import { createPinia } from "pinia";
 import { ToastService } from "primevue";
 import PrimeVue from "primevue/config";
+import Tooltip from "primevue/tooltip";
 import { createApp } from "vue";
 import { createAuthSession } from "@/features/auth/model/auth.session";
 import { useAuthStore } from "@/features/auth/model/auth.store";
@@ -14,6 +15,8 @@ import router from "./router";
 
 const app = createApp(App);
 const queryClient = new QueryClient();
+
+app.directive("tooltip", Tooltip);
 
 app.use(PrimeVue, primeVueOptions);
 app.use(ToastService);

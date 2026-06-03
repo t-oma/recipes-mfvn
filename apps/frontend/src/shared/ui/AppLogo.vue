@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { APP_NAME } from "@/shared/constants";
+import AppLink from "./AppLink.vue";
 
 const { theme = "light" } = defineProps<{
   theme?: "light" | "dark";
@@ -7,7 +8,7 @@ const { theme = "light" } = defineProps<{
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
+  <AppLink to="/" class="inline-flex items-center gap-2">
     <div
       class="bg-terracotta flex h-10 w-10 items-center justify-center rounded-xl"
     >
@@ -22,5 +23,5 @@ const { theme = "light" } = defineProps<{
     >
       {{ APP_NAME }}
     </span>
-  </div>
+  </AppLink>
 </template>

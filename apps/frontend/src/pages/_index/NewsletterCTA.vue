@@ -22,12 +22,7 @@
       </p>
 
       <div class="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row">
-        <InputText
-          type="email"
-          placeholder="your@email.com"
-          class="py-3! focus:ring-2! focus:ring-white/50!"
-          fluid
-        />
+        <InputText type="email" placeholder="your@email.com" fluid />
         <Button label="Subscribe" iconPos="right" severity="contrast" />
       </div>
 
