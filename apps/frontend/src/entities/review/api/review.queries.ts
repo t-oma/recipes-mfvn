@@ -1,16 +1,16 @@
 import { queryOptions } from "@tanstack/vue-query";
-import { getReviewStats, getTestimonials } from "./review.api";
+import { getReviewsStats, getTestimonials } from "./review.api";
 
-const reviewKeys = {
+export const queryKeys = {
   all: ["reviews"] as const,
 
-  testimonials: () => [...reviewKeys.all, "testimonials"] as const,
-  stats: () => [...reviewKeys.all, "stats"] as const,
+  testimonials: () => [...queryKeys.all, "testimonials"] as const,
+  stats: () => [...queryKeys.all, "stats"] as const,
 };
 
 export function testimonialsOptions() {
   return queryOptions({
-    queryKey: reviewKeys.testimonials(),
+    queryKey: queryKeys.testimonials(),
     queryFn: getTestimonials,
     staleTime: 5 * 60 * 1000,
   });
@@ -18,8 +18,8 @@ export function testimonialsOptions() {
 
 export function reviewStatsOptions() {
   return queryOptions({
-    queryKey: reviewKeys.stats(),
-    queryFn: getReviewStats,
+    queryKey: queryKeys.stats(),
+    queryFn: getReviewsStats,
     staleTime: 5 * 60 * 1000,
   });
 }

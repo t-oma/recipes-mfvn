@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
-import { categoryListOptions } from "@/entities/category/api/category.queries";
-import CategoryCard from "@/entities/category/ui/CategoryCard.vue";
-import { recipeListOptions } from "@/entities/recipe/api/recipe.queries";
-import RecipeCard from "@/entities/recipe/ui/RecipeCard.vue";
-import { testimonialsOptions } from "@/entities/review/api/review.queries";
-import ReviewCard from "@/entities/review/ui/ReviewCard.vue";
+import { CategoryCard, categoryListOptions } from "@/entities/category";
+import { RecipeCard, recipeListOptions } from "@/entities/recipe";
+import { ReviewCard, testimonialsOptions } from "@/entities/review";
 import Section from "@/shared/ui/Section.vue";
 import SectionHeader from "@/shared/ui/SectionHeader.vue";
 import { HomeHero } from "@/widgets/home-hero";

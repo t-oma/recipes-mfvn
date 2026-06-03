@@ -1,17 +1,17 @@
 import type { CommentQuery } from "@recipes/shared";
-import { queryOptions, useMutation, useQueryClient } from "@tanstack/vue-query";
+import { queryOptions } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";
-import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
-import { deleteRecipeComment, getRecipeComments } from "./comment.api";
+import { recipeQueryKeys } from "@/entities/recipe";
+import { getRecipeComments } from "./comment.api";
 
-export const recipeCommentKeys = {
+export const queryKeys = {
   all: ["comments"] as const,
 
   lists: (id: string) =>
-    [...recipeKeys.details(id), ...recipeCommentKeys.all] as const,
+    [...recipeQueryKeys.detail(id), ...queryKeys.all] as const,
   list: (id: string, filters: Partial<CommentQuery>) =>
-    [...recipeCommentKeys.lists(id), filters] as const,
+    [...queryKeys.lists(id), filters] as const,
 };
 
 export function recipeCommentListOptions(
@@ -19,23 +19,8 @@ export function recipeCommentListOptions(
   filters: MaybeRef<Partial<CommentQuery>>,
 ) {
   return queryOptions({
-    queryKey: recipeCommentKeys.list(toValue(id), toValue(filters)),
+    queryKey: queryKeys.list(toValue(id), toValue(filters)),
     queryFn: () => getRecipeComments(toValue(id), toValue(filters)),
     enabled: () => !!toValue(id),
-  });
-}
-
-export function useDeleteRecipeComment() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ commentId }: { recipeId: string; commentId: string }) =>
-      deleteRecipeComment(commentId),
-
-    onSuccess: (_, { recipeId }) => {
-      queryClient.invalidateQueries({
-        queryKey: recipeCommentKeys.lists(recipeId),
-      });
-    },
   });
 }

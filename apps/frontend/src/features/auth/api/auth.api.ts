@@ -4,7 +4,7 @@ import type {
   RegisterInput,
   UserDetails,
 } from "@recipes/shared";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 export function register(body: RegisterInput) {
   return http.post<AuthResponse>("/api/auth/register", { body });

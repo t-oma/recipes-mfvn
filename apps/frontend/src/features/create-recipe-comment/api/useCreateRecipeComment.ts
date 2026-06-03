@@ -1,18 +1,19 @@
 import type { CreateCommentInput } from "@recipes/shared";
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
-import { createRecipeComment } from "@/entities/recipe-comment/api/comment.api";
-import { recipeCommentKeys } from "@/entities/recipe-comment/api/comment.queries";
+import { useMutation } from "@tanstack/vue-query";
+import {
+  createRecipeComment,
+  recipeCommentQueryKeys,
+} from "@/entities/recipe-comment";
 
 export function useCreateRecipeComment(recipeId: string) {
-  const queryClient = useQueryClient();
-  const queryKey = recipeCommentKeys.lists(recipeId);
+  const queryKey = recipeCommentQueryKeys.lists(recipeId);
 
   return useMutation({
     mutationFn: (body: CreateCommentInput) =>
       createRecipeComment(recipeId, body),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: (_data, _body, _onMutateResult, context) => {
+      context.client.invalidateQueries({
         queryKey,
       });
     },

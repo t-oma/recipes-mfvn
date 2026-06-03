@@ -1,5 +1,5 @@
 import type { ReviewDetails, ReviewsStats } from "@recipes/shared";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 /**
  * Get featured testimonials.
@@ -15,6 +15,6 @@ export function getTestimonials() {
  *
  * @returns Review stats (total, average rating, happy cooks).
  */
-export function getReviewStats() {
+export function getReviewsStats() {
   return http.get<ReviewsStats>("/api/reviews/stats");
 }

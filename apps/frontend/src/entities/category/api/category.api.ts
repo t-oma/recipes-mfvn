@@ -3,7 +3,7 @@ import type {
   CategoryQuery,
   Paginated,
 } from "@recipes/shared";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 export function getCategories(filters: Partial<CategoryQuery> = {}) {
   return http.get<Paginated<CategoryListItem>>("/api/categories", {

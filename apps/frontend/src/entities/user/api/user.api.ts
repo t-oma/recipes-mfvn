@@ -5,7 +5,7 @@ import type {
   Paginated,
   RecipeListItem,
 } from "@recipes/shared";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 /**
  * @todo Implement retriving favorite recipes for the user other than the current one.

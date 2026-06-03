@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
+  SignedIn,
+  SignedOut,
   useCurrentUser,
   useLogoutMutation,
-} from "@/features/auth/api/auth.queries";
-import SignedIn from "@/features/auth/ui/SignedIn.vue";
-import SignedOut from "@/features/auth/ui/SignedOut.vue";
+} from "@/features/auth";
 import AppLink from "@/shared/ui/AppLink.vue";
 import AppLogo from "@/shared/ui/AppLogo.vue";
 

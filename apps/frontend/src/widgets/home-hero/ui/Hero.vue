@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
-import { reviewStatsOptions } from "@/entities/review/api/review.queries";
+import { reviewStatsOptions } from "@/entities/review";
 import SocialProof from "@/shared/ui/SocialProof.vue";
 import WavyDivider from "@/shared/ui/WavyDivider.vue";
 import HeroRecipe from "./HeroRecipe.vue";

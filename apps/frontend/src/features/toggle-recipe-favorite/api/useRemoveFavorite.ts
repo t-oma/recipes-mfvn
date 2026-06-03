@@ -1,6 +1,6 @@
 import type { RecipeDetails } from "@recipes/shared";
 import { useMutation } from "@tanstack/vue-query";
-import { recipeKeys } from "@/entities/recipe/api/recipe.queries";
+import { recipeQueryKeys } from "@/entities/recipe";
 import { removeFavorite } from "./favorites.api";
 
 export function useRemoveFavorite() {
@@ -8,7 +8,7 @@ export function useRemoveFavorite() {
     mutationFn: removeFavorite,
 
     onMutate: async (recipeId, context) => {
-      const queryKey = recipeKeys.details(recipeId);
+      const queryKey = recipeQueryKeys.detail(recipeId);
 
       await context.client.cancelQueries({ queryKey });
 
@@ -32,14 +32,14 @@ export function useRemoveFavorite() {
 
     onError: (_error, recipeId, onMutateResult, context) => {
       context.client.setQueryData(
-        recipeKeys.details(recipeId),
+        recipeQueryKeys.detail(recipeId),
         onMutateResult?.previous,
       );
     },
 
     onSettled: (_data, _error, _recipeId, _onMutateResult, context) => {
       context.client.invalidateQueries({
-        queryKey: recipeKeys.all,
+        queryKey: recipeQueryKeys.all,
       });
     },
   });
