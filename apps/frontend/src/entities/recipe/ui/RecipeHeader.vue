@@ -17,7 +17,7 @@ const { loading = false } = defineProps<{
     <template v-if="loading">
       <Skeleton
         height="100%"
-        class="hidden aspect-4/3 md:col-span-3 md:block"
+        class="hidden aspect-4/3 md:col-span-3 md:inline"
       />
 
       <div class="flex flex-col justify-center space-y-2 md:col-span-2">
@@ -25,13 +25,15 @@ const { loading = false } = defineProps<{
         <Skeleton height="1.25rem" width="50%" />
         <Skeleton height="1.25rem" width="40%" class="mt-4" />
       </div>
+
+      <Skeleton height="100%" class="aspect-4/3 md:col-span-3 md:hidden" />
     </template>
 
     <template v-else-if="recipe">
       <Image
         :src="recipe.image.url"
         :alt="recipe.image.alt"
-        class="hidden! overflow-hidden rounded-md object-cover md:col-span-3 md:block!"
+        class="hidden aspect-4/3 overflow-hidden rounded-md object-cover md:col-span-3 md:inline"
         preview
       />
 
@@ -64,7 +66,7 @@ const { loading = false } = defineProps<{
       <Image
         :src="recipe.image.url"
         :alt="recipe.image.alt"
-        class="overflow-hidden rounded-md object-cover md:col-span-3 md:hidden!"
+        class="aspect-4/3 overflow-hidden rounded-md object-cover md:col-span-3 md:hidden"
         preview
       />
     </template>

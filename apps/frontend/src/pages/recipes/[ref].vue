@@ -83,7 +83,7 @@ const authStore = useAuthStore();
             </template>
           </RecipeDescriptionList>
 
-          <Skeleton v-if="isPending" class="h-20! lg:hidden!" />
+          <Skeleton v-if="isPending" height="6rem" class="lg:hidden" />
           <p v-else class="text-lg text-pretty lg:hidden">
             {{ recipe?.description }}
           </p>
@@ -104,8 +104,8 @@ const authStore = useAuthStore();
           </div>
         </div>
 
-        <Skeleton v-if="isPending" class="hidden! h-20! lg:block!" />
-        <p v-else class="hidden text-lg text-pretty lg:block">
+        <Skeleton v-if="isPending" height="6rem" class="hidden lg:inline" />
+        <p v-else class="hidden text-lg text-pretty lg:inline">
           {{ recipe?.description }}
         </p>
       </div>

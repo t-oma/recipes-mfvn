@@ -14,13 +14,15 @@ const { stats, loading = false } = defineProps<{
         <Skeleton
           v-for="n in 4"
           :key="n"
-          class="h-9! w-9! border-2 border-white"
+          height="2.25rem"
+          width="2.25rem"
+          class="border-2 border-white"
           shape="circle"
         />
       </div>
       <div class="space-y-2">
-        <Skeleton class="h-3 w-24!" />
-        <Skeleton class="h-3 w-26!" />
+        <Skeleton height="0.75rem" width="6rem" />
+        <Skeleton height="0.75rem" width="6.5rem" />
       </div>
     </template>
 
@@ -31,7 +33,7 @@ const { stats, loading = false } = defineProps<{
           :key="index"
           :label="user"
           shape="circle"
-          class="h-9! w-9!"
+          class="h-9 w-9"
           :pt="{
             label: {
               class: 'text-xs font-semibold',

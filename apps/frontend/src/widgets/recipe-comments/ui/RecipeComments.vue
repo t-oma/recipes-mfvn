@@ -36,17 +36,17 @@ const {
         class="rounded-2xl border border-stone-200 p-4"
       >
         <div class="mb-3 flex items-center gap-3">
-          <Skeleton shape="circle" class="h-10! w-10!" />
+          <Skeleton shape="circle" height="2.5rem" width="2.5rem" />
           <div class="space-y-2">
-            <Skeleton class="h-3 w-28!" />
-            <Skeleton class="h-3 w-20!" />
+            <Skeleton height="0.75rem" width="7rem" />
+            <Skeleton height="0.75rem" width="5rem" />
           </div>
         </div>
 
         <div class="space-y-2">
-          <Skeleton class="h-3 w-full!" />
-          <Skeleton class="h-3 w-11/12!" />
-          <Skeleton class="h-3 w-8/12!" />
+          <Skeleton height="0.5rem" width="100%" />
+          <Skeleton height="0.75rem" width="91.666667%" />
+          <Skeleton height="0.75rem" width="66.666667%" />
         </div>
       </div>
     </div>

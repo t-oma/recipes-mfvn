@@ -26,7 +26,7 @@ const PLACEHOLDERS_COUNT = 6;
     <ul class="space-y-3">
       <template v-if="loading">
         <li v-for="n in PLACEHOLDERS_COUNT" :key="n">
-          <Skeleton height="3rem" class="rounded-xl bg-white" />
+          <Skeleton height="3rem" />
         </li>
       </template>
 

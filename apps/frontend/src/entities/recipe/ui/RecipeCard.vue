@@ -15,7 +15,7 @@ const props = defineProps<Props>();
 
 <template>
   <Card
-    class="group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl! hover:shadow-stone-900/8!"
+    class="group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/8"
     :pt="{
       header: {
         class: 'relative',
@@ -39,7 +39,7 @@ const props = defineProps<Props>();
       <Button
         icon="pi pi-heart-fill text-stone-400 group-active/favorite:text-rose-500 group-hover/favorite:text-rose-500"
         size="small"
-        class="group/favorite absolute! top-3 right-3"
+        class="group/favorite absolute top-3 right-3"
         severity="secondary"
         rounded
       />
@@ -77,7 +77,7 @@ const props = defineProps<Props>();
       <PrimaryLink
         :to="`/recipes/${buildRecipeRef(recipe)}`"
         class="text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100"
-        icon="pi pi-arrow-right text-[0.75rem]!"
+        icon="pi pi-arrow-right text-[0.75rem]"
       >
         View
       </PrimaryLink>

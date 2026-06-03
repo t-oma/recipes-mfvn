@@ -118,6 +118,11 @@ export const primeVueOptions: PrimeVueConfiguration = {
     preset,
     options: {
       darkModeSelector: "html.dark",
+      cssLayer: {
+        name: "primevue",
+        order:
+          "properties, keyframes, theme, base, primevue, components, utilities",
+      },
     },
   },
 };
