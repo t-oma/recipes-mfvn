@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
 import { ref } from "vue";
-import { recipeCommentListOptions } from "@/entities/recipe-comment/api/comment.queries";
-import CommentCard from "@/entities/recipe-comment/ui/CommentCard.vue";
+import {
+  CommentCard,
+  recipeCommentListOptions,
+} from "@/entities/recipe-comment";
 import { CreateCommentForm } from "@/features/create-recipe-comment";
 
 const props = defineProps<{
