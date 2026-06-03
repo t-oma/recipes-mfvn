@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
-import { categoryListOptions } from "@/entities/category/api/category.queries";
-import CategoryCard from "@/entities/category/ui/CategoryCard.vue";
+import { CategoryCard, categoryListOptions } from "@/entities/category";
 import { recipeListOptions } from "@/entities/recipe/api/recipe.queries";
 import RecipeCard from "@/entities/recipe/ui/RecipeCard.vue";
 import { testimonialsOptions } from "@/entities/review/api/review.queries";

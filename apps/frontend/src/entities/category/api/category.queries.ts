@@ -4,19 +4,19 @@ import type { MaybeRef } from "vue";
 import { toValue } from "vue";
 import { getCategories } from "./category.api";
 
-const categoryKeys = {
+export const queryKeys = {
   all: ["categories"] as const,
 
-  lists: () => [...categoryKeys.all, "list"] as const,
+  lists: () => [...queryKeys.all, "list"] as const,
   list: (query: Partial<CategoryQuery>) =>
-    [...categoryKeys.lists(), query] as const,
+    [...queryKeys.lists(), query] as const,
 };
 
 export function categoryListOptions(
   filters: MaybeRef<Partial<CategoryQuery>> = {},
 ) {
   return queryOptions({
-    queryKey: categoryKeys.list(toValue(filters)),
+    queryKey: queryKeys.list(toValue(filters)),
     queryFn: () => getCategories(toValue(filters)),
     staleTime: 5 * 60 * 1000,
   });
