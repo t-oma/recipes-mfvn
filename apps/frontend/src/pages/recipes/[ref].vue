@@ -6,7 +6,7 @@ import IngredientList from "@/entities/recipe/ui/IngredientList.vue";
 import InstructionSteps from "@/entities/recipe/ui/InstructionSteps.vue";
 import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vue";
 import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
-import { useAuthStore } from "@/features/auth/model/auth.store";
+import { useAuthStore } from "@/features/auth";
 import RateRecipeControl from "@/features/rate-recipe/ui/RateRecipeControl.vue";
 import ToggleFavoriteButton from "@/features/toggle-recipe-favorite/ui/ToggleFavoriteButton.vue";
 import WidthContainer from "@/shared/ui/WidthContainer.vue";

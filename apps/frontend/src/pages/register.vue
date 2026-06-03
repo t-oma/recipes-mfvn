@@ -6,8 +6,7 @@ import { registerInputSchema } from "@recipes/shared";
 import { useToast } from "primevue";
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
-import { useRegisterMutation } from "@/features/auth/api/auth.queries";
-import AuthPageShell from "@/features/auth/ui/AuthPageShell.vue";
+import { AuthPageShell, useRegisterMutation } from "@/features/auth";
 
 definePage({
   meta: {
