@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { APP_NAME } from "@/shared/constants";
+import { APP_NAME } from "@/shared";
 import AppLink from "./AppLink.vue";
 
 const { theme = "light" } = defineProps<{

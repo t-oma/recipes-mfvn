@@ -1,4 +1,4 @@
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 /**
  * Check if recipe with the given id is favorited by the current user.

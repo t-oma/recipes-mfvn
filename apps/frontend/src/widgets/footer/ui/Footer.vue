@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { APP_NAME } from "@/shared/constants";
+import { APP_NAME } from "@/shared";
 import AppLogo from "@/shared/ui/AppLogo.vue";
 import FooterSocials from "./FooterSocials.vue";
 </script>

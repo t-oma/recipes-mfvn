@@ -1,5 +1,5 @@
 import type { ReviewDetails, ReviewsStats } from "@recipes/shared";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 /**
  * Get featured testimonials.

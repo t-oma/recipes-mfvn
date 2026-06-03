@@ -8,7 +8,7 @@ import Tooltip from "primevue/tooltip";
 import { createApp } from "vue";
 import { useAuthStore } from "@/features/auth";
 import { createAuthSession } from "@/features/auth/model";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 import App from "./App.vue";
 import { primeVueOptions } from "./primevue-options";
 import router from "./router";

@@ -1,5 +1,5 @@
 import type { RecipeRatingInput } from "@recipes/shared";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 export function rateRecipe(ref: string, body: RecipeRatingInput) {
   return http.put<void>(`/api/recipes/${ref}/rating`, { body });

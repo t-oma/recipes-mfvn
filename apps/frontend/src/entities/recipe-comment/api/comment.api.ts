@@ -4,7 +4,7 @@ import type {
   CreateCommentInput,
   Paginated,
 } from "@recipes/shared";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 /**
  * Get comments for the recipe with the given id.

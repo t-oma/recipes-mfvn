@@ -6,7 +6,7 @@ import type {
   RecipeQuery,
   UpdateRecipeInput,
 } from "@recipes/shared";
-import { http } from "@/shared/api/http";
+import { http } from "@/shared";
 
 /**
  * Retrieve recipes with the given filters.
