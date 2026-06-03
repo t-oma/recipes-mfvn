@@ -1,5 +1,10 @@
 export function toUTCWithoutTime(date: Date) {
-  return date.toUTCString().split(" ").slice(0, -2).join(" ");
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 export function formatRecipeDate(createdAt: string, updatedAt: string) {
