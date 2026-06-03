@@ -8,7 +8,7 @@ import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vu
 import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
 import { useAuthStore } from "@/features/auth";
 import { RateRecipeControl } from "@/features/rate-recipe";
-import ToggleFavoriteButton from "@/features/toggle-recipe-favorite/ui/ToggleFavoriteButton.vue";
+import { ToggleFavoriteButton } from "@/features/toggle-recipe-favorite";
 import WidthContainer from "@/shared/ui/WidthContainer.vue";
 import { RecipeComments } from "@/widgets/recipe-comments";
 
