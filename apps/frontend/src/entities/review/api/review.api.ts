@@ -15,6 +15,6 @@ export function getTestimonials() {
  *
  * @returns Review stats (total, average rating, happy cooks).
  */
-export function getReviewStats() {
+export function getReviewsStats() {
   return http.get<ReviewsStats>("/api/reviews/stats");
 }

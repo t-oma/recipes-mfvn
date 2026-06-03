@@ -2,8 +2,7 @@
 import { useQuery } from "@tanstack/vue-query";
 import { CategoryCard, categoryListOptions } from "@/entities/category";
 import { RecipeCard, recipeListOptions } from "@/entities/recipe";
-import { testimonialsOptions } from "@/entities/review/api/review.queries";
-import ReviewCard from "@/entities/review/ui/ReviewCard.vue";
+import { ReviewCard, testimonialsOptions } from "@/entities/review";
 import Section from "@/shared/ui/Section.vue";
 import SectionHeader from "@/shared/ui/SectionHeader.vue";
 import { HomeHero } from "@/widgets/home-hero";
