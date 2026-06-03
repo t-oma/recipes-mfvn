@@ -1,0 +1,10 @@
+import type { RecipeRatingInput } from "@recipes/shared";
+import { http } from "@/shared/api/http";
+
+export function rateRecipe(ref: string, body: RecipeRatingInput) {
+  return http.put<void>(`/api/recipes/${ref}/rating`, { body });
+}
+
+export function removeRecipeRating(ref: string) {
+  return http.delete<void>(`/api/recipes/${ref}/rating`);
+}

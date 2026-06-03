@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLink from "@/shared/ui/AppLink.vue";
 
-const { canRate = false, loading = false } = defineProps<{
+const { loading = false } = defineProps<{
   cookTime?: number | null;
   difficulty?: string | null;
   mealType?: string | null;
@@ -10,8 +10,6 @@ const { canRate = false, loading = false } = defineProps<{
     name: string;
     slug: string;
   } | null;
-  averageRating?: number | null;
-  canRate?: boolean;
   loading?: boolean;
 }>();
 </script>
@@ -91,22 +89,8 @@ const { canRate = false, loading = false } = defineProps<{
       </dd>
 
       <dt class="font-semibold">Rating</dt>
-      <dd class="flex items-center gap-2">
-        <span class="font-medium">{{ averageRating ?? 0 }}</span>
-        <Rating
-          v-tooltip.top="{
-            value:
-              '<span class=\'underline\'>Log in</span> or <span class=\'underline\'>sign up</span> to rate recipes',
-            class: 'text-xs text-pretty text-center',
-            showDelay: 300,
-            hideDelay: 300,
-            disabled: canRate,
-            escape: false,
-          }"
-          :defaultValue="averageRating ?? 0"
-          :readonly="!canRate"
-          class="text-amber-400"
-        />
+      <dd class="">
+        <slot name="rating-control" />
       </dd>
     </template>
   </dl>

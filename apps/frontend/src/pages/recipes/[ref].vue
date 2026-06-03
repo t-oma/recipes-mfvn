@@ -7,6 +7,7 @@ import InstructionSteps from "@/entities/recipe/ui/InstructionSteps.vue";
 import RecipeDescriptionList from "@/entities/recipe/ui/RecipeDescriptionList.vue";
 import RecipeHeader from "@/entities/recipe/ui/RecipeHeader.vue";
 import { useAuthStore } from "@/features/auth/model/auth.store";
+import RateRecipeControl from "@/features/rate-recipe/ui/RateRecipeControl.vue";
 import ToggleFavoriteButton from "@/features/toggle-recipe-favorite/ui/ToggleFavoriteButton.vue";
 import WidthContainer from "@/shared/ui/WidthContainer.vue";
 import { RecipeComments } from "@/widgets/recipe-comments";
@@ -23,8 +24,7 @@ function extractIdFromRef(ref: string): string {
 }
 
 const route = useRoute();
-const recipeRef = route.params.ref;
-const recipeId = extractIdFromRef(recipeRef);
+const recipeId = extractIdFromRef(route.params.ref);
 
 const {
   data: recipe,
@@ -58,7 +58,7 @@ const authStore = useAuthStore();
     <template v-else>
       <RecipeHeader :recipe="recipe" :loading="isLoading" />
 
-      <div class="grid gap-8 pb-6 lg:grid-cols-[320px_1fr] lg:pb-10">
+      <div class="grid gap-8 pb-6 lg:grid-cols-[360px_1fr] lg:pb-10">
         <div class="space-y-6">
           <RecipeDescriptionList
             :cook-time="recipe?.cookingTime"
@@ -66,10 +66,18 @@ const authStore = useAuthStore();
             :meal-type="recipe?.mealType"
             :servings="recipe?.servings"
             :cuisine="recipe?.cuisine"
-            :average-rating="recipe?.stats.averageRating"
-            :can-rate="authStore.isAuthenticated"
             :loading="isPending"
-          />
+          >
+            <template #rating-control>
+              <RateRecipeControl
+                :recipe-id="recipeId"
+                :average-rating="recipe?.stats.averageRating"
+                :ratings-count="recipe?.stats.ratingCount"
+                :user-rating="recipe?.userRating"
+                :can-rate="authStore.isAuthenticated"
+              />
+            </template>
+          </RecipeDescriptionList>
 
           <Skeleton v-if="isPending" class="h-20! lg:hidden!" />
           <p v-else class="text-lg text-pretty lg:hidden">
@@ -84,19 +92,9 @@ const authStore = useAuthStore();
               :can-favorite="authStore.isAuthenticated"
             />
             <Button
-              v-tooltip.top="{
-                value:
-                  '<span class=\'underline\'>Log in</span> or <span class=\'underline\'>sign up</span> to comment on recipes',
-                class: 'text-xs text-pretty text-center',
-                showDelay: 300,
-                hideDelay: 300,
-                disabled: authStore.isAuthenticated,
-                escape: false,
-              }"
               :label="`Comment (${recipe?.stats.commentsCount ?? 0})`"
               icon="pi pi-comment"
               severity="secondary"
-              :disabled="!authStore.isAuthenticated"
               as="RouterLink"
               to="#comments"
             />
@@ -109,7 +107,7 @@ const authStore = useAuthStore();
         </p>
       </div>
 
-      <div class="grid gap-8 pb-6 lg:grid-cols-[320px_1fr] lg:pb-10">
+      <div class="grid gap-8 pb-6 lg:grid-cols-[360px_1fr] lg:pb-10">
         <IngredientList
           :ingredients="recipe?.ingredients"
           :servings="recipe?.servings"
