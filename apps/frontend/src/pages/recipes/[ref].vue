@@ -28,7 +28,6 @@ const recipeId = extractIdFromRef(route.params.ref);
 
 const {
   data: recipe,
-  isLoading,
   isPending,
   error,
 } = useQuery(recipeDetailsOptions(recipeId));
@@ -60,7 +59,7 @@ const authStore = useAuthStore();
     </div>
 
     <template v-else>
-      <RecipeHeader :recipe="recipe" :loading="isLoading" />
+      <RecipeHeader :recipe="recipe" :loading="isPending" />
 
       <div class="grid gap-8 pb-6 lg:grid-cols-[360px_1fr] lg:pb-10">
         <div class="space-y-6">
