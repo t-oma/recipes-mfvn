@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
+import { ref } from "vue";
 import { recipeCommentListOptions } from "@/entities/recipe-comment/api/comment.queries";
 import CommentCard from "@/entities/recipe-comment/ui/CommentCard.vue";
 import CreateCommentForm from "@/features/create-recipe-comment/ui/CreateCommentForm.vue";
@@ -9,11 +10,19 @@ const props = defineProps<{
   canComment?: boolean;
 }>();
 
+const filters = ref({
+  page: 1,
+  limit: 5,
+});
 const {
   data: comments,
   isPending,
   error,
-} = useQuery(recipeCommentListOptions(props.recipeId, { limit: 10 }));
+} = useQuery(recipeCommentListOptions(props.recipeId, filters));
+
+function handlePageChange(page: number) {
+  filters.value.page = page + 1;
+}
 </script>
 
 <template>
@@ -23,7 +32,7 @@ const {
         Comments
       </h2>
       <span class="text-sm text-stone-500">
-        ({{ comments?.items.length ?? 0 }})
+        ({{ comments?.pagination.total ?? 0 }})
       </span>
     </div>
 
@@ -75,5 +84,12 @@ const {
         :comment="comment"
       />
     </div>
+
+    <Paginator
+      :rows="filters.limit"
+      :total-records="comments?.pagination.total"
+      @page="(state) => handlePageChange(state.page)"
+      class="overflow-hidden rounded-xl shadow"
+    />
   </section>
 </template>
