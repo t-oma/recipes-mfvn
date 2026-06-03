@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { APP_NAME } from "@/shared/constants";
 import AppLogo from "@/shared/ui/AppLogo.vue";
-import FooterSocials from "./ui/FooterSocials.vue";
+import FooterSocials from "./FooterSocials.vue";
 </script>
 
 <template>

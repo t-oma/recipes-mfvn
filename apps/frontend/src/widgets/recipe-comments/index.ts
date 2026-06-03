@@ -1,1 +1,1 @@
-export { default as RecipeComments } from "./ui/RecipeComments.vue";
+export { RecipeComments } from "./ui";
