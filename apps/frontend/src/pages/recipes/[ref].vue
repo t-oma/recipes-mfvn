@@ -50,8 +50,12 @@ const authStore = useAuthStore();
         <h2 class="text-xl font-semibold text-stone-800">
           Failed to load recipe
         </h2>
-        <p class="mt-2 text-stone-500">{{ error.message }}</p>
-        <Button label="Go back home" class="mt-6" as="RouterLink" to="/" />
+        <p class="mt-2 text-stone-500">{{ error?.message }}</p>
+        <Button as-child v-slot="slotProps" class="mt-6">
+          <RouterLink to="/" :class="slotProps.class">
+            Go back home
+          </RouterLink>
+        </Button>
       </div>
     </div>
 
@@ -91,13 +95,12 @@ const authStore = useAuthStore();
               :total="recipe?.stats.favoritesCount"
               :can-favorite="authStore.isAuthenticated"
             />
-            <Button
-              :label="`Comment (${recipe?.stats.commentsCount ?? 0})`"
-              icon="pi pi-comment"
-              severity="secondary"
-              as="RouterLink"
-              to="#comments"
-            />
+            <Button as-child v-slot="slotProps" severity="secondary">
+              <RouterLink to="#comments" :class="slotProps.class">
+                <i class="pi pi-comment"></i>
+                Comment ({{ recipe?.stats.commentsCount ?? 0 }})
+              </RouterLink>
+            </Button>
           </div>
         </div>
 
