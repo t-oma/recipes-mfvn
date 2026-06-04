@@ -36,13 +36,10 @@ const props = defineProps<Props>();
         class="h-full transition-transform duration-500 group-hover:scale-105"
         preview
       />
-      <Button
-        icon="pi pi-heart-fill text-stone-400 group-active/favorite:text-rose-500 group-hover/favorite:text-rose-500"
-        size="small"
-        class="group/favorite absolute top-3 right-3"
-        severity="secondary"
-        rounded
-      />
+
+      <div class="absolute top-3 right-3 left-3">
+        <slot name="header-actions" />
+      </div>
     </template>
 
     <template #content>
