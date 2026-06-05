@@ -260,6 +260,46 @@ describe("RecipeRepository", () => {
       expect(recipes[0]?.title).toBe("Low");
     });
 
+    it("should filter by maxCookingTime and minCookingTime", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Low",
+        isPublic: true,
+        cookingTime: 10 as Minutes,
+      });
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Medium",
+        isPublic: true,
+        cookingTime: 20 as Minutes,
+      });
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "High",
+        isPublic: true,
+        cookingTime: 30 as Minutes,
+      });
+
+      const [recipes, total] = await repository.aggregateSearch({
+        query: {
+          page: 1,
+          limit: 10,
+          sort: "-createdAt",
+          minCookingTime: 15 as Minutes,
+          maxCookingTime: 25 as Minutes,
+        },
+        initiator: noInitiator(),
+      });
+
+      expect(total).toBe(1);
+      expect(recipes[0]?.title).toBe("Medium");
+    });
+
     describe(() => {
       beforeAll(async () => {
         const author = await createDbUser();
