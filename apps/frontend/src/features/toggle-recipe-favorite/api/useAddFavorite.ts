@@ -1,11 +1,11 @@
 import type { RecipeDetails } from "@recipes/shared";
 import { useMutation } from "@tanstack/vue-query";
 import { recipeQueryKeys } from "@/entities/recipe";
-import { addFavorite } from "./favorites.api";
+import { favoriteRecipe } from "./favorites.api";
 
 export function useAddFavorite() {
   return useMutation({
-    mutationFn: addFavorite,
+    mutationFn: favoriteRecipe,
 
     onMutate: async (recipeId, context) => {
       const queryKey = recipeQueryKeys.detail(recipeId);

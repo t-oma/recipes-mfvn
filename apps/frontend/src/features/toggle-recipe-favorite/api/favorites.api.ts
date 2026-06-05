@@ -16,7 +16,7 @@ export function isFavorited(id: string) {
  * @param id - recipe id.
  * @returns \{favorited: true\} if the recipe was added to the user's favorites.
  */
-export function addFavorite(id: string) {
+export function favoriteRecipe(id: string) {
   return http.post<{ favorited: true }>(`/api/recipes/${id}/favorite`);
 }
 
@@ -26,6 +26,6 @@ export function addFavorite(id: string) {
  * @param id - recipe id.
  * @returns \{favorited: false\} if the recipe was removed from the user's favorites.
  */
-export function removeFavorite(id: string) {
+export function unfavoriteRecipe(id: string) {
   return http.delete<{ favorited: false }>(`/api/recipes/${id}/favorite`);
 }
