@@ -7,6 +7,7 @@ import {
 import {
   difficultySchema,
   mealTypeSchema,
+  minutesSchema,
 } from "./recipe.primitives.schema.js";
 
 export const recipeStatsSchema = z.object({
@@ -28,6 +29,8 @@ export const recipeQuerySchema = z
     difficulty: difficultySchema.optional(),
     isFavorited: z.stringbool().optional(),
     mealType: mealTypeSchema.optional(),
+    minCookingTime: z.coerce.number().pipe(minutesSchema).optional(),
+    maxCookingTime: z.coerce.number().pipe(minutesSchema).optional(),
   })
   .extend(paginationQuerySchema.shape)
   .extend(searchQuerySchema.shape);
