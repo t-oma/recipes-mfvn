@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PrimaryLink from "./PrimaryLink.vue";
+import AppLink from "./AppLink.vue";
 
 type Props = {
   title: string;
@@ -35,7 +35,7 @@ const { align = "left" } = defineProps<Props>();
       </h2>
     </div>
 
-    <PrimaryLink
+    <AppLink
       v-if="link"
       :to="link.to"
       class="font-medium"
@@ -43,6 +43,6 @@ const { align = "left" } = defineProps<Props>();
       iconPos="right"
     >
       {{ link.label }}
-    </PrimaryLink>
+    </AppLink>
   </div>
 </template>

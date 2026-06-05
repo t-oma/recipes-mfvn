@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { RecipeListItem } from "@recipes/shared";
 import { buildRecipeRef } from "@recipes/shared";
-import PrimaryLink from "@/shared/ui/PrimaryLink.vue";
+import AppLink from "@/shared/ui/AppLink.vue";
 
 type Props = {
   recipe: Pick<
@@ -43,13 +43,13 @@ const props = defineProps<Props>();
 
     <template #content>
       <div class="flex flex-1 flex-col">
-        <PrimaryLink :to="`/recipes/${buildRecipeRef(recipe)}`">
+        <AppLink :to="`/recipes/${buildRecipeRef(recipe)}`">
           <h3
             class="font-display group-hover:text-terracotta text-lg font-bold text-stone-900 transition-colors"
           >
             {{ recipe.title }}
           </h3>
-        </PrimaryLink>
+        </AppLink>
 
         <div class="mt-3 mb-4 flex items-center gap-4 text-sm text-stone-500">
           <span class="flex items-center gap-1.5">
@@ -72,14 +72,14 @@ const props = defineProps<Props>();
         </span>
       </div>
 
-      <PrimaryLink
+      <AppLink
         :to="`/recipes/${buildRecipeRef(recipe)}`"
         class="text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100"
         icon="pi pi-arrow-right text-[0.75rem]"
         iconPos="right"
       >
         View
-      </PrimaryLink>
+      </AppLink>
     </template>
   </Card>
 </template>
