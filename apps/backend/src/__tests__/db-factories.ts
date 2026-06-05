@@ -51,7 +51,7 @@ export async function createDbCategory(
   const name = overrides.name ?? unique("category");
   return CategoryModel.create({
     name,
-    slug: overrides.slug ?? name.toLowerCase().replace(/\s+/g, "-"),
+    slug: overrides.slug ?? slugify(name),
     description: "A test category",
     image: { url: "https://example.com/category.jpg" },
     ...overrides,
@@ -69,7 +69,7 @@ export async function createDbCuisine(
   const name = overrides.name ?? unique("cuisine");
   return CuisineModel.create({
     name,
-    slug: overrides.slug ?? name.toLowerCase().replace(/\s+/g, "-"),
+    slug: overrides.slug ?? slugify(name),
     description: "A test cuisine",
     image: { url: "https://example.com/cuisine.jpg" },
     ...overrides,
