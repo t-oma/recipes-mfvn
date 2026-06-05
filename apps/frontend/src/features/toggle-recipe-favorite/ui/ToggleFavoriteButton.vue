@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useAddFavorite } from "../api/useAddFavorite";
-import { useRemoveFavorite } from "../api/useRemoveFavorite";
+import { useToggleRecipeFavorite } from "../api/useToggleRecipeFavorite";
 
 const {
   recipeId,
@@ -17,17 +16,10 @@ const {
   canFavorite?: boolean;
 }>();
 
-const { mutate: addFavorite, isPending: isAddPending } = useAddFavorite();
-const { mutate: removeFavorite, isPending: isRemovePending } =
-  useRemoveFavorite();
+const { mutate: toggleFavorite, isPending } = useToggleRecipeFavorite(recipeId);
 
-const isPending = computed(() => isAddPending.value || isRemovePending.value);
 const isIconOnly = computed(() => variant === "icon");
 const label = computed(() => `${isFavorited ? "Saved" : "Save"} (${total})`);
-
-function handleClick() {
-  isFavorited ? removeFavorite(recipeId) : addFavorite(recipeId);
-}
 </script>
 
 <template>
@@ -48,6 +40,6 @@ function handleClick() {
     :aria-label="
       isFavorited ? 'Remove recipe from favorites' : 'Add recipe to favorites'
     "
-    @click.stop="handleClick"
+    @click.stop="() => toggleFavorite(isFavorited)"
   />
 </template>
