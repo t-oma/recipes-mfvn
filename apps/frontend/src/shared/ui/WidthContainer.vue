@@ -14,13 +14,17 @@ const widthClasses = {
   <component
     v-if="as"
     :is="as"
-    class="mx-auto px-6 lg:px-8"
+    class="relative mx-auto px-6 lg:px-8"
     :class="widthClasses[width]"
   >
     <slot />
   </component>
 
-  <div v-else class="mx-auto px-6 lg:px-8" :class="widthClasses[width]">
+  <div
+    v-else
+    class="relative mx-auto px-6 lg:px-8"
+    :class="widthClasses[width]"
+  >
     <slot />
   </div>
 </template>

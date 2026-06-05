@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute right-0 bottom-0 left-0">
+  <div>
     <svg
       viewBox="0 0 1440 60"
       fill="none"

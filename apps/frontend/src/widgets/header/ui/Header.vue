@@ -38,10 +38,7 @@ const { mutate: logout } = useLogoutMutation();
         <nav class="hidden md:block">
           <ul class="flex items-center gap-8">
             <li v-for="link in links" :key="link.to">
-              <AppLink
-                :to="link.to"
-                class="hover:text-terracotta-500 inline-flex items-center justify-center gap-2 text-sm font-medium text-stone-600 transition-colors"
-              >
+              <AppLink :to="link.to" variant="secondary" class="justify-center">
                 {{ link.label }}
               </AppLink>
             </li>

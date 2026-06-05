@@ -19,7 +19,7 @@ const { data: reviewsStats, isPending: isReviewsStatsPending } =
 </script>
 
 <template>
-  <section class="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32">
+  <section class="relative overflow-hidden pt-6 pb-18 lg:pt-10 lg:pb-20">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
         <!-- Left: Text -->
@@ -88,6 +88,6 @@ const { data: reviewsStats, isPending: isReviewsStatsPending } =
       </div>
     </div>
 
-    <WavyDivider />
+    <WavyDivider class="absolute right-0 bottom-0 left-0" />
   </section>
 </template>
