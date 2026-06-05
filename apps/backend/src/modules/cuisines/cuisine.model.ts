@@ -2,6 +2,7 @@ import type { Image } from "@recipes/shared";
 import type { Model } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";
+import { slugify } from "@/common/utils/slug.js";
 
 export interface CuisineDocument extends BaseDocument {
   name: string;
@@ -34,11 +35,7 @@ const cuisineSchema = new Schema<CuisineDocument>(
 
 cuisineSchema.pre("validate", function () {
   if (this.isModified("name") && !this.slug) {
-    this.slug = this.name
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .trim();
+    this.slug = slugify(this.name);
   }
 });
 

@@ -9,6 +9,8 @@ export const recipeCache = {
         category: filters.category,
         difficulty: filters.difficulty,
         sort: filters.sort,
+        minCookingTime: filters.minCookingTime,
+        maxCookingTime: filters.maxCookingTime,
       })}`,
     listPattern: () => "list:*",
     allPattern: () => "*",
