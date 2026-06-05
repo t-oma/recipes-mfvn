@@ -95,6 +95,8 @@ export class RecipeRepository extends BaseRepository<
       cuisineId,
       difficulty,
       mealType,
+      minCookingTime,
+      maxCookingTime,
     } = query;
 
     const sortWithPopularityReplaced = sort.replace(
@@ -110,6 +112,7 @@ export class RecipeRepository extends BaseRepository<
         ...(cuisineId && { cuisine: toObjectId(cuisineId) }),
         ...(difficulty && { difficulty }),
         ...(mealType && { mealType }),
+        ...buildCookingTimeFilter({ minCookingTime, maxCookingTime }),
       }),
       stages.unset<RecipeDocument>("__v"),
 
@@ -301,4 +304,32 @@ export class RecipeRepository extends BaseRepository<
       )
       .lean();
   }
+}
+
+function buildCookingTimeFilter({
+  minCookingTime,
+  maxCookingTime,
+}: Pick<SearchRecipeQuery, "minCookingTime" | "maxCookingTime">) {
+  if (!minCookingTime && !maxCookingTime) return {};
+  if (!minCookingTime) {
+    return {
+      cookingTime: {
+        $lte: maxCookingTime,
+      },
+    };
+  }
+  if (!maxCookingTime) {
+    return {
+      cookingTime: {
+        $gte: minCookingTime,
+      },
+    };
+  }
+
+  return {
+    cookingTime: {
+      $gte: minCookingTime,
+      $lte: maxCookingTime,
+    },
+  };
 }
