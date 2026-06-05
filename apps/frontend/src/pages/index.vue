@@ -5,8 +5,8 @@ import { RecipeCard, recipeListOptions } from "@/entities/recipe";
 import { ReviewCard, testimonialsOptions } from "@/entities/review";
 import { useAuthStore } from "@/features/auth";
 import { ToggleFavoriteButton } from "@/features/toggle-recipe-favorite";
-import Section from "@/shared/ui/Section.vue";
 import SectionHeader from "@/shared/ui/SectionHeader.vue";
+import WidthContainer from "@/shared/ui/WidthContainer.vue";
 import { HomeHero } from "@/widgets/home-hero";
 import NewsletterCTA from "./_index/NewsletterCTA.vue";
 import TodaysPick from "./_index/TodaysPick.vue";
@@ -46,7 +46,7 @@ const authStore = useAuthStore();
   <main>
     <HomeHero />
 
-    <Section id="categories" bg="bg-white">
+    <WidthContainer id="categories" class="bg-white py-12 lg:py-20">
       <SectionHeader
         title="Pick a direction"
         subtitle="Recipe Categories"
@@ -84,9 +84,9 @@ const authStore = useAuthStore();
           :category
         />
       </div>
-    </Section>
+    </WidthContainer>
 
-    <Section id="featured-recipes" bg="bg-stone-50">
+    <WidthContainer id="featured-recipes" class="bg-stone-50 py-12 lg:py-20">
       <SectionHeader
         title="Popular dishes"
         subtitle="Featured Recipes"
@@ -135,13 +135,13 @@ const authStore = useAuthStore();
           </template>
         </RecipeCard>
       </div>
-    </Section>
+    </WidthContainer>
 
-    <Section id="todays-pick" bg="bg-white">
+    <WidthContainer id="todays-pick" class="bg-white py-12 lg:py-20">
       <TodaysPick />
-    </Section>
+    </WidthContainer>
 
-    <Section id="testimonials" bg="bg-stone-50">
+    <WidthContainer id="testimonials" class="bg-stone-50 py-12 lg:py-20">
       <SectionHeader title="Reviews" subtitle="What Cooks Say" align="center" />
 
       <div v-if="isTestimonialsLoading" class="grid gap-6 md:grid-cols-3">
@@ -185,10 +185,10 @@ const authStore = useAuthStore();
           :rating="review.rating"
         />
       </div>
-    </Section>
+    </WidthContainer>
 
-    <Section id="newsletter" bg="bg-white">
+    <WidthContainer id="newsletter" class="bg-white py-12 lg:py-20">
       <NewsletterCTA />
-    </Section>
+    </WidthContainer>
   </main>
 </template>
