@@ -1,3 +1,4 @@
+import { Minutes } from "@recipes/shared";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   createDbCategory,
@@ -193,6 +194,70 @@ describe("RecipeRepository", () => {
 
       expect(total).toBe(1);
       expect(recipes[0]?.isFavorited).toBe(true);
+    });
+
+    it("should filter by minCookingTime", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Low",
+        isPublic: true,
+        cookingTime: 10 as Minutes,
+      });
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "High",
+        isPublic: true,
+        cookingTime: 20 as Minutes,
+      });
+
+      const [recipes, total] = await repository.aggregateSearch({
+        query: {
+          page: 1,
+          limit: 10,
+          sort: "-createdAt",
+          minCookingTime: 15 as Minutes,
+        },
+        initiator: noInitiator(),
+      });
+
+      expect(total).toBe(1);
+      expect(recipes[0]?.title).toBe("High");
+    });
+
+    it("should filter by maxCookingTime", async () => {
+      const author = await createDbUser();
+      const category = await createDbCategory();
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "Low",
+        isPublic: true,
+        cookingTime: 10 as Minutes,
+      });
+      await createDbRecipe({
+        author: author._id,
+        category: category._id,
+        title: "High",
+        isPublic: true,
+        cookingTime: 20 as Minutes,
+      });
+
+      const [recipes, total] = await repository.aggregateSearch({
+        query: {
+          page: 1,
+          limit: 10,
+          sort: "-createdAt",
+          maxCookingTime: 15 as Minutes,
+        },
+        initiator: noInitiator(),
+      });
+
+      expect(total).toBe(1);
+      expect(recipes[0]?.title).toBe("Low");
     });
 
     describe(() => {
