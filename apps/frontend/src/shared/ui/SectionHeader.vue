@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PrimaryLink from "./PrimaryLink.vue";
 
-const { align = "left" } = defineProps<{
+type Props = {
   title: string;
   subtitle: string;
   link?: {
@@ -9,7 +9,9 @@ const { align = "left" } = defineProps<{
     to: string;
   };
   align?: "left" | "center";
-}>();
+};
+
+const { align = "left" } = defineProps<Props>();
 </script>
 
 <template>
@@ -33,7 +35,13 @@ const { align = "left" } = defineProps<{
       </h2>
     </div>
 
-    <PrimaryLink v-if="link" :to="link.to" class="font-medium">
+    <PrimaryLink
+      v-if="link"
+      :to="link.to"
+      class="font-medium"
+      icon="pi pi-arrow-right text-xs"
+      iconPos="right"
+    >
       {{ link.label }}
     </PrimaryLink>
   </div>

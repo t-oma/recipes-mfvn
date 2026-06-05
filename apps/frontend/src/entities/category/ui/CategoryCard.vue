@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CategoryListItem } from "@recipes/shared";
-import { RouterLink } from "vue-router";
+import AppLink from "@/shared/ui/AppLink.vue";
 
 const props = defineProps<{
   category: Pick<CategoryListItem, "name" | "recipeCount" | "image">;
@@ -8,15 +8,16 @@ const props = defineProps<{
 </script>
 
 <template>
-  <RouterLink
+  <AppLink
     to="#/categories"
-    class="group relative block overflow-hidden rounded-2xl shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/15"
+    class="group relative block overflow-hidden rounded-xl shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/15"
   >
     <img
       :src="category.image.url"
       :alt="category.image.alt ?? category.name"
       class="aspect-3/4 w-full object-cover transition-transform duration-500 group-hover:scale-105"
     />
+
     <div
       class="absolute inset-0 bg-linear-to-t from-stone-900/70 via-stone-900/20 to-transparent"
     />
@@ -28,5 +29,5 @@ const props = defineProps<{
         {{ category.recipeCount }} recipes
       </p>
     </div>
-  </RouterLink>
+  </AppLink>
 </template>
