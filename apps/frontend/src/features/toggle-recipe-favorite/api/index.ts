@@ -1,3 +1,2 @@
-export { addFavorite, isFavorited, removeFavorite } from "./favorites.api";
-export { useAddFavorite } from "./useAddFavorite.ts";
-export { useRemoveFavorite } from "./useRemoveFavorite.ts";
+export { favoriteRecipe, isFavorited, unfavoriteRecipe } from "./favorites.api";
+export { useToggleRecipeFavorite } from "./useToggleRecipeFavorite.ts";

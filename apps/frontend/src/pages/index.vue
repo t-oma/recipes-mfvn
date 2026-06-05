@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/vue-query";
 import { CategoryCard, categoryListOptions } from "@/entities/category";
 import { RecipeCard, recipeListOptions } from "@/entities/recipe";
 import { ReviewCard, testimonialsOptions } from "@/entities/review";
+import { useAuthStore } from "@/features/auth";
+import { ToggleFavoriteButton } from "@/features/toggle-recipe-favorite";
 import Section from "@/shared/ui/Section.vue";
 import SectionHeader from "@/shared/ui/SectionHeader.vue";
 import { HomeHero } from "@/widgets/home-hero";
@@ -36,6 +38,8 @@ const {
 } = useQuery(
   recipeListOptions({ sort: "-popularity", limit: POPULAR_RECIPES_LIMIT }),
 );
+
+const authStore = useAuthStore();
 </script>
 
 <template>
@@ -117,7 +121,19 @@ const {
           v-for="recipe in popularRecipes.items"
           :key="recipe.id"
           :recipe="recipe"
-        />
+        >
+          <template #header-actions>
+            <div class="flex items-center justify-end gap-2">
+              <ToggleFavoriteButton
+                :recipe-id="recipe.id"
+                :is-favorited="recipe.isFavorited"
+                :total="recipe.stats.favoritesCount"
+                :can-favorite="authStore.isAuthenticated"
+                variant="icon"
+              />
+            </div>
+          </template>
+        </RecipeCard>
       </div>
     </Section>
 
