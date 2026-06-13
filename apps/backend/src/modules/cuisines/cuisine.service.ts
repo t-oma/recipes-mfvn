@@ -1,11 +1,11 @@
+import type { Paginated } from "@recipes/shared/core";
+import { withPagination } from "@recipes/shared/core";
 import type {
   CreateCuisineInput,
   CuisineDetails,
   CuisineListItem,
   CuisineQuery,
-  Paginated,
-} from "@recipes/shared";
-import { withPagination } from "@recipes/shared";
+} from "@recipes/shared/cuisines";
 import type {
   CachedResult,
   CacheService,

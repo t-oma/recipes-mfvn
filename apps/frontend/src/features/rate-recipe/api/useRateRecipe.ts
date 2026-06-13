@@ -1,4 +1,5 @@
-import type { RecipeDetails, RecipeRatingInput } from "@recipes/shared";
+import type { RecipeRatingInput } from "@recipes/shared/recipe-rating";
+import type { RecipeDetails } from "@recipes/shared/recipes";
 import { useMutation } from "@tanstack/vue-query";
 import { recipeQueryKeys } from "@/entities/recipe";
 import { recalculateRating } from "../lib/recalculateRating";

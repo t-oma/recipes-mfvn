@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReviewsStats } from "@recipes/shared";
+import type { ReviewsStats } from "@recipes/shared/reviews";
 
 const { stats, loading = false } = defineProps<{
   stats?: ReviewsStats;

@@ -1,4 +1,4 @@
-import type { MealType, Minutes, RecipeQuery } from "@recipes/shared";
+import type { MealType, Minutes, RecipeQuery } from "@recipes/shared/recipes";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createObjectId,

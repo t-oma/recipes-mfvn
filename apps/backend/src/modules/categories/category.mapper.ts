@@ -2,8 +2,8 @@ import type {
   CategoryDetails,
   CategoryListItem,
   CategorySummary,
-  Image,
-} from "@recipes/shared";
+} from "@recipes/shared/categories";
+import type { Image } from "@recipes/shared/common";
 
 export type CategorySummaryView = {
   _id: string | { toString(): string };

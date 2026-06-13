@@ -1,4 +1,4 @@
-import type { ReviewDetails } from "@recipes/shared";
+import type { ReviewDetails } from "@recipes/shared/reviews";
 
 export type ReviewView = {
   _id: string | { toString(): string };

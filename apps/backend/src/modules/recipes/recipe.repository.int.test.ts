@@ -1,4 +1,4 @@
-import type { Minutes } from "@recipes/shared";
+import type { Minutes } from "@recipes/shared/recipes";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   createDbCategory,

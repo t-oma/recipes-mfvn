@@ -1,4 +1,4 @@
-import type { CategoryQuery } from "@recipes/shared";
+import type { CategoryQuery } from "@recipes/shared/categories";
 import { hashFilters } from "@/common/utils/cache.js";
 
 export const categoryCache = {

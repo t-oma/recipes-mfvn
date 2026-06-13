@@ -1,4 +1,4 @@
-import type { CategoryQuery } from "@recipes/shared";
+import type { CategoryQuery } from "@recipes/shared/categories";
 import { queryOptions } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";

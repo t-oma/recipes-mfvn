@@ -1,11 +1,11 @@
 import {
   commentDetailsSchema,
   commentQuerySchema,
-  favoriteQuerySchema,
-  paginatedSchema,
-  recipeListItemSchema,
-  userDetailsSchema,
-} from "@recipes/shared";
+} from "@recipes/shared/comments";
+import { paginatedSchema } from "@recipes/shared/core";
+import { favoriteQuerySchema } from "@recipes/shared/favorites";
+import { recipeListItemSchema } from "@recipes/shared/recipes";
+import { userDetailsSchema } from "@recipes/shared/users";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {

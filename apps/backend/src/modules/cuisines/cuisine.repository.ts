@@ -1,8 +1,5 @@
-import type {
-  CuisineComputed,
-  CuisineQuery,
-  RequireKeys,
-} from "@recipes/shared";
+import type { RequireKeys } from "@recipes/shared/core";
+import type { CuisineComputed, CuisineQuery } from "@recipes/shared/cuisines";
 import type {
   CreateInput,
   TimestampKeys,

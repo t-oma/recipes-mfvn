@@ -1,4 +1,4 @@
-import type { Merge, RequireKeys } from "@recipes/shared";
+import type { Merge, RequireKeys } from "@recipes/shared/core";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
 import type {

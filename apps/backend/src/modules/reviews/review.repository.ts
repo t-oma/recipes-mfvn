@@ -1,4 +1,5 @@
-import type { RequireKeys, ReviewQuery } from "@recipes/shared";
+import type { RequireKeys } from "@recipes/shared/core";
+import type { ReviewQuery } from "@recipes/shared/reviews";
 import type { QueryFilter } from "mongoose";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";

@@ -1,4 +1,4 @@
-import type { ReviewDetails, ReviewsStats } from "@recipes/shared";
+import type { ReviewDetails, ReviewsStats } from "@recipes/shared/reviews";
 import { http } from "@/shared";
 
 /**

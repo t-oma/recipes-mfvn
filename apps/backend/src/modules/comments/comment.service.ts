@@ -1,9 +1,9 @@
 import type {
   CommentDetails,
   CreateCommentInput,
-  Paginated,
-} from "@recipes/shared";
-import { withPagination } from "@recipes/shared";
+} from "@recipes/shared/comments";
+import type { Paginated } from "@recipes/shared/core";
+import { withPagination } from "@recipes/shared/core";
 import { ForbiddenError, NotFoundError } from "@/common/errors.js";
 import type { TypedEmitter } from "@/common/events.js";
 import type {

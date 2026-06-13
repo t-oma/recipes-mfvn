@@ -1,4 +1,4 @@
-import type { DeepPartialObject, Prettify } from "@recipes/shared";
+import type { DeepPartialObject, Prettify } from "@recipes/shared/core";
 import type {
   HydratedDocument,
   Model,

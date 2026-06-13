@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { recipeRatingInputSchema } from "@recipes/shared";
+import { recipeRatingInputSchema } from "@recipes/shared/recipe-rating";
 import { computed } from "vue";
 import { useRateRecipe } from "../api/useRateRecipe";
 import { useRemoveRecipeRating } from "../api/useRemoveRecipeRating";

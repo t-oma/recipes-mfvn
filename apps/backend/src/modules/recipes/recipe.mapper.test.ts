@@ -1,4 +1,4 @@
-import type { Minutes, RecipeComputed } from "@recipes/shared";
+import type { Minutes, RecipeComputed } from "@recipes/shared/recipes";
 import { describe, expect, it } from "vitest";
 import { createObjectId, createRecipeDoc } from "@/__tests__/helpers.js";
 import {

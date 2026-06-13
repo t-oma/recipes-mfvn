@@ -1,8 +1,8 @@
 import type {
   CategoryComputed,
   CategoryQuery,
-  RequireKeys,
-} from "@recipes/shared";
+} from "@recipes/shared/categories";
+import type { RequireKeys } from "@recipes/shared/core";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
 import type { PaginatedStageResult } from "@/common/utils/stages.js";

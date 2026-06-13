@@ -2,7 +2,7 @@ import {
   authResponseSchema,
   loginInputSchema,
   registerInputSchema,
-} from "@recipes/shared";
+} from "@recipes/shared/auth";
 import type { FastifyPluginAsync, FastifyReply } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";

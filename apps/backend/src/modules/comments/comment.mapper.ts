@@ -1,4 +1,4 @@
-import type { CommentDetails } from "@recipes/shared";
+import type { CommentDetails } from "@recipes/shared/comments";
 import type { RecipeSummaryView } from "@/modules/recipes/recipe.mapper.js";
 import { toRecipeSummary } from "@/modules/recipes/recipe.mapper.js";
 import type { UserSummaryView } from "@/modules/users/user.mapper.js";

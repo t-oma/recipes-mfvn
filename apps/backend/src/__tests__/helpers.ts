@@ -1,4 +1,5 @@
-import type { Minutes, RecipeComputed, UserRole } from "@recipes/shared";
+import type { Minutes, RecipeComputed } from "@recipes/shared/recipes";
+import type { UserRole } from "@recipes/shared/users";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { Types } from "mongoose";
 import type { Mock } from "vitest";

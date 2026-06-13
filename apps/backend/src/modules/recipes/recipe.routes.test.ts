@@ -1,5 +1,5 @@
-import type { Minutes, RecipeDetails } from "@recipes/shared";
-import { buildRecipeRef } from "@recipes/shared";
+import type { Minutes, RecipeDetails } from "@recipes/shared/recipes";
+import { buildRecipeRef } from "@recipes/shared/recipes";
 import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authHeader, createTestApp } from "@/__tests__/build-test-app.js";

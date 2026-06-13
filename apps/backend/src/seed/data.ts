@@ -1,4 +1,4 @@
-import type { Difficulty, MealType } from "@recipes/shared";
+import type { Difficulty, MealType } from "@recipes/shared/recipes";
 
 export interface SeedUser {
   email: string;

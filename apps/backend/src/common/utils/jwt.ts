@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
-import type { Prettify, UserRole } from "@recipes/shared";
+import type { Prettify } from "@recipes/shared/core";
+import type { UserRole } from "@recipes/shared/users";
 import type { JwtPayload as _JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 import type { StringValue } from "ms";

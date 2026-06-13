@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { RecipeIngredient } from "@recipes/shared";
+import type { RecipeIngredient } from "@recipes/shared/recipes";
 
 const {
   ingredients,

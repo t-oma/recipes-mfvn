@@ -1,4 +1,4 @@
-import { getSortObject } from "@recipes/shared";
+import { getSortObject } from "@recipes/shared/query";
 import type {
   AnyExpression,
   BooleanExpression,

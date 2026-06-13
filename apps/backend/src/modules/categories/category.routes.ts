@@ -3,8 +3,8 @@ import {
   categoryListItemSchema,
   categoryQuerySchema,
   createCategoryInputSchema,
-  paginatedSchema,
-} from "@recipes/shared";
+} from "@recipes/shared/categories";
+import { paginatedSchema } from "@recipes/shared/core";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {

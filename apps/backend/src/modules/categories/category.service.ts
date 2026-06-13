@@ -3,9 +3,9 @@ import type {
   CategoryListItem,
   CategoryQuery,
   CreateCategoryInput,
-  Paginated,
-} from "@recipes/shared";
-import { withPagination } from "@recipes/shared";
+} from "@recipes/shared/categories";
+import type { Paginated } from "@recipes/shared/core";
+import { withPagination } from "@recipes/shared/core";
 import type {
   CachedGetResult,
   CacheService,

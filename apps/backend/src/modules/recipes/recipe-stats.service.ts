@@ -1,4 +1,4 @@
-import type { RecipeStats } from "@recipes/shared";
+import type { RecipeStats } from "@recipes/shared/recipes";
 import type { Types } from "mongoose";
 import stages from "@/common/utils/stages.js";
 import type { CommentModelType } from "@/modules/comments/comment.model.js";
