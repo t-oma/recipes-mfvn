@@ -1,8 +1,8 @@
 import type {
   CategoryListItem,
   CategoryQuery,
-  Paginated,
-} from "@recipes/shared";
+} from "@recipes/shared/categories";
+import type { Paginated } from "@recipes/shared/core";
 import { http } from "@/shared";
 
 export function getCategories(filters: Partial<CategoryQuery> = {}) {

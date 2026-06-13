@@ -3,7 +3,7 @@ import type {
   MealType,
   Minutes,
   RecipeStats,
-} from "@recipes/shared";
+} from "@recipes/shared/recipes";
 import type { Types } from "mongoose";
 import { slugify } from "@/common/utils/slug.js";
 import { RefreshSessionModel } from "@/modules/auth/refresh-session.model.js";

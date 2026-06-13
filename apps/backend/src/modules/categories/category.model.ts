@@ -1,4 +1,4 @@
-import type { Image } from "@recipes/shared";
+import type { Image } from "@recipes/shared/common";
 import type { Model } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";

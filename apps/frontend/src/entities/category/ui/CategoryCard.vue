@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CategoryListItem } from "@recipes/shared";
+import type { CategoryListItem } from "@recipes/shared/categories";
 import AppLink from "@/shared/ui/AppLink.vue";
 
 const props = defineProps<{

@@ -2,8 +2,8 @@ import type {
   AuthResponse,
   LoginInput,
   RegisterInput,
-  UserDetails,
-} from "@recipes/shared";
+} from "@recipes/shared/auth";
+import type { UserDetails } from "@recipes/shared/users";
 import { http } from "@/shared";
 
 export function register(body: RegisterInput) {

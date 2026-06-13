@@ -1,9 +1,7 @@
-import type {
-  Paginated,
-  PaginationQuery,
-  RecipeListItem,
-} from "@recipes/shared";
-import { withPagination } from "@recipes/shared";
+import type { Paginated } from "@recipes/shared/core";
+import { withPagination } from "@recipes/shared/core";
+import type { PaginationQuery } from "@recipes/shared/query";
+import type { RecipeListItem } from "@recipes/shared/recipes";
 import type { TypedEmitter } from "@/common/events.js";
 import type {
   DefaultInitiator,

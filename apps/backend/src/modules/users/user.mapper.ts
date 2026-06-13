@@ -1,4 +1,4 @@
-import type { UserDetails, UserSummary } from "@recipes/shared";
+import type { UserDetails, UserSummary } from "@recipes/shared/users";
 
 export type UserSummaryView = {
   _id: string | { toString(): string };

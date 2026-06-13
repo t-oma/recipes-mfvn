@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { categorySummarySchema } from "../categories/category.response.schema.js";
-import { persistenceFieldsSchema } from "../common/persistence.schema.js";
-import { cuisineSummarySchema } from "../cuisines/cuisine.response.schema.js";
-import { userSummarySchema } from "../users/user.response.schema.js";
-import { createRecipeInputSchema } from "./recipe.input.schema.js";
-import { recipeStatsSchema } from "./recipe.schema.js";
+import { categorySummarySchema } from "../categories/category.response.js";
+import { persistenceFieldsSchema } from "../common/persistence.js";
+import { cuisineSummarySchema } from "../cuisines/cuisine.response.js";
+import { userSummarySchema } from "../users/user.response.js";
+import { createRecipeInputSchema } from "./recipe.input.js";
+import { recipeStatsSchema } from "./recipe.stats.js";
 
 export const recipeComputedSchema = z.object({
   isFavorited: z.boolean(),

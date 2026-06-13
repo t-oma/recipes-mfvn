@@ -1,4 +1,4 @@
-import type { RecipeRatingInput } from "@recipes/shared";
+import type { RecipeRatingInput } from "@recipes/shared/recipe-rating";
 import { http } from "@/shared";
 
 export function rateRecipe(ref: string, body: RecipeRatingInput) {

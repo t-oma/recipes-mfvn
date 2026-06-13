@@ -1,10 +1,8 @@
-import type {
-  CommentDetails,
-  Paginated,
-  PaginationQuery,
-  RecipeListItem,
-  UserDetails,
-} from "@recipes/shared";
+import type { CommentDetails } from "@recipes/shared/comments";
+import type { Paginated } from "@recipes/shared/core";
+import type { PaginationQuery } from "@recipes/shared/query";
+import type { RecipeListItem } from "@recipes/shared/recipes";
+import type { UserDetails } from "@recipes/shared/users";
 import { NotFoundError } from "@/common/errors.js";
 import type {
   DefaultInitiator,

@@ -1,4 +1,8 @@
-import type { AuthResponse, LoginInput, RegisterInput } from "@recipes/shared";
+import type {
+  AuthResponse,
+  LoginInput,
+  RegisterInput,
+} from "@recipes/shared/auth";
 import { ConflictError, UnauthorizedError } from "@/common/errors.js";
 import type { Logger } from "@/common/logger.js";
 import type { PasswordService } from "@/common/passwords/password.service.js";

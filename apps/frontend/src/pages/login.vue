@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
-import type { LoginInput } from "@recipes/shared";
-import { loginInputSchema } from "@recipes/shared";
+import type { LoginInput } from "@recipes/shared/auth";
+import { loginInputSchema } from "@recipes/shared/auth";
 import { useToast } from "primevue";
 import { reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { persistenceFieldsSchema } from "../common/persistence.schema.js";
+import { persistenceFieldsSchema } from "../common/persistence.js";
 
 export const userSummarySchema = z
   .object({

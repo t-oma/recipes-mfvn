@@ -1,5 +1,5 @@
 import "dotenv/config";
-import type { Minutes } from "@recipes/shared";
+import type { Minutes } from "@recipes/shared/recipes";
 import { hashSync } from "bcryptjs";
 import { logger } from "@/common/logger.js";
 import { toObjectId } from "@/common/utils/mongo.js";

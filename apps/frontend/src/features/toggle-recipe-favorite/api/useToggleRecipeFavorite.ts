@@ -1,4 +1,5 @@
-import type { Paginated, RecipeDetails, RecipeListItem } from "@recipes/shared";
+import type { Paginated } from "@recipes/shared/core";
+import type { RecipeDetails, RecipeListItem } from "@recipes/shared/recipes";
 import { useMutation } from "@tanstack/vue-query";
 import { recipeQueryKeys } from "@/entities/recipe";
 import { favoriteRecipe, unfavoriteRecipe } from "./favorites.api";

@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import { paginationQuerySchema } from "../query.js";
+import { paginationQuerySchema } from "../query/index.js";
 
 export const favoriteQuerySchema = paginationQuerySchema;
 

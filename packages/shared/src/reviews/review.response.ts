@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { persistenceFieldsSchema } from "../common/persistence.schema.js";
-import { userSummarySchema } from "../users/user.response.schema.js";
-import { createReviewInputSchema } from "./review.input.schema.js";
+import { persistenceFieldsSchema } from "../common/persistence.js";
+import { userSummarySchema } from "../users/user.response.js";
+import { createReviewInputSchema } from "./review.input.js";
 
 export const reviewsStatsSchema = z.object({
   totalReviews: z.number().int().nonnegative(),

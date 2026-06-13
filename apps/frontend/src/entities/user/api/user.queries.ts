@@ -1,4 +1,5 @@
-import type { CommentQuery, FavoriteQuery } from "@recipes/shared";
+import type { CommentQuery } from "@recipes/shared/comments";
+import type { FavoriteQuery } from "@recipes/shared/favorites";
 import { queryOptions } from "@tanstack/vue-query";
 import type { MaybeRef } from "vue";
 import { toValue } from "vue";

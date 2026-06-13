@@ -1,4 +1,4 @@
-import type { RecipeRatingInput } from "@recipes/shared";
+import type { RecipeRatingInput } from "@recipes/shared/recipe-rating";
 import { NotFoundError } from "@/common/errors.js";
 import type { TypedEmitter } from "@/common/events.js";
 import type {

@@ -1,10 +1,7 @@
-import type {
-  CommentDetails,
-  CommentQuery,
-  FavoriteQuery,
-  Paginated,
-  RecipeListItem,
-} from "@recipes/shared";
+import type { CommentDetails, CommentQuery } from "@recipes/shared/comments";
+import type { Paginated } from "@recipes/shared/core";
+import type { FavoriteQuery } from "@recipes/shared/favorites";
+import type { RecipeListItem } from "@recipes/shared/recipes";
 import { http } from "@/shared";
 
 /**

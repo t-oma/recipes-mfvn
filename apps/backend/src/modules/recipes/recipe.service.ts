@@ -1,12 +1,12 @@
+import type { Paginated } from "@recipes/shared/core";
+import { withPagination } from "@recipes/shared/core";
 import type {
   CreateRecipeInput,
-  Paginated,
   RecipeDetails,
   RecipeListItem,
   RecipeQuery,
   UpdateRecipeInput,
-} from "@recipes/shared";
-import { withPagination } from "@recipes/shared";
+} from "@recipes/shared/recipes";
 import type { EmptyObject } from "@/common/base.repository.js";
 import type {
   CachedResult,

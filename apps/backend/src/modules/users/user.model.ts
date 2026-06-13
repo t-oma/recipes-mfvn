@@ -1,4 +1,4 @@
-import type { UserRole } from "@recipes/shared";
+import type { UserRole } from "@recipes/shared/users";
 import type { Model } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";

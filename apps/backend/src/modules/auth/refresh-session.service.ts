@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { UserDetails } from "@recipes/shared";
+import type { UserDetails } from "@recipes/shared/users";
 import { AppError, UnauthorizedError } from "@/common/errors.js";
 import {
   generateOpaqueToken,

@@ -1,11 +1,11 @@
+import type { Paginated } from "@recipes/shared/core";
 import type {
   CreateRecipeInput,
-  Paginated,
   RecipeDetails,
   RecipeListItem,
   RecipeQuery,
   UpdateRecipeInput,
-} from "@recipes/shared";
+} from "@recipes/shared/recipes";
 import { http } from "@/shared";
 
 /**

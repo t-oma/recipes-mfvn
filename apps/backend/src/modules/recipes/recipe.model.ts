@@ -1,13 +1,12 @@
+import type { Image } from "@recipes/shared/common";
+import type { Merge, RequireKeys } from "@recipes/shared/core";
 import type {
   Difficulty,
-  Image,
   MealType,
-  Merge,
   Minutes,
   RecipeStats,
-  RequireKeys,
-} from "@recipes/shared";
-import { MEAL_TYPES } from "@recipes/shared";
+} from "@recipes/shared/recipes";
+import { MEAL_TYPES } from "@recipes/shared/recipes";
 import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";

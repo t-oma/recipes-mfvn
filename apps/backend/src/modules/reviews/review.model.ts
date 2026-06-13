@@ -1,4 +1,4 @@
-import type { Merge } from "@recipes/shared";
+import type { Merge } from "@recipes/shared/core";
 import type { Model, Types } from "mongoose";
 import { model, Schema } from "mongoose";
 import type { BaseDocument } from "@/common/types/mongoose.js";

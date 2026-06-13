@@ -1,4 +1,4 @@
-import { recipeRatingInputSchema } from "@recipes/shared";
+import { recipeRatingInputSchema } from "@recipes/shared/recipe-rating";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";

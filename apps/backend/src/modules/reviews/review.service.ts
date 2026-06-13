@@ -1,12 +1,12 @@
+import type { Paginated } from "@recipes/shared/core";
+import { withPagination } from "@recipes/shared/core";
 import type {
   CreateReviewInput,
-  Paginated,
   ReviewDetails,
   ReviewQuery,
   ReviewsStats,
   UpdateReviewInput,
-} from "@recipes/shared";
-import { withPagination } from "@recipes/shared";
+} from "@recipes/shared/reviews";
 import type { EmptyObject } from "@/common/base.repository.js";
 import type {
   CachedGetResult,

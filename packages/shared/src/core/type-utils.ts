@@ -45,7 +45,3 @@ export type DeepPartialObject<T> = {
     ? DeepPartialObject<T[P]>
     : T[P];
 };
-
-export function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

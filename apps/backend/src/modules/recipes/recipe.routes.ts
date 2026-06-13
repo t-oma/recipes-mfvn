@@ -2,13 +2,15 @@ import {
   commentDetailsSchema,
   commentQuerySchema,
   createCommentInputSchema,
+} from "@recipes/shared/comments";
+import { paginatedSchema } from "@recipes/shared/core";
+import {
   createRecipeInputSchema,
-  paginatedSchema,
   recipeDetailsSchema,
   recipeListItemSchema,
   recipeQuerySchema,
   updateRecipeInputSchema,
-} from "@recipes/shared";
+} from "@recipes/shared/recipes";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { isObjectIdOrHexString } from "mongoose";

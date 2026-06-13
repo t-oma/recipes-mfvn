@@ -1,4 +1,4 @@
-import { withPagination } from "@recipes/shared";
+import { withPagination } from "@recipes/shared/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCuisineDoc,

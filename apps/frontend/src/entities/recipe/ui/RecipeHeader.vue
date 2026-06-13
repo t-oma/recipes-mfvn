@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { RecipeDetails } from "@recipes/shared";
+import type { RecipeDetails } from "@recipes/shared/recipes";
 import AppLink from "@/shared/ui/AppLink.vue";
 import { formatRecipeDate } from "../lib/format";
 

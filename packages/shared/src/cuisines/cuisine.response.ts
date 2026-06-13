@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { imageSchema } from "../common/image.schema.js";
-import { persistenceFieldsSchema } from "../common/persistence.schema.js";
-import { createCuisineInputSchema } from "./cuisine.input.schema.js";
+import { imageSchema } from "../common/image.js";
+import { persistenceFieldsSchema } from "../common/persistence.js";
+import { createCuisineInputSchema } from "./cuisine.input.js";
 
 export const cuisineComputedSchema = z.object({
   recipeCount: z.number().int().nonnegative(),

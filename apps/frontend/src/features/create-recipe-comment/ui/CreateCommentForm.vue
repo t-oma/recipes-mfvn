@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
-import type { CreateCommentInput } from "@recipes/shared";
-import { createCommentInputSchema, MAX_COMMENT_LENGTH } from "@recipes/shared";
+import type { CreateCommentInput } from "@recipes/shared/comments";
+import {
+  createCommentInputSchema,
+  MAX_COMMENT_LENGTH,
+} from "@recipes/shared/comments";
 import { reactive } from "vue";
 import { useCreateRecipeComment } from "../api/useCreateRecipeComment";
 

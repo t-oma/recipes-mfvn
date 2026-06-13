@@ -1,4 +1,5 @@
-import type { Prettify, UserRole } from "@recipes/shared";
+import type { Prettify } from "@recipes/shared/core";
+import type { UserRole } from "@recipes/shared/users";
 
 export type DefaultQuery = { page: number; limit: number };
 export type DefaultInitiator = { readonly id: string; readonly role: UserRole };

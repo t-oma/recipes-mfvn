@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { imageSchema } from "../common/image.schema.js";
+import { imageSchema } from "../common/image.js";
 
 export const createCuisineInputSchema = z.object({
   name: z.string().trim().min(1).max(100),

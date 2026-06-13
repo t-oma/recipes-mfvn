@@ -10,6 +10,54 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js"
+    },
+    "./categories": {
+      "types": "./dist/categories/index.d.ts",
+      "import": "./dist/categories/index.js"
+    },
+    "./comments": {
+      "types": "./dist/comments/index.d.ts",
+      "import": "./dist/comments/index.js"
+    },
+    "./common": {
+      "types": "./dist/common/index.d.ts",
+      "import": "./dist/common/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./cuisines": {
+      "types": "./dist/cuisines/index.d.ts",
+      "import": "./dist/cuisines/index.js"
+    },
+    "./favorites": {
+      "types": "./dist/favorites/index.d.ts",
+      "import": "./dist/favorites/index.js"
+    },
+    "./query": {
+      "types": "./dist/query/index.d.ts",
+      "import": "./dist/query/index.js"
+    },
+    "./recipe-rating": {
+      "types": "./dist/recipe-rating/index.d.ts",
+      "import": "./dist/recipe-rating/index.js"
+    },
+    "./recipes": {
+      "types": "./dist/recipes/index.d.ts",
+      "import": "./dist/recipes/index.js"
+    },
+    "./reviews": {
+      "types": "./dist/reviews/index.d.ts",
+      "import": "./dist/reviews/index.js"
+    },
+    "./users": {
+      "types": "./dist/users/index.d.ts",
+      "import": "./dist/users/index.js"
     }
   },
   "files": [

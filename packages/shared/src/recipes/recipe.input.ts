@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { imageSchema } from "../common/image.schema.js";
-import { recipeIngredientSchema } from "./ingredient.schema.js";
+import { imageSchema } from "../common/image.js";
+import { recipeIngredientSchema } from "./ingredient.js";
 import {
   difficultySchema,
   mealTypeSchema,
   minutesSchema,
-} from "./recipe.primitives.schema.js";
+} from "./recipe.primitives.js";
 
 export const createRecipeInputSchema = z.object({
   title: z.string().trim().min(3).max(200),

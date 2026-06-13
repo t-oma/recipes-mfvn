@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { RecipeListItem } from "@recipes/shared";
-import { buildRecipeRef } from "@recipes/shared";
+import type { RecipeListItem } from "@recipes/shared/recipes";
+import { buildRecipeRef } from "@recipes/shared/recipes";
 import AppLink from "@/shared/ui/AppLink.vue";
 
 type Props = {

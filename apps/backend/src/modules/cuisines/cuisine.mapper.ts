@@ -1,9 +1,9 @@
+import type { Image } from "@recipes/shared/common";
 import type {
   CuisineDetails,
   CuisineListItem,
   CuisineSummary,
-  Image,
-} from "@recipes/shared";
+} from "@recipes/shared/cuisines";
 
 export type CuisineSummaryView = {
   _id: string | { toString(): string };

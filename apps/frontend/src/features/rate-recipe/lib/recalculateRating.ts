@@ -1,4 +1,4 @@
-import type { RecipeDetails } from "@recipes/shared";
+import type { RecipeDetails } from "@recipes/shared/recipes";
 
 export function recalculateRating(
   old: Pick<RecipeDetails, "stats" | "userRating">,

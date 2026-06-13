@@ -2,8 +2,8 @@ import type {
   CommentDetails,
   CommentQuery,
   CreateCommentInput,
-  Paginated,
-} from "@recipes/shared";
+} from "@recipes/shared/comments";
+import type { Paginated } from "@recipes/shared/core";
 import { http } from "@/shared";
 
 /**

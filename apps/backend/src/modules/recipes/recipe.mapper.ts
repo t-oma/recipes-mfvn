@@ -1,13 +1,13 @@
+import type { Image } from "@recipes/shared/common";
 import type {
   Difficulty,
-  Image,
   MealType,
   Minutes,
   RecipeDetails,
   RecipeListItem,
   RecipeStats,
   RecipeSummary,
-} from "@recipes/shared";
+} from "@recipes/shared/recipes";
 import type { CategorySummaryView } from "@/modules/categories/category.mapper.js";
 import { toCategorySummary } from "@/modules/categories/category.mapper.js";
 import type { CuisineSummaryView } from "@/modules/cuisines/cuisine.mapper.js";

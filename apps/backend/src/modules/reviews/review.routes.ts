@@ -1,11 +1,11 @@
+import { paginatedSchema } from "@recipes/shared/core";
 import {
   createReviewInputSchema,
-  paginatedSchema,
   reviewDetailsSchema,
   reviewQuerySchema,
   reviewsStatsSchema,
   updateReviewInputSchema,
-} from "@recipes/shared";
+} from "@recipes/shared/reviews";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";

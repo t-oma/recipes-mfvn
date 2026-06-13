@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createSortSchema, paginationQuerySchema } from "../query.js";
+import { createSortSchema, paginationQuerySchema } from "../query/index.js";
 
 export const cuisineQuerySchema = z
   .object({

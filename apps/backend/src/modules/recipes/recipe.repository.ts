@@ -1,4 +1,5 @@
-import type { RecipeComputed, RecipeQuery, RequireKeys } from "@recipes/shared";
+import type { RequireKeys } from "@recipes/shared/core";
+import type { RecipeComputed, RecipeQuery } from "@recipes/shared/recipes";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
 import type {

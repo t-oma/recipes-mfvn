@@ -1,10 +1,10 @@
+import { paginatedSchema } from "@recipes/shared/core";
 import {
   createCuisineInputSchema,
   cuisineDetailsSchema,
   cuisineListItemSchema,
   cuisineQuerySchema,
-  paginatedSchema,
-} from "@recipes/shared";
+} from "@recipes/shared/cuisines";
 import type { FastifyPluginAsync } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";

@@ -1,4 +1,4 @@
-import type { CreateCommentInput } from "@recipes/shared";
+import type { CreateCommentInput } from "@recipes/shared/comments";
 import { useMutation } from "@tanstack/vue-query";
 import {
   createRecipeComment,

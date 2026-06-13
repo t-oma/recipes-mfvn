@@ -1,4 +1,4 @@
-import type { RequireKeys } from "@recipes/shared";
+import type { RequireKeys } from "@recipes/shared/core";
 import type { Types } from "mongoose";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";

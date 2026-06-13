@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CommentDetails } from "@recipes/shared";
+import type { CommentDetails } from "@recipes/shared/comments";
 
 const props = defineProps<{
   comment: Omit<CommentDetails, "recipe">;
