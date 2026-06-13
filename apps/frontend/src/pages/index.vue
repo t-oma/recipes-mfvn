@@ -23,7 +23,7 @@ const {
   isLoading: isCategoriesLoading,
   error: categoriesError,
 } = useQuery(
-  categoryListOptions({ sort: "-recipeCount", limit: CATEGORIES_LIMIT }),
+  categoryListOptions({ sort: "recipeCount", order: "desc", limit: CATEGORIES_LIMIT }),
 );
 
 const { data: testimonials, isLoading: isTestimonialsLoading } = useQuery(
@@ -36,7 +36,7 @@ const {
   isLoading: isPopularRecipesLoading,
   error: popularRecipesError,
 } = useQuery(
-  recipeListOptions({ sort: "-popularity", limit: POPULAR_RECIPES_LIMIT }),
+  recipeListOptions({ sort: "popularity", order: "desc", limit: POPULAR_RECIPES_LIMIT }),
 );
 
 const authStore = useAuthStore();

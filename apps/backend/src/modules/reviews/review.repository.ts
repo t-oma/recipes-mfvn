@@ -40,7 +40,7 @@ export class ReviewRepository extends BaseRepository<
       stages.match<ReviewDocument>({ isFeatured: true }),
       stages.unset<ReviewDocument>("__v"),
       withAuthor(),
-      stages.sort("-createdAt"),
+      stages.sort({ sort: "createdAt", order: "desc" }),
       stages.limit(limit),
     ].flat();
 
@@ -64,7 +64,7 @@ export class ReviewRepository extends BaseRepository<
       stages.unset<ReviewDocument>("__v"),
       withAuthor(),
       stages.paginated({
-        sort: query.sort,
+        sort: { sort: query.sort, order: query.order },
         page: query.page,
         limit: query.limit,
       }),

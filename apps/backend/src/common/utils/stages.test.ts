@@ -56,8 +56,10 @@ describe("paginate", () => {
 });
 
 describe("sort", () => {
-  it("should create a sort stage from a string", () => {
-    expect(sort("-createdAt")).toEqual({ $sort: { createdAt: -1 } });
+  it("should create a sort stage from sort options", () => {
+    expect(sort({ sort: "createdAt", order: "desc" })).toEqual({
+      $sort: { createdAt: -1 },
+    });
   });
 
   it("should create a sort stage from an object", () => {
@@ -180,7 +182,11 @@ describe("cond", () => {
 describe("paginated", () => {
   it("should create facet + project stages with sort and pagination", () => {
     const [facet, projectStage] = paginated(
-      { sort: "-createdAt", page: 2, limit: 10 },
+      {
+        sort: { sort: "createdAt", order: "desc" },
+        page: 2,
+        limit: 10,
+      },
       match({ isPublic: true }),
     );
 

@@ -1,9 +1,10 @@
 import { z } from "zod";
-import { createSortSchema, paginationQuerySchema } from "../query/index.js";
+import { paginationQuerySchema, sortOrderSchema } from "../query/index.js";
 
 export const categoryQuerySchema = z
   .object({
-    sort: createSortSchema(["name", "recipeCount"]).default("name"),
+    sort: z.enum(["name", "recipeCount"]).default("name"),
+    order: sortOrderSchema.default("asc"),
   })
   .extend(paginationQuerySchema.shape);
 

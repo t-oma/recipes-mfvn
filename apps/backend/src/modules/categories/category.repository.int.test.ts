@@ -22,6 +22,7 @@ describe("CategoryRepository", () => {
 
       const [items, total] = await repository.findMany({
         sort: "name",
+        order: "asc",
         page: 1,
         limit: 10,
       });
@@ -39,6 +40,7 @@ describe("CategoryRepository", () => {
     it("should return empty result when no categories exist", async () => {
       const [items, total] = await repository.findMany({
         sort: "name",
+        order: "asc",
         page: 1,
         limit: 10,
       });
@@ -54,6 +56,7 @@ describe("CategoryRepository", () => {
 
       const [items, total] = await repository.findMany({
         sort: "name",
+        order: "asc",
         page: 2,
         limit: 1,
       });
@@ -70,6 +73,7 @@ describe("CategoryRepository", () => {
 
       const [items] = await repository.findMany({
         sort: "name",
+        order: "asc",
         page: 1,
         limit: 10,
       });
@@ -83,7 +87,8 @@ describe("CategoryRepository", () => {
       await createDbCategory({ name: "Mango" });
 
       const [items] = await repository.findMany({
-        sort: "-name",
+        sort: "name",
+        order: "desc",
         page: 1,
         limit: 10,
       });

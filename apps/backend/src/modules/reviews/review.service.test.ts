@@ -191,7 +191,7 @@ describe("reviewService", () => {
       mockReviewRepository.findAll.mockResolvedValue([[review], 1]);
 
       const result = await service.findAll({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
         initiator: initiator(),
       });
 

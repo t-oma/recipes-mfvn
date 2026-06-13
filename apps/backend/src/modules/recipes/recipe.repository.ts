@@ -90,6 +90,7 @@ export class RecipeRepository extends BaseRepository<
       page,
       limit,
       sort,
+      order,
       isFavorited,
       search,
       categoryId,
@@ -100,10 +101,7 @@ export class RecipeRepository extends BaseRepository<
       maxCookingTime,
     } = query;
 
-    const sortWithPopularityReplaced = sort.replace(
-      "popularity",
-      "stats.popularity",
-    );
+    const sortField = sort === "popularity" ? "stats.popularity" : sort;
 
     const pipeline = [
       stages.match<RecipeDocument>({
@@ -125,7 +123,7 @@ export class RecipeRepository extends BaseRepository<
 
       stages.paginated(
         {
-          sort: sortWithPopularityReplaced,
+          sort: { sort: sortField, order },
           page,
           limit,
         },

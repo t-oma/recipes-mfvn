@@ -54,7 +54,7 @@ export class CommentRepository extends BaseRepository<
       withAuthor(),
       withRecipe(initiator),
       stages.paginated({
-        sort: "-createdAt",
+        sort: { sort: "createdAt", order: "desc" },
         page: query.page,
         limit: query.limit,
       }),
@@ -80,7 +80,7 @@ export class CommentRepository extends BaseRepository<
       withAuthor(),
       withRecipe(initiator),
       stages.paginated({
-        sort: "-createdAt",
+        sort: { sort: "createdAt", order: "desc" },
         page: query.page,
         limit: query.limit,
       }),

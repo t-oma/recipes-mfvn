@@ -9,6 +9,7 @@ export const recipeCache = {
         category: filters.category,
         difficulty: filters.difficulty,
         sort: filters.sort,
+        order: filters.order,
         minCookingTime: filters.minCookingTime,
         maxCookingTime: filters.maxCookingTime,
       })}`,

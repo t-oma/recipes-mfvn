@@ -62,7 +62,12 @@ describe("cuisineService", () => {
       ];
       mockCuisineRepository.findMany.mockResolvedValue([docs, 2]);
 
-      const query = { sort: "name" as const, page: 1, limit: 10 };
+      const query = {
+        sort: "name" as const,
+        order: "asc" as const,
+        page: 1,
+        limit: 10,
+      };
       const result = await service.findAll({
         query,
         initiator: noInitiator(),
@@ -85,7 +90,12 @@ describe("cuisineService", () => {
     it("should return empty paginated result when no cuisines exist", async () => {
       mockCuisineRepository.findMany.mockResolvedValue([[], 0]);
 
-      const query = { sort: "name" as const, page: 1, limit: 10 };
+      const query = {
+        sort: "name" as const,
+        order: "asc" as const,
+        page: 1,
+        limit: 10,
+      };
       const result = await service.findAll({
         query,
         initiator: noInitiator(),
@@ -105,7 +115,12 @@ describe("cuisineService", () => {
       ];
       mockCuisineRepository.findMany.mockResolvedValue([docs, 1]);
 
-      const query = { sort: "name" as const, page: 1, limit: 10 };
+      const query = {
+        sort: "name" as const,
+        order: "asc" as const,
+        page: 1,
+        limit: 10,
+      };
       await service.findAll({
         query,
         initiator: noInitiator(),

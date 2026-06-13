@@ -6,6 +6,7 @@ export const categoryCache = {
     list: (filters: CategoryQuery) =>
       `list:${hashFilters({
         sort: filters.sort,
+        order: filters.order,
         page: filters.page,
         limit: filters.limit,
       })}`,
