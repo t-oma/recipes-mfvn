@@ -1,2 +1,2 @@
-export * from "./image.schema.js";
-export * from "./persistence.schema.js";
+export * from "./image.js";
+export * from "./persistence.js";

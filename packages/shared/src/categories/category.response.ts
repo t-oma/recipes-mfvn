@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { persistenceFieldsSchema } from "../common/persistence.schema.js";
-import { createCategoryInputSchema } from "./category.input.schema.js";
+import { persistenceFieldsSchema } from "../common/persistence.js";
+import { createCategoryInputSchema } from "./category.input.js";
 
 export const categoryComputedSchema = z.object({
   recipeCount: z.number().int().nonnegative(),

@@ -1,3 +1,3 @@
-export * from "./review.input.schema.js";
-export * from "./review.query.schema.js";
-export * from "./review.response.schema.js";
+export * from "./review.input.js";
+export * from "./review.query.js";
+export * from "./review.response.js";

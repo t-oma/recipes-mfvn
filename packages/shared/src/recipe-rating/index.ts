@@ -1,1 +1,1 @@
-export * from "./recipe-rating.input.schema.js";
+export * from "./recipe-rating.input.js";

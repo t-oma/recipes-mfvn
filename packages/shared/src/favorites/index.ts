@@ -1,1 +1,1 @@
-export * from "./favorite.query.schema.js";
+export * from "./favorite.query.js";

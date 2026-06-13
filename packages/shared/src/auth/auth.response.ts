@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { userDetailsSchema } from "../users/user.response.schema.js";
+import { userDetailsSchema } from "../users/user.response.js";
 
 export const authResponseSchema = z.object({
   user: userDetailsSchema,

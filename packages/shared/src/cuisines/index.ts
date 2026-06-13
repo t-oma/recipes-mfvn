@@ -1,3 +1,3 @@
-export * from "./cuisine.input.schema.js";
-export * from "./cuisine.query.schema.js";
-export * from "./cuisine.response.schema.js";
+export * from "./cuisine.input.js";
+export * from "./cuisine.query.js";
+export * from "./cuisine.response.js";

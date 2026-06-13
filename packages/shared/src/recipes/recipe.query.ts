@@ -8,7 +8,7 @@ import {
   difficultySchema,
   mealTypeSchema,
   minutesSchema,
-} from "./recipe.primitives.schema.js";
+} from "./recipe.primitives.js";
 
 export const recipeQuerySchema = z
   .object({
