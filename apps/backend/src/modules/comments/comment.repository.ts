@@ -1,3 +1,4 @@
+import type { CommentQuery } from "@recipes/shared/comments";
 import type { Merge, RequireKeys } from "@recipes/shared/core";
 import type { CreateInput, UpdateInput } from "@/common/base.repository.js";
 import { BaseRepository } from "@/common/base.repository.js";
@@ -44,7 +45,7 @@ export class CommentRepository extends BaseRepository<
 > {
   async findByRecipe(
     recipeId: string,
-    { query, initiator }: QueryMethodParams,
+    { query, initiator }: QueryMethodParams<CommentQuery>,
   ): Promise<[CommentDocumentPopulated[], number]> {
     const pipeline = [
       stages.match<CommentDocument>({
@@ -54,7 +55,7 @@ export class CommentRepository extends BaseRepository<
       withAuthor(),
       withRecipe(initiator),
       stages.paginated({
-        sort: "-createdAt",
+        sort: { sort: query.sort, order: query.order },
         page: query.page,
         limit: query.limit,
       }),
@@ -70,7 +71,7 @@ export class CommentRepository extends BaseRepository<
 
   async findByAuthor(
     authorId: string,
-    { query, initiator }: QueryMethodParams,
+    { query, initiator }: QueryMethodParams<CommentQuery>,
   ): Promise<[CommentDocumentPopulated[], number]> {
     const pipeline = [
       stages.match<CommentDocument>({
@@ -80,7 +81,7 @@ export class CommentRepository extends BaseRepository<
       withAuthor(),
       withRecipe(initiator),
       stages.paginated({
-        sort: "-createdAt",
+        sort: { sort: query.sort, order: query.order },
         page: query.page,
         limit: query.limit,
       }),

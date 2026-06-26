@@ -1,18 +1,29 @@
+import type { CommentQuery } from "@recipes/shared/comments";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCommentDoc,
   createObjectId,
   initiator,
-  queryParams,
 } from "@/__tests__/helpers.js";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "@/common/errors.js";
+import type { QueryMethodParams } from "@/common/types/methods.js";
 import { createCommentService } from "@/modules/comments/comment.service.js";
 
 describe("commentService", () => {
+  const commentQueryParams = (): QueryMethodParams<CommentQuery> => ({
+    query: {
+      page: 1,
+      limit: 10,
+      sort: "createdAt",
+      order: "desc",
+    },
+    initiator: initiator(),
+  });
+
   const mockCommentRepository = {
     findByRecipe: vi.fn(),
     findByAuthor: vi.fn(),
@@ -63,7 +74,7 @@ describe("commentService", () => {
 
       const result = await service.findByRecipe(
         recipeId.toString(),
-        queryParams(),
+        commentQueryParams(),
       );
 
       expect(result.items).toHaveLength(1);
@@ -73,7 +84,7 @@ describe("commentService", () => {
 
     it("should throw BadRequestError for invalid recipe ID", async () => {
       await expect(
-        service.findByRecipe("invalid-id", queryParams()),
+        service.findByRecipe("invalid-id", commentQueryParams()),
       ).rejects.toThrow(BadRequestError);
     });
 
@@ -81,7 +92,7 @@ describe("commentService", () => {
       mockRecipeRepository.exists.mockResolvedValue(null);
 
       await expect(
-        service.findByRecipe(createObjectId().toString(), queryParams()),
+        service.findByRecipe(createObjectId().toString(), commentQueryParams()),
       ).rejects.toThrow(NotFoundError);
     });
 
@@ -91,7 +102,7 @@ describe("commentService", () => {
 
       const result = await service.findByRecipe(
         createObjectId().toString(),
-        queryParams(),
+        commentQueryParams(),
       );
 
       expect(result.items).toEqual([]);
@@ -117,7 +128,7 @@ describe("commentService", () => {
 
       const result = await service.findByAuthor(
         authorId.toString(),
-        queryParams(),
+        commentQueryParams(),
       );
 
       expect(result.items).toHaveLength(1);
@@ -126,7 +137,7 @@ describe("commentService", () => {
 
     it("should throw BadRequestError for invalid author ID", async () => {
       await expect(
-        service.findByAuthor("invalid-id", queryParams()),
+        service.findByAuthor("invalid-id", commentQueryParams()),
       ).rejects.toThrow(BadRequestError);
     });
   });

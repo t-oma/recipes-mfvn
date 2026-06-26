@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createObjectId,
   createUserDoc,
+  initiator,
   queryParams,
 } from "@/__tests__/helpers.js";
 import { NotFoundError } from "@/common/errors.js";
@@ -94,10 +95,15 @@ describe("userService", () => {
       };
       mockCommentService.findByAuthor.mockResolvedValue(expected);
 
-      const result = await service.getComments(
-        createObjectId().toString(),
-        queryParams(),
-      );
+      const result = await service.getComments(createObjectId().toString(), {
+        query: {
+          page: 1,
+          limit: 10,
+          sort: "createdAt",
+          order: "desc",
+        },
+        initiator: initiator(),
+      });
 
       expect(mockCommentService.findByAuthor).toHaveBeenCalled();
       expect(result).toBe(expected);

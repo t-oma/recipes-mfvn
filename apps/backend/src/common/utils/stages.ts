@@ -1,3 +1,4 @@
+import type { SortOrder } from "@recipes/shared/query";
 import { getSortObject } from "@recipes/shared/query";
 import type {
   AnyExpression,
@@ -60,14 +61,28 @@ export function paginate(
   return [{ $skip: (page - 1) * limit }, { $limit: limit }];
 }
 
-export type SortStage = string | Record<string, 1 | -1>;
-export function sort(sort: SortStage = { createdAt: -1 }): PipelineStage.Sort {
-  if (typeof sort === "string") {
-    return { $sort: getSortObject(sort) };
+export type SortOptions = {
+  sort: string;
+  order: SortOrder;
+};
+export type SortStage = SortOptions | Record<string, 1 | -1>;
+
+function isSortOptions(sortStage: SortStage): sortStage is SortOptions {
+  return (
+    typeof sortStage.sort === "string" &&
+    (sortStage.order === "asc" || sortStage.order === "desc")
+  );
+}
+
+export function sort(
+  sortStage: SortStage = { sort: "createdAt", order: "desc" },
+): PipelineStage.Sort {
+  if (isSortOptions(sortStage)) {
+    return { $sort: getSortObject(sortStage) };
   }
 
   return {
-    $sort: sort,
+    $sort: sortStage,
   };
 }
 

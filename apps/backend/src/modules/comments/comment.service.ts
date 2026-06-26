@@ -1,5 +1,6 @@
 import type {
   CommentDetails,
+  CommentQuery,
   CreateCommentInput,
 } from "@recipes/shared/comments";
 import type { Paginated } from "@recipes/shared/core";
@@ -20,11 +21,11 @@ import type { CommentRepository } from "./comment.repository.js";
 export interface CommentService {
   findByRecipe(
     recipeId: string,
-    params: QueryMethodParams,
+    params: QueryMethodParams<CommentQuery>,
   ): Promise<Paginated<CommentDetails>>;
   findByAuthor(
     authorId: string,
-    params: QueryMethodParams,
+    params: QueryMethodParams<CommentQuery>,
   ): Promise<Paginated<CommentDetails>>;
   create(
     recipeId: string,

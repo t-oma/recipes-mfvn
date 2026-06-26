@@ -1,9 +1,10 @@
 import { z } from "zod";
-import { createSortSchema, paginationQuerySchema } from "../query/index.js";
+import { paginationQuerySchema, sortOrderSchema } from "../query/index.js";
 
 export const reviewQuerySchema = z
   .object({
-    sort: createSortSchema(["createdAt", "rating"]).default("-createdAt"),
+    sort: z.enum(["createdAt", "rating"]).default("createdAt"),
+    order: sortOrderSchema.default("desc"),
     isFeatured: z.coerce.boolean().optional(),
   })
   .extend(paginationQuerySchema.shape);

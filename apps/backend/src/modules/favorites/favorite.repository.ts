@@ -51,7 +51,7 @@ export class FavoriteRepository extends BaseRepository<
       stages.unset<FavoriteDocument>("__v", "user"),
       withRecipe(initiator),
       stages.paginated({
-        sort: "-createdAt",
+        sort: { sort: "createdAt", order: "desc" },
         page: query.page,
         limit: query.limit,
       }),

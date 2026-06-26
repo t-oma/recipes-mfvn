@@ -1,8 +1,8 @@
 import { z } from "zod";
 import {
-  createSortSchema,
   paginationQuerySchema,
   searchQuerySchema,
+  sortOrderSchema,
 } from "../query/index.js";
 import {
   difficultySchema,
@@ -12,9 +12,10 @@ import {
 
 export const recipeQuerySchema = z
   .object({
-    sort: createSortSchema(["createdAt", "cookingTime", "popularity"]).default(
-      "-createdAt",
-    ),
+    sort: z
+      .enum(["createdAt", "cookingTime", "popularity"])
+      .default("createdAt"),
+    order: sortOrderSchema.default("desc"),
     category: z.string().trim().optional(),
     cuisine: z.string().trim().optional(),
     difficulty: difficultySchema.optional(),

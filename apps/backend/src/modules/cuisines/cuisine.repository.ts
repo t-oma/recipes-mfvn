@@ -42,7 +42,7 @@ export class CuisineRepository extends BaseRepository<
       stages.project({ recipes: 0 }),
       stages.paginated(
         {
-          sort: query.sort,
+          sort: { sort: query.sort, order: query.order },
           page: query.page,
           limit: query.limit,
         },

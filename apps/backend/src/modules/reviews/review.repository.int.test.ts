@@ -75,7 +75,7 @@ describe("ReviewRepository", () => {
       await createDbReview({ author: user2._id, text: "Second", rating: 4 });
 
       const [reviews, total] = await repository.findAll({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
         initiator: { id: undefined, role: undefined },
       });
 
@@ -92,7 +92,13 @@ describe("ReviewRepository", () => {
       await createDbReview({ author: user2._id, isFeatured: false });
 
       const [reviews, total] = await repository.findAll({
-        query: { page: 1, limit: 10, sort: "-createdAt", isFeatured: true },
+        query: {
+          page: 1,
+          limit: 10,
+          sort: "createdAt",
+          order: "desc",
+          isFeatured: true,
+        },
         initiator: { id: undefined, role: undefined },
       });
 
@@ -109,7 +115,7 @@ describe("ReviewRepository", () => {
       await createDbReview({ author: user2._id, text: "Second" });
 
       const [reviews, total] = await repository.findAll({
-        query: { page: 2, limit: 1, sort: "-createdAt" },
+        query: { page: 2, limit: 1, sort: "createdAt", order: "desc" },
         initiator: { id: undefined, role: undefined },
       });
 

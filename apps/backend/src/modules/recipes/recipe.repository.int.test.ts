@@ -32,7 +32,7 @@ describe("RecipeRepository", () => {
       });
 
       const [recipes, total] = await repository.aggregateSearch({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
         initiator: { id: undefined, role: undefined },
       });
 
@@ -56,7 +56,7 @@ describe("RecipeRepository", () => {
       });
 
       const [recipes, total] = await repository.aggregateSearch({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
         initiator: { id: undefined, role: undefined },
       });
 
@@ -75,7 +75,7 @@ describe("RecipeRepository", () => {
       });
 
       const [recipes, total] = await repository.aggregateSearch({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
         initiator: {
           id: author._id.toString(),
           role: "user",
@@ -97,7 +97,7 @@ describe("RecipeRepository", () => {
       });
 
       const [, total] = await repository.aggregateSearch({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
         initiator: {
           id: admin._id.toString(),
           role: "admin",
@@ -128,7 +128,8 @@ describe("RecipeRepository", () => {
         query: {
           page: 1,
           limit: 10,
-          sort: "-createdAt",
+          sort: "createdAt",
+          order: "desc",
           categoryId: catA._id.toString(),
         },
         initiator: { id: undefined, role: undefined },
@@ -158,7 +159,8 @@ describe("RecipeRepository", () => {
         query: {
           page: 1,
           limit: 10,
-          sort: "-createdAt",
+          sort: "createdAt",
+          order: "desc",
           difficulty: "hard",
         },
         initiator: { id: undefined, role: undefined },
@@ -183,7 +185,8 @@ describe("RecipeRepository", () => {
         query: {
           page: 1,
           limit: 10,
-          sort: "-createdAt",
+          sort: "createdAt",
+          order: "desc",
           isFavorited: true,
         },
         initiator: {
@@ -218,7 +221,8 @@ describe("RecipeRepository", () => {
         query: {
           page: 1,
           limit: 10,
-          sort: "-createdAt",
+          sort: "createdAt",
+          order: "desc",
           minCookingTime: 15 as Minutes,
         },
         initiator: noInitiator(),
@@ -250,7 +254,8 @@ describe("RecipeRepository", () => {
         query: {
           page: 1,
           limit: 10,
-          sort: "-createdAt",
+          sort: "createdAt",
+          order: "desc",
           maxCookingTime: 15 as Minutes,
         },
         initiator: noInitiator(),
@@ -289,7 +294,8 @@ describe("RecipeRepository", () => {
         query: {
           page: 1,
           limit: 10,
-          sort: "-createdAt",
+          sort: "createdAt",
+          order: "desc",
           minCookingTime: 15 as Minutes,
           maxCookingTime: 25 as Minutes,
         },
@@ -352,7 +358,8 @@ describe("RecipeRepository", () => {
           query: {
             page: 1,
             limit: 10,
-            sort: "-createdAt",
+            sort: "createdAt",
+            order: "desc",
             mealType,
           },
           initiator: noInitiator(),
@@ -394,7 +401,8 @@ describe("RecipeRepository", () => {
         query: {
           page: 1,
           limit: 10,
-          sort: "-createdAt",
+          sort: "createdAt",
+          order: "desc",
           cuisineId: italian._id.toString(),
         },
         initiator: noInitiator(),
@@ -418,7 +426,7 @@ describe("RecipeRepository", () => {
       });
 
       const [recipes] = await repository.aggregateSearch({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
         initiator: noInitiator(),
       });
 
@@ -457,7 +465,7 @@ describe("RecipeRepository", () => {
       });
 
       const [recipes] = await repository.aggregateSearch({
-        query: { page: 1, limit: 10, sort: "-createdAt" },
+        query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
         initiator: {
           id: user._id.toString(),
           role: "user",
@@ -486,7 +494,7 @@ describe("RecipeRepository", () => {
       });
 
       const [recipes, total] = await repository.aggregateSearch({
-        query: { page: 2, limit: 1, sort: "-createdAt" },
+        query: { page: 2, limit: 1, sort: "createdAt", order: "desc" },
         initiator: { id: undefined, role: undefined },
       });
 
@@ -541,7 +549,7 @@ describe("RecipeRepository", () => {
       });
 
       const [recipes] = await repository.aggregateSearch({
-        query: { page: 1, limit: 10, sort: "-popularity" },
+        query: { page: 1, limit: 10, sort: "popularity", order: "desc" },
         initiator: noInitiator(),
       });
 
@@ -598,7 +606,7 @@ describe("RecipeRepository", () => {
       });
 
       const [recipes] = await repository.aggregateSearch({
-        query: { page: 1, limit: 10, sort: "popularity" },
+        query: { page: 1, limit: 10, sort: "popularity", order: "asc" },
         initiator: noInitiator(),
       });
 

@@ -88,7 +88,8 @@ describe("recipeService", () => {
       const query = {
         page: 1,
         limit: 10,
-        sort: "-createdAt",
+        sort: "createdAt",
+        order: "desc",
       } satisfies RecipeQuery;
       const result = await service.findAll({
         query,
@@ -112,7 +113,8 @@ describe("recipeService", () => {
       const query = {
         page: 1,
         limit: 10,
-        sort: "-createdAt",
+        sort: "createdAt",
+        order: "desc",
       } satisfies RecipeQuery;
       const result = await service.findAll({
         query,
@@ -128,7 +130,8 @@ describe("recipeService", () => {
       const query = {
         page: 1,
         limit: 10,
-        sort: "-createdAt",
+        sort: "createdAt",
+        order: "desc",
         isFavorited: true,
       } satisfies RecipeQuery;
       const result = await service.findAll({
@@ -162,7 +165,8 @@ describe("recipeService", () => {
       const query = {
         page: 1,
         limit: 10,
-        sort: "-createdAt",
+        sort: "createdAt",
+        order: "desc",
       } satisfies RecipeQuery;
       const result = await service.findAll({
         query,
@@ -181,7 +185,8 @@ describe("recipeService", () => {
       const query = {
         page: 1,
         limit: 10,
-        sort: "-createdAt",
+        sort: "createdAt",
+        order: "desc",
       } satisfies RecipeQuery;
       const result = await service.findAll({
         query,
