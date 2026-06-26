@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { as, width = "7xl" } = defineProps<{
+const { as = "div", width = "7xl" } = defineProps<{
   as?: string;
   width?: "7xl";
 }>();
@@ -12,19 +12,10 @@ const widthClasses = {
 <template>
   <!-- Container -->
   <component
-    v-if="as"
     :is="as"
     class="relative mx-auto px-6 lg:px-8"
     :class="widthClasses[width]"
   >
     <slot />
   </component>
-
-  <div
-    v-else
-    class="relative mx-auto px-6 lg:px-8"
-    :class="widthClasses[width]"
-  >
-    <slot />
-  </div>
 </template>
