@@ -28,7 +28,7 @@ describe("CommentRepository", () => {
       const [comments, total] = await repository.findByRecipe(
         recipe._id.toString(),
         {
-          query: { page: 1, limit: 10 },
+          query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
           initiator: noInitiator(),
         },
       );
@@ -55,7 +55,7 @@ describe("CommentRepository", () => {
       const [comments, total] = await repository.findByRecipe(
         recipe._id.toString(),
         {
-          query: { page: 1, limit: 10 },
+          query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
           initiator: noInitiator(),
         },
       );
@@ -79,7 +79,7 @@ describe("CommentRepository", () => {
       const [comments, total] = await repository.findByRecipe(
         recipe._id.toString(),
         {
-          query: { page: 1, limit: 10 },
+          query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
           initiator: {
             id: author._id.toString(),
             role: "user",
@@ -107,7 +107,7 @@ describe("CommentRepository", () => {
       const [comments, total] = await repository.findByRecipe(
         recipe._id.toString(),
         {
-          query: { page: 1, limit: 10 },
+          query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
           initiator: {
             id: admin._id.toString(),
             role: "admin",
@@ -140,7 +140,7 @@ describe("CommentRepository", () => {
       const [comments, total] = await repository.findByRecipe(
         recipe._id.toString(),
         {
-          query: { page: 2, limit: 1 },
+          query: { page: 2, limit: 1, sort: "createdAt", order: "desc" },
           initiator: noInitiator(),
         },
       );
@@ -164,7 +164,7 @@ describe("CommentRepository", () => {
       const [comments, total] = await repository.findByAuthor(
         author._id.toString(),
         {
-          query: { page: 1, limit: 10 },
+          query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
           initiator: noInitiator(),
         },
       );
@@ -192,7 +192,7 @@ describe("CommentRepository", () => {
       const [comments, total] = await repository.findByAuthor(
         author._id.toString(),
         {
-          query: { page: 1, limit: 10 },
+          query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
           initiator: noInitiator(),
         },
       );
@@ -217,7 +217,7 @@ describe("CommentRepository", () => {
       const [comments, total] = await repository.findByAuthor(
         author._id.toString(),
         {
-          query: { page: 1, limit: 10 },
+          query: { page: 1, limit: 10, sort: "createdAt", order: "desc" },
           initiator: {
             id: author._id.toString(),
             role: "user",

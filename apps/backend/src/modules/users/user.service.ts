@@ -1,4 +1,4 @@
-import type { CommentDetails } from "@recipes/shared/comments";
+import type { CommentDetails, CommentQuery } from "@recipes/shared/comments";
 import type { Paginated } from "@recipes/shared/core";
 import type { PaginationQuery } from "@recipes/shared/query";
 import type { RecipeListItem } from "@recipes/shared/recipes";
@@ -21,7 +21,7 @@ export interface UserService {
   ): Promise<Paginated<RecipeListItem>>;
   getComments(
     userId: string,
-    params: QueryMethodParams<PaginationQuery, DefaultInitiator>,
+    params: QueryMethodParams<CommentQuery, DefaultInitiator>,
   ): Promise<Paginated<CommentDetails>>;
 }
 

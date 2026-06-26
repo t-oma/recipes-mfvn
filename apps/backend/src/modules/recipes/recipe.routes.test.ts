@@ -109,7 +109,7 @@ describe("recipeRoutes", () => {
         value: paginatedResult,
         cache: {
           status: "miss",
-          key: "recipes:list:page=1:limit=10:sort=-createdAt",
+          key: "recipes:list:page=1:limit=10:sort=createdAt:order=desc",
           ttl: 120,
         },
       });
